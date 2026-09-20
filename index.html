@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ting Product Logos — Bộ Nhận Diện Thương Hiệu Ting Ecosystem</title>
+  <style>
+    :root {
+      --bg-page: #0D0F14;
+      --bg-card: #151821;
+      --bg-card-hover: #1A1F2C;
+      --border-card: #252B3B;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --font-mono: "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      padding: 40px 24px 60px 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    header.showcase-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      background: rgba(57, 217, 208, 0.12);
+      border: 1px solid rgba(57, 217, 208, 0.3);
+      color: #39D9D0;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1.title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 720px;
+      margin: 0 auto 20px auto;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: #3B82F6;
+      transform: translateY(-1px);
+    }
+
+    /* 4-Column Grid */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      margin-bottom: 48px;
+    }
+
+    .brand-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .brand-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-card.update:hover { border-color: #168ACB; }
+    .brand-card.server:hover { border-color: #FF4A41; }
+    .brand-card.launcher:hover { border-color: #E41865; }
+    .brand-card.admin:hover { border-color: #00B96B; }
+    .brand-card.menu:hover { border-color: #1CA6E6; }
+
+    /* Logo Canvas Preview */
+    .logo-canvas {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.3) 100%);
+      border-bottom: 1px solid var(--border-card);
+      padding: 24px;
+    }
+
+    .brand-card.update .logo-canvas {
+      background: radial-gradient(circle at center, rgba(22, 138, 203, 0.12) 0%, rgba(13, 15, 20, 0.6) 80%);
+    }
+    .brand-card.server .logo-canvas {
+      background: radial-gradient(circle at center, rgba(255, 74, 65, 0.12) 0%, rgba(13, 15, 20, 0.6) 80%);
+    }
+    .brand-card.launcher .logo-canvas {
+      background: radial-gradient(circle at center, rgba(228, 24, 101, 0.12) 0%, rgba(13, 15, 20, 0.6) 80%);
+    }
+    .brand-card.admin .logo-canvas {
+      background: radial-gradient(circle at center, rgba(0, 185, 107, 0.12) 0%, rgba(13, 15, 20, 0.6) 80%);
+    }
+    .brand-card.menu .logo-canvas {
+      background: radial-gradient(circle at center, rgba(28, 166, 230, 0.18) 0%, rgba(0, 16, 53, 0.65) 80%);
+    }
+
+    .logo-canvas img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-card:hover .logo-canvas img {
+      transform: scale(1.08);
+    }
+
+    .card-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-meta {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .product-name {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .product-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .brand-card.update .product-tag { background: rgba(57, 217, 208, 0.15); color: #39D9D0; }
+    .brand-card.server .product-tag { background: rgba(255, 74, 65, 0.15); color: #FF7B42; }
+    .brand-card.launcher .product-tag { background: rgba(228, 24, 101, 0.15); color: #FFA3CE; }
+    .brand-card.admin .product-tag { background: rgba(0, 185, 107, 0.15); color: #00F5A0; }
+    .brand-card.menu .product-tag { background: rgba(28, 166, 230, 0.15); color: #1CA6E6; }
+
+    .product-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 16px;
+      min-height: 54px;
+    }
+
+    /* Color Swatches Table */
+    .palette-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+    }
+
+    .palette-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 6px;
+    }
+
+    .palette-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .palette-label {
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    .swatch-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .swatch-code {
+      font-family: var(--font-mono);
+      color: var(--text-main);
+      font-size: 10.5px;
+    }
+
+    /* File action button */
+    .file-link-box {
+      margin-top: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    .file-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-card);
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .file-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #FFF;
+    }
+
+    /* Micro Preview Sizes */
+    .scale-test-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+
+    .scale-test-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .scale-grid {
+      display: flex;
+      align-items: flex-end;
+      gap: 32px;
+      flex-wrap: wrap;
+      padding: 16px 0;
+    }
+
+    .scale-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .scale-item-label {
+      font-size: 10.5px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    .scale-row-logos {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .scale-row-logos img {
+      object-fit: contain;
+    }
+
+    footer.showcase-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border-card);
+      padding-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header class="showcase-header">
+      <div class="badge-pill">Ting Ecosystem Design System</div>
+      <h1 class="title">Bộ Nhận Diện Logo Sản Phẩm Ting</h1>
+      <p class="subtitle">Bộ nhận diện 5 sản phẩm Ting. Ting Menu dùng trực tiếp logo vàng 3D và palette UI từ source <code>Ting Menu.svg</code>.</p>
+      
+      <div class="nav-links">
+        <a href="ting-menu-demo/index.html" class="nav-btn">🎯 Demo Ting Menu</a>
+        <a href="ting-admin-demo/index.html" class="nav-btn">🖥️ Demo Ting Admin</a>
+        <a href="ting-launcher-demo/index.html" class="nav-btn">🎮 Demo Ting Launcher</a>
+        <a href="ting-server-demo/index.html" class="nav-btn">⚡ Demo Ting Server</a>
+        <a href="ting-update-demo/index.html" class="nav-btn">🔄 Demo Ting Update</a>
+      </div>
+    </header>
+
+    <!-- 4 PRODUCTS LOGO GRID -->
+    <div class="grid-4">
+
+      <!-- 1. TING UPDATE -->
+      <div class="brand-card update">
+        <div class="logo-canvas">
+          <img src="logo.svg" alt="Ting Update Logo">
+        </div>
+        <div class="card-body">
+          <div class="product-meta">
+            <span class="product-name">Ting Update</span>
+            <span class="product-tag">Client Daemon</span>
+          </div>
+          <p class="product-desc">Ứng dụng cập nhật game nền tảng BitTorrent P2P cục bộ, đồng bộ kho game tốc độ cao với giao diện Slint Fluent UI.</p>
+          
+          <div class="palette-box">
+            <div class="palette-row">
+              <span class="palette-label">Gradient</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#39D9D0;"></span>
+                <span class="swatch-dot" style="background:#168ACB;"></span>
+                <span class="swatch-dot" style="background:#4449BB;"></span>
+                <span class="swatch-code">#39D9D0 → #4449BB</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Stroke</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#81ECE4;"></span>
+                <span class="swatch-code">#81ECE4 (2px)</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Shadow</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#0B3158;"></span>
+                <span class="swatch-code">#0B3158 (70%)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="file-link-box">
+            <a href="logo.svg" target="_blank" class="file-btn">📥 Xem SVG</a>
+            <a href="ting-update-demo/index.html" class="file-btn">🚀 Mở Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. TING SERVER -->
+      <div class="brand-card server">
+        <div class="logo-canvas">
+          <img src="logo-server.svg" alt="Ting Server Logo">
+        </div>
+        <div class="card-body">
+          <div class="product-meta">
+            <span class="product-name">Ting Server</span>
+            <span class="product-tag">Seed Master</span>
+          </div>
+          <p class="product-desc">Máy chủ trung tâm phát hành và cấp phát dữ liệu P2P, quản lý file torrent, BLAKE3 manifest và chia sẻ kho game.</p>
+          
+          <div class="palette-box">
+            <div class="palette-row">
+              <span class="palette-label">Gradient</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#FF7B42;"></span>
+                <span class="swatch-dot" style="background:#FF4A41;"></span>
+                <span class="swatch-dot" style="background:#A81A10;"></span>
+                <span class="swatch-code">#FF7B42 → #A81A10</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Stroke</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#FDBA74;"></span>
+                <span class="swatch-code">#FDBA74 (2px)</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Shadow</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#450A0A;"></span>
+                <span class="swatch-code">#450A0A (75%)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="file-link-box">
+            <a href="logo-server.svg" target="_blank" class="file-btn">📥 Xem SVG</a>
+            <a href="ting-server-demo/index.html" class="file-btn">🚀 Mở Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. TING LAUNCHER -->
+      <div class="brand-card launcher">
+        <div class="logo-canvas">
+          <img src="logo-launcher.svg" alt="Ting Launcher Logo">
+        </div>
+        <div class="card-body">
+          <div class="product-meta">
+            <span class="product-name">Ting Launcher</span>
+            <span class="product-tag">Gaming Kiosk</span>
+          </div>
+          <p class="product-desc">Cổng trò chơi và kiosk dành cho game thủ phòng net: chọn game, order đồ ăn, nạp thẻ cào, thời gian chơi và cảnh báo 180 phút.</p>
+          
+          <div class="palette-box">
+            <div class="palette-row">
+              <span class="palette-label">Gradient</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#FFCC05;"></span>
+                <span class="swatch-dot" style="background:#E41865;"></span>
+                <span class="swatch-dot" style="background:#721980;"></span>
+                <span class="swatch-code">#FFCC05 → #721980</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Stroke</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#FFA3CE;"></span>
+                <span class="swatch-code">#FFA3CE (2px)</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Shadow</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#2D0533;"></span>
+                <span class="swatch-code">#2D0533 (75%)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="file-link-box">
+            <a href="logo-launcher.svg" target="_blank" class="file-btn">📥 Xem SVG</a>
+            <a href="ting-launcher-demo/index.html" class="file-btn">🚀 Mở Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. TING ADMIN -->
+      <div class="brand-card admin">
+        <div class="logo-canvas">
+          <img src="logo-admin.svg" alt="Ting Admin Logo">
+        </div>
+        <div class="card-body">
+          <div class="product-meta">
+            <span class="product-name">Ting Admin</span>
+            <span class="product-tag">POS & Management</span>
+          </div>
+          <p class="product-desc">Phần mềm quản lý phòng máy cybercafe, sơ đồ ma trận 48 máy trạm, máy tính tiền POS, màn hình bếp KDS và báo cáo hóa đơn điện tử.</p>
+          
+          <div class="palette-box">
+            <div class="palette-row">
+              <span class="palette-label">Gradient</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#00F5A0;"></span>
+                <span class="swatch-dot" style="background:#00B96B;"></span>
+                <span class="swatch-dot" style="background:#064E3B;"></span>
+                <span class="swatch-code">#00F5A0 → #064E3B</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Stroke</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#6EE7B7;"></span>
+                <span class="swatch-code">#6EE7B7 (2px)</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Shadow</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#022C22;"></span>
+                <span class="swatch-code">#022C22 (75%)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="file-link-box">
+            <a href="logo-admin.svg" target="_blank" class="file-btn">📥 Xem SVG</a>
+            <a href="ting-admin-demo/index.html" class="file-btn">🚀 Mở Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. TING MENU -->
+      <div class="brand-card menu">
+        <div class="logo-canvas">
+          <img src="logo-menu.svg" alt="Ting Menu Logo">
+        </div>
+        <div class="card-body">
+          <div class="product-meta">
+            <span class="product-name">Ting Menu</span>
+            <span class="product-tag">Client Game Menu</span>
+          </div>
+          <p class="product-desc">Menu game máy trạm phòng net, hiển thị danh mục từ Ting Update và mở game trực tiếp từ ổ Game Bootrom.</p>
+          
+          <div class="palette-box">
+            <div class="palette-row">
+              <span class="palette-label">Background</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#0B1024;"></span>
+                <span class="swatch-code">#0B1024</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Panel</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#101A33;"></span>
+                <span class="swatch-code">#101A33</span>
+              </div>
+            </div>
+            <div class="palette-row">
+              <span class="palette-label">Accent</span>
+              <div class="swatch-group">
+                <span class="swatch-dot" style="background:#1CA6E6;"></span>
+                <span class="swatch-code">#1CA6E6</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="file-link-box">
+            <a href="logo-menu.svg" target="_blank" class="file-btn">📥 Xem SVG</a>
+            <a href="ting-menu-demo/icon.png" target="_blank" class="file-btn">📥 Xem PNG</a>
+            <a href="ting-menu-demo/index.html" class="file-btn">🚀 Mở Demo</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SCALE READABILITY TEST -->
+    <div class="scale-test-container">
+      <div class="scale-test-title">
+        <span>🔍 Kiểm Tra Độ Rõ Nét Đa Kích Thước (Multi-Scale Icon Fidelity)</span>
+        <span style="font-size: 12px; color: var(--text-dim); font-weight: 400;">16px • 24px • 32px • 48px • 64px • 96px</span>
+      </div>
+
+      <div class="scale-grid">
+        <div class="scale-item">
+          <div class="scale-row-logos">
+            <img src="logo.svg" style="width: 16px; height: 16px;" alt="16px">
+            <img src="logo-server.svg" style="width: 16px; height: 16px;" alt="16px">
+            <img src="logo-launcher.svg" style="width: 16px; height: 16px;" alt="16px">
+            <img src="logo-admin.svg" style="width: 16px; height: 16px;" alt="16px">
+            <img src="logo-menu.svg" style="width: 16px; height: 16px;" alt="16px">
+          </div>
+          <span class="scale-item-label">16×16 Titlebar</span>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-row-logos">
+            <img src="logo.svg" style="width: 24px; height: 24px;" alt="24px">
+            <img src="logo-server.svg" style="width: 24px; height: 24px;" alt="24px">
+            <img src="logo-launcher.svg" style="width: 24px; height: 24px;" alt="24px">
+            <img src="logo-admin.svg" style="width: 24px; height: 24px;" alt="24px">
+            <img src="logo-menu.svg" style="width: 24px; height: 24px;" alt="24px">
+          </div>
+          <span class="scale-item-label">24×24 Sidebar</span>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-row-logos">
+            <img src="logo.svg" style="width: 32px; height: 32px;" alt="32px">
+            <img src="logo-server.svg" style="width: 32px; height: 32px;" alt="32px">
+            <img src="logo-launcher.svg" style="width: 32px; height: 32px;" alt="32px">
+            <img src="logo-admin.svg" style="width: 32px; height: 32px;" alt="32px">
+            <img src="logo-menu.svg" style="width: 32px; height: 32px;" alt="32px">
+          </div>
+          <span class="scale-item-label">32×32 Taskbar</span>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-row-logos">
+            <img src="logo.svg" style="width: 48px; height: 48px;" alt="48px">
+            <img src="logo-server.svg" style="width: 48px; height: 48px;" alt="48px">
+            <img src="logo-launcher.svg" style="width: 48px; height: 48px;" alt="48px">
+            <img src="logo-admin.svg" style="width: 48px; height: 48px;" alt="48px">
+            <img src="logo-menu.svg" style="width: 48px; height: 48px;" alt="48px">
+          </div>
+          <span class="scale-item-label">48×48 Desktop</span>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-row-logos">
+            <img src="logo.svg" style="width: 64px; height: 64px;" alt="64px">
+            <img src="logo-server.svg" style="width: 64px; height: 64px;" alt="64px">
+            <img src="logo-launcher.svg" style="width: 64px; height: 64px;" alt="64px">
+            <img src="logo-admin.svg" style="width: 64px; height: 64px;" alt="64px">
+            <img src="logo-menu.svg" style="width: 64px; height: 64px;" alt="64px">
+          </div>
+          <span class="scale-item-label">64×64 Start Menu</span>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-row-logos">
+            <img src="logo.svg" style="width: 96px; height: 96px;" alt="96px">
+            <img src="logo-server.svg" style="width: 96px; height: 96px;" alt="96px">
+            <img src="logo-launcher.svg" style="width: 96px; height: 96px;" alt="96px">
+            <img src="logo-admin.svg" style="width: 96px; height: 96px;" alt="96px">
+            <img src="logo-menu.svg" style="width: 96px; height: 96px;" alt="96px">
+          </div>
+          <span class="scale-item-label">96×96 Splash Screen</span>
+        </div>
+      </div>
+    </div>
+
+    <footer class="showcase-footer">
+      <p>Hệ thống nhận diện thương hiệu Ting • Bản quyền thuộc TingJSC © 2026</p>
+    </footer>
+  </div>
+
+</body>
+</html>

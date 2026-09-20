@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 559" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Ting Menu</title>
+  <desc id="desc">Biểu tượng hình học Ting Gaming Menu gradient vàng kim hổ phách 3D.</desc>
+  <defs>
+    <linearGradient id="color-menu" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#FFE066"/>
+      <stop offset=".45" stop-color="#FFB700"/>
+      <stop offset="1" stop-color="#D97706"/>
+    </linearGradient>
+    <filter id="depth-menu" x="-8%" y="-8%" width="116%" height="120%">
+      <feDropShadow dx="0" dy="9" stdDeviation="1" flood-color="#4A2600" flood-opacity=".75"/>
+    </filter>
+  </defs>
+  <g fill="url(#color-menu)" stroke="#FFF3C4" stroke-width="2" stroke-linejoin="round" filter="url(#depth-menu)">
+    <path d="M74 122 256 20 499 157 499 226 256 87 134 156 74 126Z"/>
+    <path d="M50 135 134 184 372 184 499 252 291 252 291 442 216 399 216 252 116 252 9 194 9 158Z"/>
+    <path d="M312 276 499 381 499 437 470 453 312 363Z"/>
+    <path d="M9 308 285 467 381 416 447 454 285 544 9 384Z"/>
+  </g>
+</svg>

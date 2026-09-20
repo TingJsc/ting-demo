@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ting Menu - Client Game Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM - NEXT-GEN CYBER GAMING (100% FULLSCREEN)
+       ============================================================ */
+    :root {
+      --bg-base: #06090F;
+      --bg-surface: #0B101C;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-card-hover: rgba(22, 36, 66, 0.85);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-border-hover: rgba(0, 242, 254, 0.45);
+      
+      --cyan-neon: #00F2FE;
+      --cyan-glow: rgba(0, 242, 254, 0.25);
+      --blue-accent: #0284C7;
+      --gold-neon: #FBBF24;
+      --gold-dark: #D97706;
+      --gold-glow: rgba(251, 191, 36, 0.3);
+      
+      --status-ready: #10B981;
+      --status-ready-glow: rgba(16, 185, 129, 0.4);
+      --status-updating: #38BDF8;
+      --status-updating-glow: rgba(56, 189, 248, 0.4);
+      --status-reboot: #F59E0B;
+      --status-reboot-glow: rgba(245, 158, 11, 0.45);
+      --status-waiting: #64748B;
+      
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #475569;
+      
+      --font-display: "Rajdhani", sans-serif;
+      --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Gaming Lighting Backdrop */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle 800px at 15% 10%, rgba(0, 242, 254, 0.08), transparent 70%),
+        radial-gradient(circle 900px at 85% 15%, rgba(217, 119, 6, 0.07), transparent 70%),
+        radial-gradient(circle 1000px at 50% 90%, rgba(14, 165, 233, 0.06), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Subtle Cyber Grid Overlay */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================================
+       APPLICATION WRAPPER (FULLSCREEN FLEX LAYOUT)
+       ============================================================ */
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    /* ============================================================
+       1. TOP HEADER (GLASSMORPHIC CYBER BAR)
+       ============================================================ */
+    .cyber-header {
+      height: 72px;
+      min-height: 72px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(11, 16, 28, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      z-index: 100;
+    }
+
+    /* Brand Logo & Name */
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+
+    .brand-logo-container {
+      position: relative;
+      width: 44px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-logo-glow {
+      position: absolute;
+      inset: -4px;
+      background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+      filter: blur(6px);
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    .brand-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: relative;
+      filter: drop-shadow(0 4px 10px rgba(251, 191, 36, 0.4));
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-section:hover .brand-logo {
+      transform: scale(1.1) rotate(-3deg);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #FFF;
+      text-transform: uppercase;
+      line-height: 1;
+      background: linear-gradient(135deg, #FFF 40%, var(--gold-neon) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--cyan-neon);
+      text-transform: uppercase;
+      margin-top: 2px;
+      opacity: 0.85;
+    }
+
+    /* Capsule Search Container */
+    .search-container {
+      flex: 1;
+      max-width: 620px;
+      margin: 0 28px;
+      position: relative;
+    }
+
+    .search-capsule {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--glass-border);
+      border-radius: 22px;
+      padding: 0 6px 0 16px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s ease;
+    }
+
+    .search-capsule:focus-within {
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 16px var(--cyan-glow), inset 0 2px 8px rgba(0, 0, 0, 0.6);
+      background: rgba(18, 28, 52, 0.95);
+    }
+
+    .search-select {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      padding-right: 12px;
+      transition: color 0.2s ease;
+    }
+
+    .search-select:hover, .search-select:focus {
+      color: var(--cyan-neon);
+    }
+
+    .search-select option {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      padding: 8px;
+    }
+
+    .search-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 0 12px;
+    }
+
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-dim);
+      font-size: 12px;
+    }
+
+    .search-kbd {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin-right: 8px;
+    }
+
+    .search-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan-neon), var(--blue-accent));
+      border: none;
+      color: #040914;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px var(--cyan-glow);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .search-btn:hover {
+      transform: scale(1.08);
+      filter: brightness(1.2);
+    }
+
+    .search-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+
+    /* Top Right Controls & Station Info */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Cyber Station Badge (Màu hồng cánh sen - Lotus Pink / Magenta) */
+    .station-badge {
+      display: flex;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.15), rgba(236, 72, 153, 0.22));
+      border: 1px solid rgba(244, 63, 94, 0.45);
+      border-radius: 8px;
+      padding: 6px 14px;
+      gap: 10px;
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.2);
+    }
+
+    .station-ping {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      color: #FDA4AF;
+    }
+
+    .ping-dot {
+      width: 7px;
+      height: 7px;
+      background: #F43F5E;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #F43F5E;
+      animation: pulseDot 2s infinite;
+    }
+
+    .station-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #FFF;
+      border-left: 1px solid rgba(244, 63, 94, 0.35);
+      padding-left: 10px;
+      text-shadow: 0 0 8px rgba(244, 63, 94, 0.5);
+    }
+
+    /* F&B Quick Action Button */
+    .fnb-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 16px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.25));
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 8px;
+      color: var(--gold-neon);
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 12px rgba(245, 158, 11, 0.15);
+    }
+
+    .fnb-btn:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.45));
+      border-color: var(--gold-neon);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* Minimalist Frameless Window Controls */
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding-left: 16px;
+    }
+
+    .win-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .win-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #FFF;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ============================================================
+       2. MAIN BODY (SIDEBAR RAIL + GAME ARENA)
+       ============================================================ */
+    .cyber-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Sidebar Navigation Rail */
+    .cyber-sidebar {
+      width: 260px;
+      min-width: 260px;
+      background: rgba(11, 16, 28, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-right: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 14px;
+      z-index: 10;
+    }
+
+    .sidebar-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-heading {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 0 12px 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 46px;
+      padding: 0 14px;
+      border-radius: 10px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.08);
+      transform: translateX(3px);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(0, 242, 254, 0.14), rgba(2, 132, 199, 0.04));
+      border-color: rgba(0, 242, 254, 0.35);
+      color: #FFF;
+      box-shadow: inset 3px 0 0 var(--cyan-neon), 0 4px 16px rgba(0, 242, 254, 0.08);
+    }
+
+    .nav-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .nav-item.active .nav-icon {
+      opacity: 1;
+      filter: drop-shadow(0 0 8px var(--cyan-neon));
+    }
+
+    .nav-count {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-dim);
+    }
+
+    .nav-item.active .nav-count {
+      background: rgba(0, 242, 254, 0.15);
+      color: var(--cyan-neon);
+    }
+
+    /* Sidebar Disk & Network Widget */
+    .sidebar-widget {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .widget-title {
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .widget-val {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--cyan-neon);
+    }
+
+    .cyber-progress-bg {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cyber-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan-neon), var(--blue-accent));
+      border-radius: 3px;
+      box-shadow: 0 0 10px var(--cyan-neon);
+      transition: width 0.4s ease;
+    }
+
+    .widget-footer {
+      font-size: 10px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* ============================================================
+       GAME ARENA (HERO CAROUSEL + MATRIX GRID)
+       ============================================================ */
+    .game-arena {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 24px 32px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Custom Sleek Scrollbar */
+    .game-arena::-webkit-scrollbar {
+      width: 6px;
+    }
+    .game-arena::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .game-arena::-webkit-scrollbar-thumb {
+      background: rgba(0, 242, 254, 0.25);
+      border-radius: 3px;
+    }
+    .game-arena::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan-neon);
+    }
+
+    /* ============================================================
+       KHUNG TRÊN: MAIN GAME GRID & KHUNG DƯỚI: FEATURED STRIP
+       ============================================================ */
+    .catalog-section {
+      background: rgba(11, 16, 28, 0.55);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 16px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .featured-section {
+      background: rgba(11, 16, 28, 0.55);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 16px 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #FFF;
+    }
+
+    .section-title-icon {
+      font-size: 16px;
+      filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6));
+    }
+
+    .section-count {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    /* Featured Posters Row (Hàng 9 thẻ poster vát góc) */
+    .featured-strip {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    @media (max-width: 1440px) {
+      .featured-strip {
+        grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+      }
+    }
+
+    .poster-card {
+      position: relative;
+      aspect-ratio: 3/4.2;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      clip-path: polygon(0 14px, 100% 0, 100% 100%, 0 100%);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .poster-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      border-color: var(--cyan-neon);
+      box-shadow: 0 14px 28px rgba(0, 242, 254, 0.22), 0 0 15px rgba(0, 242, 254, 0.15);
+      clip-path: polygon(0 14px, 100% 0, 100% 100%, 0 100%);
+      z-index: 5;
+    }
+
+    .poster-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .poster-card:hover .poster-img {
+      transform: scale(1.1);
+    }
+
+    .poster-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(6, 9, 15, 0.95) 0%, rgba(6, 9, 15, 0.2) 60%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 12px 10px;
+    }
+
+    .poster-badge {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #EF4444, #B91C1C);
+      color: #FFF;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+    }
+
+    .poster-badge.update {
+      background: linear-gradient(135deg, #38BDF8, #0284C7);
+      box-shadow: 0 2px 8px rgba(56, 189, 248, 0.4);
+    }
+
+    .poster-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFF;
+      line-height: 1.2;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      margin-bottom: 2px;
+    }
+
+    .poster-meta {
+      font-size: 10px;
+      color: var(--cyan-neon);
+      font-weight: 500;
+    }
+
+    .poster-play-hover {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+    }
+
+    .poster-card:hover .poster-play-hover {
+      opacity: 1;
+    }
+
+    .play-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--cyan-neon), var(--blue-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #040914;
+      box-shadow: 0 0 20px var(--cyan-neon);
+      transform: scale(0.8);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .poster-card:hover .play-circle {
+      transform: scale(1);
+    }
+
+    /* Main Game Grid (Khung viền bo góc 4 hàng × 12 cột, thanh cuộn mượt màu xanh đậm) */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    @media (max-width: 1550px) {
+      .games-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      }
+    }
+
+    /* Thanh cuộn mượt màu xanh đậm bên phải */
+    .games-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+    .games-grid::-webkit-scrollbar-track {
+      background: rgba(11, 16, 28, 0.4);
+      border-radius: 3px;
+    }
+    .games-grid::-webkit-scrollbar-thumb {
+      background: #0284C7; /* Xanh đậm mượt mà */
+      border-radius: 3px;
+    }
+    .games-grid::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan-neon);
+    }
+
+    .game-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 10px 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--glass-border-hover);
+      transform: translateY(-6px) scale(1.04);
+      box-shadow: 0 10px 24px rgba(0, 242, 254, 0.15), 0 0 12px rgba(0, 242, 254, 0.1);
+      z-index: 2;
+    }
+
+    .game-icon-wrapper {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 10px;
+    }
+
+    .game-icon {
+      width: 100%;
+      height: 100%;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .game-card:hover .game-icon {
+      transform: scale(1.06);
+      border-color: rgba(0, 242, 254, 0.4);
+    }
+
+    /* Status Dot with Glow & Pulse */
+    .game-status-indicator {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-surface);
+      background: var(--status-waiting);
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .game-status-indicator.ready {
+      background: var(--status-ready);
+      box-shadow: 0 0 10px var(--status-ready);
+      animation: pulseIndicator 2.5s infinite;
+    }
+
+    .game-status-indicator.updating {
+      background: var(--status-updating);
+      box-shadow: 0 0 10px var(--status-updating);
+      animation: spinIndicator 1.5s linear infinite;
+    }
+
+    .game-status-indicator.reboot {
+      background: var(--status-reboot);
+      box-shadow: 0 0 10px var(--status-reboot);
+      animation: flashIndicator 1.5s infinite;
+    }
+
+    .game-name {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 3px;
+    }
+
+    .game-card:hover .game-name {
+      color: var(--cyan-neon);
+    }
+
+    .game-meta {
+      font-size: 10px;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    /* ============================================================
+       3. BOTTOM FOOTER (TICKER & STATS)
+       ============================================================ */
+    .cyber-footer {
+      height: 42px;
+      min-height: 42px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(11, 16, 28, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--glass-border);
+      font-size: 11px;
+      color: var(--text-muted);
+      z-index: 100;
+    }
+
+    .social-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .social-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .social-item:hover {
+      color: var(--cyan-neon);
+      transform: translateY(-1px);
+    }
+
+    /* Live Announcement Marquee */
+    .ticker-container {
+      flex: 1;
+      margin: 0 32px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ticker-badge {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--gold-neon);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .ticker-content {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-text {
+      display: inline-block;
+      animation: marqueeScroll 28s linear infinite;
+      color: var(--text-main);
+      font-size: 11px;
+    }
+
+    .footer-app-info {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .server-status-pill {
+      color: var(--status-ready);
+      font-weight: 700;
+    }
+
+    /* ============================================================
+       4. CINEMATIC PLAY MODAL (GAME DETAIL)
+       ============================================================ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 13, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-panel {
+      position: relative;
+      width: 760px;
+      max-width: 92vw;
+      background: #0B111F;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 242, 254, 0.15);
+      transform: scale(0.94);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-backdrop.active .modal-panel {
+      transform: scale(1);
+    }
+
+    /* Modal Hero Splash */
+    .modal-hero {
+      position: relative;
+      height: 260px;
+      overflow: hidden;
+    }
+
+    .modal-hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .modal-hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, #0B111F 0%, rgba(11, 17, 31, 0.6) 50%, transparent 100%);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(239, 68, 68, 0.8);
+      border-color: #EF4444;
+      transform: rotate(90deg);
+    }
+
+    /* Modal Content Body */
+    .modal-body {
+      padding: 0 32px 32px;
+      position: relative;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      margin-top: -50px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .modal-game-icon {
+      width: 88px;
+      height: 88px;
+      border-radius: 18px;
+      object-fit: cover;
+      border: 2px solid var(--glass-border-hover);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-game-info {
+      flex: 1;
+    }
+
+    .modal-game-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      color: #FFF;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .modal-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .modal-tag.status-tag {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: var(--status-ready);
+      font-weight: 700;
+    }
+
+    .modal-tag.status-tag.reboot {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: var(--status-reboot);
+    }
+
+    /* Specs Grid */
+    .modal-specs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .spec-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .spec-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Warning Banner for Reboot */
+    .reboot-alert {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      color: var(--status-reboot);
+      font-size: 12px;
+    }
+
+    .reboot-alert.active {
+      display: flex;
+    }
+
+    /* Modal Action Buttons */
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-play-primary {
+      flex: 1;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--cyan-neon), var(--blue-accent));
+      border: none;
+      color: #040914;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--cyan-glow);
+      transition: all 0.25s ease;
+    }
+
+    .btn-play-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.15);
+      box-shadow: 0 6px 26px rgba(0, 242, 254, 0.4);
+    }
+
+    .btn-play-primary.btn-reboot {
+      background: linear-gradient(135deg, var(--gold-neon), var(--gold-dark));
+      box-shadow: 0 4px 20px var(--gold-glow);
+    }
+
+    .btn-secondary {
+      height: 48px;
+      padding: 0 20px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ============================================================
+       5. NOTIFICATION TOAST
+       ============================================================ */
+    .cyber-toast {
+      position: fixed;
+      bottom: 60px;
+      right: 30px;
+      padding: 14px 20px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--cyan-neon);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 16px var(--cyan-glow);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #FFF;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 2000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .cyber-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      font-size: 18px;
+    }
+
+    /* ============================================================
+       ANIMATIONS
+       ============================================================ */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.15); }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.7; }
+    }
+
+    @keyframes pulseIndicator {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 6px var(--status-ready); }
+      50% { transform: scale(1.18); box-shadow: 0 0 14px var(--status-ready); }
+    }
+
+    @keyframes flashIndicator {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    @keyframes spinIndicator {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes marqueeScroll {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- 1. TOP HEADER -->
+    <header class="cyber-header">
+      <!-- Brand Logo -->
+      <div class="brand-section" id="btnBrand">
+        <div class="brand-logo-container">
+          <div class="brand-logo-glow"></div>
+          <img src="icon.png" alt="Ting Logo" class="brand-logo">
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">TING MENU</span>
+          <span class="brand-subtitle">CYBER GAMING HUB</span>
+        </div>
+      </div>
+
+      <!-- Capsule Search -->
+      <div class="search-container">
+        <div class="search-capsule">
+          <select id="categorySelect" class="search-select" title="Phân loại trò chơi">
+            <option value="all">⊞ Tất cả các games</option>
+            <option value="online">🌐 Game Online</option>
+            <option value="offline">⚔️ Game Offline</option>
+            <option value="tool">🛠️ Công Cụ / Tiện Ích</option>
+          </select>
+          <div class="search-divider"></div>
+          <input type="text" id="searchInput" class="search-input" placeholder="Find your games... / Tìm kiếm game (Ctrl+K)">
+          <span class="search-kbd">Ctrl+K</span>
+          <button id="searchButton" class="search-btn" title="Tìm kiếm">
+            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Actions: Station, F&B & Controls -->
+      <div class="header-actions">
+        <div class="station-badge" title="Tên máy Windows đọc từ %COMPUTERNAME%">
+          <div class="station-ping">
+            <div class="ping-dot"></div>
+            <span>1ms LAN</span>
+          </div>
+          <div class="station-name">Số Máy: B-05</div>
+        </div>
+
+        <button id="btnFnb" class="fnb-btn" title="Kích hoạt ứng dụng Ting Launcher để nạp tiền & gọi món (open_launcher)">
+          <span>🍔</span>
+          <span>Gọi Món & Nạp Tiền</span>
+        </button>
+
+        <div class="window-controls">
+          <button id="btnMinimize" class="win-btn" title="Thu nhỏ xuống Taskbar (window_minimize)">
+            <svg width="12" height="2" viewBox="0 0 12 2" fill="currentColor"><rect width="12" height="2" rx="1"/></svg>
+          </button>
+          <button id="btnFullscreen" class="win-btn" title="Phóng to / Khôi phục kích thước (window_toggle_maximize)">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. MAIN BODY -->
+    <main class="cyber-body">
+      <!-- Sidebar Navigation Rail -->
+      <aside class="cyber-sidebar">
+        <div class="sidebar-menu">
+          <div class="sidebar-heading">Phân Loại Trò Chơi</div>
+          <button class="nav-item active" data-category="all">
+            <div class="nav-content">
+              <span class="nav-icon">🎮</span>
+              <span>Tất cả các games</span>
+            </div>
+            <span class="nav-count" id="countAll">48</span>
+          </button>
+
+          <button class="nav-item" data-category="online">
+            <div class="nav-content">
+              <span class="nav-icon">🌐</span>
+              <span>Game Online</span>
+            </div>
+            <span class="nav-count" id="countOnline">16</span>
+          </button>
+
+          <button class="nav-item" data-category="offline">
+            <div class="nav-content">
+              <span class="nav-icon">⚔️</span>
+              <span>Game Offline</span>
+            </div>
+            <span class="nav-count" id="countOffline">24</span>
+          </button>
+
+          <button class="nav-item" data-category="tool">
+            <div class="nav-content">
+              <span class="nav-icon">🛠️</span>
+              <span>Công Cụ</span>
+            </div>
+            <span class="nav-count" id="countTool">8</span>
+          </button>
+        </div>
+
+        <!-- Storage & Server Widget -->
+        <div class="sidebar-widget">
+          <div class="widget-header">
+            <span class="widget-title">💾 Ổ Game (G:)</span>
+            <span class="widget-val">91%</span>
+          </div>
+          <div class="cyber-progress-bg">
+            <div class="cyber-progress-bar" style="width: 91%;"></div>
+          </div>
+          <div class="widget-footer">
+            <span>Còn trống 180 GB / 2.0 TB</span>
+            <span style="color: var(--status-ready);">● P2P 40MB/s</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Game Arena Content -->
+      <section class="game-arena">
+        <!-- Khung Trên: Main Game Catalog Grid (Danh Sách Game 4 hàng × 12 cột) -->
+        <div class="catalog-section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-title-icon">🕹️</span>
+              <span id="catalogCategoryTitle">Tất cả các games</span>
+            </div>
+            <span class="section-count" id="gridCountDisplay">Hiển thị 48 trò chơi</span>
+          </div>
+          <div class="games-grid" id="gamesGrid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Khung Dưới: Slanted Featured Cards (Hàng 9 thẻ poster vát góc) -->
+        <div class="featured-section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="section-title-icon">🔥</span>
+              <span>Top Game Thịnh Hành Quán Net</span>
+            </div>
+            <span class="section-count">9 Tựa Game Đang Chơi Nhiều Nhất</span>
+          </div>
+          <div class="featured-strip" id="featuredStrip">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 3. FOOTER -->
+    <footer class="cyber-footer">
+      <!-- Social Media Links -->
+      <div class="social-links">
+        <a class="social-item" href="https://discord.com" target="_blank" rel="noopener">
+          <span>💬</span> Discord Cyber
+        </a>
+        <a class="social-item" href="https://facebook.com" target="_blank" rel="noopener">
+          <span>📘</span> Fanpage Quán
+        </a>
+        <a class="social-item" href="https://youtube.com" target="_blank" rel="noopener">
+          <span>▶️</span> Kênh Highlight
+        </a>
+      </div>
+
+      <!-- Live Announcement Ticker -->
+      <div class="ticker-container">
+        <div class="ticker-badge">TIN NÓNG</div>
+        <div class="ticker-content">
+          <div class="ticker-text">
+            ⚡ NẠP GIỜ VÀNG: Tặng ngay 100% thời gian chơi từ 12h - 14h hàng ngày &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; 
+            🏆 GIẢI ĐẤU CS2 & LOL CYBER CUP 2026: Đăng ký miễn phí tại quầy thu ngân &nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp; 
+            ⭐ GAME MỚI: Black Myth Wukong & Cyberpunk 2077 đã cập nhật bản mới nhất trên ổ Game (G:) sẵn sàng chiến mượt mà!
+          </div>
+        </div>
+      </div>
+
+      <!-- App & Server Info -->
+      <div class="footer-app-info">
+        <span>Ting Menu V0.1.0</span>
+        <span>•</span>
+        <span>Máy chủ: <strong style="color: #FFF;">192.168.1.200</strong></span>
+        <span class="server-status-pill">● Trực tuyến</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 4. CINEMATIC PLAY MODAL -->
+  <div class="modal-backdrop" id="gameModal">
+    <div class="modal-panel">
+      <button class="modal-close-btn" id="modalCloseBtn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l12 12M13 1L1 13"/></svg>
+      </button>
+
+      <div class="modal-hero">
+        <img src="" alt="" class="modal-hero-img" id="modalHeroImg">
+        <div class="modal-hero-gradient"></div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-header-row">
+          <img src="" alt="" class="modal-game-icon" id="modalGameIcon">
+          <div class="modal-game-info">
+            <h2 class="modal-game-title" id="modalGameTitle">Tên Trò Chơi</h2>
+            <div class="modal-tags">
+              <span class="modal-tag" id="modalGenreTag">Hành động</span>
+              <span class="modal-tag status-tag" id="modalStatusTag">Sẵn sàng chơi</span>
+              <span class="modal-tag">🛡️ Đã xác minh P2P</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="reboot-alert" id="modalRebootAlert">
+          <span style="font-size: 18px;">⚠️</span>
+          <span>Bản cập nhật mới yêu cầu <strong>Khởi động lại máy trạm</strong> trước khi chơi để hoàn tất thay đổi file hệ thống.</span>
+        </div>
+
+        <div class="modal-specs-grid">
+          <div class="spec-item">
+            <span class="spec-label">Dung lượng ổ đĩa</span>
+            <span class="spec-val" id="modalSize">22.4 GB</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Phiên bản hiện tại</span>
+            <span class="spec-val" id="modalVersion">v14.18</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">File chạy chính</span>
+            <span class="spec-val" id="modalExe" style="font-family: monospace;">LeagueClient.exe</span>
+          </div>
+          <div class="spec-item" style="grid-column: span 3;">
+            <span class="spec-label">Đường dẫn cài đặt</span>
+            <span class="spec-val" id="modalPath" style="font-family: monospace; font-size: 11px; color: var(--cyan-neon);">G:\Online Games\LeagueClient\LeagueClient.exe</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-play-primary" id="btnLaunchGame">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <span id="btnLaunchText">CHƠI NGAY</span>
+          </button>
+          <button class="btn-secondary" id="btnOpenFolder">📂 Mở Thư Mục</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. NOTIFICATION TOAST -->
+  <div class="cyber-toast" id="toast">
+    <span class="toast-icon" id="toastIcon">🍔</span>
+    <span id="toastMsg">Thông báo</span>
+  </div>
+
+  <!-- ============================================================
+       APPLICATION LOGIC SCRIPT
+       ============================================================ -->
+  <script>
+    // Master Game Database with high-res game assets
+    const baseCatalog = [
+      {
+        id: "lol",
+        name: "League of Legends",
+        category: "online",
+        genre: "MOBA / Chiến thuật",
+        status: "ready",
+        size: "22.4 GB",
+        version: "14.18",
+        executable: "LeagueClient.exe",
+        path: "G:\\Online\\League of Legends\\LeagueClient.exe",
+        icon: "assets/source/game-lol.png",
+        poster: "assets/source/poster-lol.png"
+      },
+      {
+        id: "gta5",
+        name: "Grand Theft Auto V",
+        category: "offline",
+        genre: "Hành động / Thế giới mở",
+        status: "ready",
+        size: "110.5 GB",
+        version: "1.0.3095",
+        executable: "GTA5.exe",
+        path: "G:\\Offline\\GTA V\\GTA5.exe",
+        icon: "assets/source/game-gta.png",
+        poster: "assets/source/game-gta-poster.png"
+      },
+      {
+        id: "cs2",
+        name: "Counter-Strike 2",
+        category: "online",
+        genre: "Bắn súng FPS",
+        status: "ready",
+        size: "35.2 GB",
+        version: "1.40.2",
+        executable: "cs2.exe",
+        path: "G:\\Online\\Counter-Strike 2\\game\\bin\\win64\\cs2.exe",
+        icon: "assets/source/game-counter-strike.png",
+        poster: "assets/source/poster-pubg.png"
+      },
+      {
+        id: "hitman",
+        name: "Hitman: World of Assassination",
+        category: "offline",
+        genre: "Hành động lén lút",
+        status: "ready",
+        size: "75.0 GB",
+        version: "3.180",
+        executable: "HITMAN3.exe",
+        path: "G:\\Offline\\Hitman 3\\Retail\\HITMAN3.exe",
+        icon: "assets/source/game-hitman.png",
+        poster: "assets/source/game-gta-poster.png"
+      },
+      {
+        id: "halflife",
+        name: "Half Life 1.1",
+        category: "offline",
+        genre: "Bắn súng cổ điển",
+        status: "reboot",
+        size: "1.2 GB",
+        version: "1.1.0",
+        executable: "hl.exe",
+        path: "G:\\Offline\\Half Life\\hl.exe",
+        icon: "assets/source/game-counter-strike.png",
+        poster: "assets/source/poster-cyberpunk.png"
+      },
+      {
+        id: "aoe",
+        name: "Age of Empires (Đế Chế)",
+        category: "offline",
+        genre: "Chiến thuật RTS",
+        status: "waiting",
+        size: "2.5 GB",
+        version: "1.0c",
+        executable: "EMPIRESX.EXE",
+        path: "G:\\Offline\\AOE\\EMPIRESX.EXE",
+        icon: "assets/source/game-aoe.png",
+        poster: "assets/source/poster-dota2.png"
+      },
+      {
+        id: "fo4",
+        name: "EA SPORTS FC Online",
+        category: "online",
+        genre: "Thể thao bóng đá",
+        status: "updating",
+        size: "36.8 GB",
+        version: "2024.09",
+        executable: "FC_Online.exe",
+        path: "G:\\Online\\FC Online\\FC_Online.exe",
+        icon: "assets/source/game-fo4.png",
+        poster: "assets/source/poster-cyberpunk.png"
+      },
+      {
+        id: "nghichthien",
+        name: "Nghịch Thiên Kiếm Thế",
+        category: "online",
+        genre: "Nhập vai MMORPG",
+        status: "ready",
+        size: "14.5 GB",
+        version: "2.1",
+        executable: "game.exe",
+        path: "G:\\Online\\Nghich Thien\\game.exe",
+        icon: "assets/source/game-nghich-thien.png",
+        poster: "assets/source/poster-dota2.png"
+      },
+      {
+        id: "dota2",
+        name: "Dota 2",
+        category: "online",
+        genre: "MOBA Esports",
+        status: "ready",
+        size: "58.6 GB",
+        version: "7.37",
+        executable: "dota2.exe",
+        path: "G:\\Online\\Dota 2\\game\\bin\\win64\\dota2.exe",
+        icon: "assets/source/game-lol.png",
+        poster: "assets/source/poster-dota2.png"
+      },
+      {
+        id: "cyberpunk",
+        name: "Cyberpunk 2077",
+        category: "offline",
+        genre: "Hành động / Nhập vai",
+        status: "ready",
+        size: "83.4 GB",
+        version: "2.13",
+        executable: "Cyberpunk2077.exe",
+        path: "G:\\Offline\\Cyberpunk 2077\\bin\\x64\\Cyberpunk2077.exe",
+        icon: "assets/source/game-gta.png",
+        poster: "assets/source/poster-cyberpunk.png"
+      },
+      {
+        id: "tingsupport",
+        name: "Ting Remote Support",
+        category: "tool",
+        genre: "Hỗ trợ kỹ thuật",
+        status: "ready",
+        size: "42 MB",
+        version: "0.1.0",
+        executable: "ting-support.exe",
+        path: "G:\\TingMenu\\ting-support.exe",
+        icon: "icon.png",
+        poster: "assets/source/poster-cyberpunk.png"
+      },
+      {
+        id: "tingsettings",
+        name: "Ting System Settings",
+        category: "tool",
+        genre: "Cấu hình hệ thống",
+        status: "ready",
+        size: "18 MB",
+        version: "0.1.0",
+        executable: "ting-settings.exe",
+        path: "G:\\TingMenu\\ting-settings.exe",
+        icon: "assets/source/logo.png",
+        poster: "assets/source/poster-dota2.png"
+      }
+    ];
+
+    // Generate 48 items to populate the grid (4 groups of 12)
+    const games = Array.from({ length: 4 }, (_, groupIndex) =>
+      baseCatalog.map((item, idx) => ({
+        ...item,
+        uniqueId: `game-${groupIndex}-${idx}`,
+        // Variate status on some items for demonstration
+        status: (groupIndex === 1 && idx === 3) ? "reboot" :
+                (groupIndex === 2 && idx === 5) ? "updating" :
+                (groupIndex === 3 && idx === 7) ? "waiting" : item.status
+      }))
+    ).flat();
+
+    // 9 Top Trending Posters
+    const trendingPosters = [
+      { name: "League of Legends", genre: "MOBA", poster: "assets/source/poster-lol.png", badge: "HOT", catalogIndex: 0 },
+      { name: "Dota 2", genre: "MOBA", poster: "assets/source/poster-dota2.png", badge: "UPDATE", catalogIndex: 8 },
+      { name: "PUBG: BATTLEGROUNDS", genre: "Battle Royale", poster: "assets/source/poster-pubg.png", badge: "HOT", catalogIndex: 2 },
+      { name: "Grand Theft Auto V", genre: "Open World", poster: "assets/source/game-gta-poster.png", badge: "POPULAR", catalogIndex: 1 },
+      { name: "Cyberpunk 2077", genre: "Sci-Fi RPG", poster: "assets/source/poster-cyberpunk.png", badge: "RAY TRACING", catalogIndex: 9 },
+      { name: "Counter-Strike 2", genre: "FPS Esports", poster: "assets/source/poster-pubg.png", badge: "HOT", catalogIndex: 2 },
+      { name: "EA SPORTS FC Online", genre: "Football", poster: "assets/source/poster-cyberpunk.png", badge: "UPDATE", catalogIndex: 6 },
+      { name: "Hitman: World of Assassination", genre: "Stealth", poster: "assets/source/game-gta-poster.png", badge: "ACTION", catalogIndex: 3 },
+      { name: "Nghịch Thiên Kiếm Thế", genre: "MMORPG", poster: "assets/source/poster-dota2.png", badge: "NEW", catalogIndex: 7 }
+    ];
+
+    // State Variables
+    let currentCategory = "all";
+    let searchQuery = "";
+    let selectedGame = null;
+
+    // DOM References
+    const categorySelect = document.getElementById("categorySelect");
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const navItems = document.querySelectorAll(".nav-item");
+    const featuredStrip = document.getElementById("featuredStrip");
+    const gamesGrid = document.getElementById("gamesGrid");
+    const catalogCategoryTitle = document.getElementById("catalogCategoryTitle");
+    const gridCountDisplay = document.getElementById("gridCountDisplay");
+    
+    // Modal References
+    const gameModal = document.getElementById("gameModal");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const modalHeroImg = document.getElementById("modalHeroImg");
+    const modalGameIcon = document.getElementById("modalGameIcon");
+    const modalGameTitle = document.getElementById("modalGameTitle");
+    const modalGenreTag = document.getElementById("modalGenreTag");
+    const modalStatusTag = document.getElementById("modalStatusTag");
+    const modalRebootAlert = document.getElementById("modalRebootAlert");
+    const modalSize = document.getElementById("modalSize");
+    const modalVersion = document.getElementById("modalVersion");
+    const modalExe = document.getElementById("modalExe");
+    const modalPath = document.getElementById("modalPath");
+    const btnLaunchGame = document.getElementById("btnLaunchGame");
+    const btnLaunchText = document.getElementById("btnLaunchText");
+    const btnOpenFolder = document.getElementById("btnOpenFolder");
+    
+    // Toast References
+    const toast = document.getElementById("toast");
+    const toastIcon = document.getElementById("toastIcon");
+    const toastMsg = document.getElementById("toastMsg");
+
+    // ============================================================
+    // RENDER FUNCTIONS
+    // ============================================================
+
+    // Render Trending Posters
+    function renderFeaturedPosters() {
+      featuredStrip.innerHTML = trendingPosters.map((item, idx) => `
+        <div class="poster-card" data-idx="${item.catalogIndex}">
+          <img src="${item.poster}" alt="${item.name}" class="poster-img" loading="lazy">
+          <div class="poster-badge ${item.badge === 'UPDATE' ? 'update' : ''}">${item.badge}</div>
+          <div class="poster-overlay">
+            <div class="poster-title">${item.name}</div>
+            <div class="poster-meta">${item.genre}</div>
+          </div>
+          <div class="poster-play-hover">
+            <div class="play-circle">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      // Bind click events on posters
+      featuredStrip.querySelectorAll(".poster-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const idx = parseInt(card.getAttribute("data-idx"), 10);
+          openGameModal(baseCatalog[idx] || baseCatalog[0]);
+        });
+      });
+    }
+
+    // Render Main Game Grid
+    function renderGamesGrid() {
+      const filtered = games.filter(game => {
+        const matchCategory = currentCategory === "all" || game.category === currentCategory;
+        const matchSearch = !searchQuery || 
+          game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          game.genre.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchCategory && matchSearch;
+      });
+
+      // Update Counts
+      const catTitles = {
+        all: "Tất cả các games",
+        online: "Game Online",
+        offline: "Game Offline",
+        tool: "Công Cụ / Tiện Ích"
+      };
+      catalogCategoryTitle.textContent = catTitles[currentCategory] || "Danh Sách Game";
+      gridCountDisplay.textContent = `Hiển thị ${filtered.length} / ${games.length} trò chơi`;
+
+      if (filtered.length === 0) {
+        gamesGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 60px 0; text-align: center; color: var(--text-dim);">
+            <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
+            <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Không tìm thấy game phù hợp</div>
+            <div style="font-size: 12px; margin-top: 4px;">Vui lòng thử từ khóa tìm kiếm hoặc chọn danh mục khác</div>
+          </div>
+        `;
+        return;
+      }
+
+      gamesGrid.innerHTML = filtered.map(game => `
+        <div class="game-card" data-unique-id="${game.uniqueId}">
+          <div class="game-icon-wrapper">
+            <img src="${game.icon}" alt="${game.name}" class="game-icon" loading="lazy">
+            <div class="game-status-indicator ${game.status}" title="${getStatusLabel(game.status)}"></div>
+          </div>
+          <div class="game-name" title="${game.name}">${game.name}</div>
+          <div class="game-meta">${game.size}</div>
+        </div>
+      `).join("");
+
+      // Bind click events on cards
+      gamesGrid.querySelectorAll(".game-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const id = card.getAttribute("data-unique-id");
+          const game = games.find(g => g.uniqueId === id);
+          if (game) openGameModal(game);
+        });
+      });
+    }
+
+    function getStatusLabel(status) {
+      switch (status) {
+        case "ready": return "Sẵn sàng";
+        case "updating": return "Đang cập nhật";
+        case "reboot": return "Cần restart máy";
+        default: return "Chờ tải";
+      }
+    }
+
+    // ============================================================
+    // MODAL INTERACTION
+    // ============================================================
+    function openGameModal(game) {
+      selectedGame = game;
+      modalHeroImg.src = game.poster || "assets/source/poster-lol.png";
+      modalGameIcon.src = game.icon;
+      modalGameTitle.textContent = game.name;
+      modalGenreTag.textContent = game.genre;
+      modalSize.textContent = game.size;
+      modalVersion.textContent = `v${game.version}`;
+      modalExe.textContent = game.executable;
+      modalPath.textContent = game.path;
+
+      // Status Styling
+      if (game.status === "reboot") {
+        modalStatusTag.textContent = "⚠️ Cần khởi động lại";
+        modalStatusTag.className = "modal-tag status-tag reboot";
+        modalRebootAlert.className = "reboot-alert active";
+        btnLaunchText.textContent = "KHỞI ĐỘNG LẠI MÁY ĐỂ CHƠI";
+        btnLaunchGame.className = "btn-play-primary btn-reboot";
+      } else if (game.status === "updating") {
+        modalStatusTag.textContent = "🔄 Đang tải cập nhật 85%";
+        modalStatusTag.className = "modal-tag status-tag";
+        modalRebootAlert.className = "reboot-alert";
+        btnLaunchText.textContent = "ĐANG TẢI (85%)";
+        btnLaunchGame.className = "btn-play-primary";
+      } else {
+        modalStatusTag.textContent = "🟢 Sẵn sàng vào chơi";
+        modalStatusTag.className = "modal-tag status-tag";
+        modalRebootAlert.className = "reboot-alert";
+        btnLaunchText.textContent = "CHƠI NGAY";
+        btnLaunchGame.className = "btn-play-primary";
+      }
+
+      gameModal.classList.add("active");
+    }
+
+    function closeGameModal() {
+      gameModal.classList.remove("active");
+      selectedGame = null;
+    }
+
+    // ============================================================
+    // TOAST NOTIFICATION
+    // ============================================================
+    let toastTimer = null;
+    function showToast(icon, message) {
+      toastIcon.textContent = icon;
+      toastMsg.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3500);
+    }
+
+    // ============================================================
+    // EVENT LISTENERS & SHORTCUTS
+    // ============================================================
+    function setupEvents() {
+      // Sidebar Navigation Click
+      navItems.forEach(item => {
+        item.addEventListener("click", () => {
+          navItems.forEach(btn => btn.classList.remove("active"));
+          item.classList.add("active");
+          currentCategory = item.getAttribute("data-category");
+          categorySelect.value = currentCategory;
+          renderGamesGrid();
+        });
+      });
+
+      // Header Select Change
+      categorySelect.addEventListener("change", (e) => {
+        currentCategory = e.target.value;
+        navItems.forEach(btn => {
+          if (btn.getAttribute("data-category") === currentCategory) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+        renderGamesGrid();
+      });
+
+      // Search Input with Debouncing
+      let searchTimeout = null;
+      searchInput.addEventListener("input", (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          searchQuery = e.target.value.trim();
+          renderGamesGrid();
+        }, 120);
+      });
+
+      // Global Shortcut (Ctrl + K or / to focus search)
+      window.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey && (e.key === "k" || e.key === "K")) || (e.key === "/" && document.activeElement !== searchInput)) {
+          e.preventDefault();
+          searchInput.focus();
+          searchInput.select();
+        }
+        if (e.key === "Escape" && gameModal.classList.contains("active")) {
+          closeGameModal();
+        }
+      });
+
+      // Modal Events
+      modalCloseBtn.addEventListener("click", closeGameModal);
+      gameModal.addEventListener("click", (e) => {
+        if (e.target === gameModal) closeGameModal();
+      });
+
+      // Launch Game Action (ShellExecuteExW & window_minimize)
+      btnLaunchGame.addEventListener("click", () => {
+        if (!selectedGame) return;
+        if (selectedGame.status === "reboot") {
+          showToast("⚠️", `Yêu cầu khởi động lại máy trạm trước khi chơi ${selectedGame.name}!`);
+        } else {
+          showToast("🚀", `Khởi chạy ${selectedGame.name} (ShellExecuteExW)... Ting Menu tự động thu nhỏ xuống Taskbar.`);
+          closeGameModal();
+        }
+      });
+
+      btnOpenFolder.addEventListener("click", () => {
+        if (!selectedGame) return;
+        showToast("📂", `Đã mở thư mục: ${selectedGame.path}`);
+      });
+
+      // Nút Gọi Món & Nạp Tiền: Kích hoạt ting-launcher (invoke 'open_launcher')
+      document.getElementById("btnFnb").addEventListener("click", () => {
+        showToast("🚀", "Kích hoạt ting-launcher (invoke 'open_launcher'): Khởi chạy hoặc đưa cửa sổ Ting Launcher lên trên.");
+      });
+
+      // Window Controls: Thu nhỏ và Phóng to/Khôi phục (Tuyệt đối không có đóng)
+      document.getElementById("btnMinimize").addEventListener("click", () => {
+        showToast("—", "Ting Menu đã thu nhỏ xuống Taskbar (invoke 'window_minimize').");
+      });
+
+      document.getElementById("btnFullscreen").addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      document.getElementById("btnBrand").addEventListener("click", () => {
+        currentCategory = "all";
+        categorySelect.value = "all";
+        searchQuery = "";
+        searchInput.value = "";
+        navItems.forEach(b => b.classList.remove("active"));
+        document.querySelector(".nav-item[data-category='all']").classList.add("active");
+        renderGamesGrid();
+      });
+    }
+
+    // ============================================================
+    // INITIALIZATION
+    // ============================================================
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFeaturedPosters();
+      renderGamesGrid();
+      setupEvents();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,3886 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ting Server</title>
+  <style>
+    :root {
+      /* Windows 11 Dark Mode */
+      --bg-window: #131417;
+      --bg-sidebar: #17181c;
+      --bg-sidebar-hover: #22232a;
+      --bg-sidebar-active: #282a33;
+      --bg-panel: #1b1c20;
+      --bg-toolbar: #1a1b1f;
+      --bg-table-header: #202126;
+      --bg-table-row: #16171b;
+      --bg-table-alt: #1a1b1f;
+      --bg-table-hover: #23252c;
+      --bg-table-selected: #1d3b53;
+      --bg-table-selected-hover: #224562;
+      --bg-input: #121316;
+      --bg-dropdown: #202126;
+      --bg-status-bar: #16171a;
+      --bg-context-menu: #1e1f24;
+      --bg-context-hover: #2a2c34;
+      --bg-card: #1f2026;
+      --bg-card-inner: #16171b;
+
+      --border-color: #2e3038;
+      --border-subtle: #24252c;
+      --border-header: #353740;
+
+      --text-primary: #f2f3f5;
+      --text-game-name: #ffffff;
+      --text-secondary: #9aa1a9;
+      --text-muted: #6b7280;
+      --text-header: #8a949e;
+
+      --accent-blue: #1f75b8;
+      --accent-blue-hover: #298cd4;
+      --accent-blue-active: #186098;
+      --accent-indicator: #0078d4;
+
+      --status-seed-color: #4fa3e3;
+      --status-missing-color: #d96b66;
+      --status-paused-color: #9aa1a9;
+      --status-tested-color: #3bb273;
+      --status-online-green: #34c759;
+      --status-not-download-color: #eab308;
+
+      --priority-high-bg: rgba(239, 68, 68, 0.18);
+      --priority-high-text: #f87171;
+      --priority-normal-bg: rgba(59, 130, 246, 0.16);
+      --priority-normal-text: #60a5fa;
+      --priority-low-bg: rgba(156, 163, 175, 0.16);
+      --priority-low-text: #9ca3af;
+
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    [data-theme="light"] {
+      /* Windows 11 Light Mode */
+      --bg-window: #f3f4f6;
+      --bg-sidebar: #eaebee;
+      --bg-sidebar-hover: #dee0e5;
+      --bg-sidebar-active: #d2d6df;
+      --bg-panel: #ffffff;
+      --bg-toolbar: #ffffff;
+      --bg-table-header: #f2f3f5;
+      --bg-table-row: #ffffff;
+      --bg-table-alt: #f8f9fa;
+      --bg-table-hover: #eef1f5;
+      --bg-table-selected: #d7eaf8;
+      --bg-table-selected-hover: #cbe3f5;
+      --bg-input: #ffffff;
+      --bg-dropdown: #ffffff;
+      --bg-status-bar: #eaebee;
+      --bg-context-menu: #ffffff;
+      --bg-context-hover: #f0f2f5;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+
+      --border-color: #d5d8de;
+      --border-subtle: #e5e7eb;
+      --border-header: #ccd0d8;
+
+      --text-primary: #191b1f;
+      --text-game-name: #000000;
+      --text-secondary: #5c6470;
+      --text-muted: #8c939e;
+      --text-header: #59636e;
+
+      --accent-blue: #0067b8;
+      --accent-blue-hover: #1075c7;
+      --accent-blue-active: #005a9e;
+      --accent-indicator: #0067b8;
+
+      --status-seed-color: #0b72b9;
+      --status-missing-color: #c93b36;
+      --status-paused-color: #64748b;
+      --status-tested-color: #15803d;
+      --status-online-green: #16a34a;
+      --status-not-download-color: #b45309;
+
+      --priority-high-bg: rgba(220, 38, 38, 0.12);
+      --priority-high-text: #b91c1c;
+      --priority-normal-bg: rgba(37, 99, 235, 0.12);
+      --priority-normal-text: #1d4ed8;
+      --priority-low-bg: rgba(107, 114, 128, 0.12);
+      --priority-low-text: #4b5563;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-window);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 12.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Windows Native Style Titlebar */
+    .titlebar {
+      height: 32px;
+      background-color: var(--bg-sidebar);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 10px 0 12px;
+      flex-shrink: 0;
+    }
+
+    .titlebar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .titlebar-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .titlebar-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.2px;
+    }
+
+    /* Main App Layout */
+    .app-frame {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 32px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left Sidebar: Brand Top, Navigation Middle, Service Status Bottom */
+    .sidebar {
+      width: 220px;
+      min-width: 170px;
+      max-width: 360px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: relative;
+      transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.collapsed {
+      width: 54px !important;
+      min-width: 54px !important;
+    }
+
+    .sidebar.collapsed .brand-logo-wrap,
+    .sidebar.collapsed .brand-logo-img,
+    .sidebar.collapsed .brand-tag,
+    .sidebar.collapsed .nav-item span:not(.nav-icon),
+    .sidebar.collapsed .nav-badge,
+    .sidebar.collapsed .nav-section-title,
+    .sidebar.collapsed .sidebar-resizer {
+      display: none !important;
+    }
+
+    .sidebar.collapsed .sidebar-bottom {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px;
+    }
+
+    .sidebar.collapsed .service-info-box,
+    .sidebar.collapsed .sidebar-theme-switch {
+      width: 32px;
+      min-width: 32px;
+      padding: 0;
+    }
+
+    .sidebar.collapsed .service-info-box { height: 32px; }
+    .sidebar.collapsed .service-status-line { height: 100%; justify-content: center; }
+    .sidebar.collapsed #service-status-text,
+    .sidebar.collapsed .service-port-tag,
+    .sidebar.collapsed .service-detail-line,
+    .sidebar.collapsed #theme-text { display: none !important; }
+
+    .sidebar.collapsed .sidebar-brand {
+      justify-content: center;
+      padding: 0 0 10px 0;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .sidebar.collapsed .nav-left {
+      gap: 0;
+    }
+
+    .sidebar-resizer {
+      position: absolute;
+      top: 0;
+      right: -3px;
+      width: 6px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 20;
+    }
+
+    .sidebar-resizer:hover {
+      background-color: var(--accent-indicator);
+    }
+
+    .sidebar-top {
+      padding: 10px 8px 6px 8px;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 10px 4px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 8px;
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo-img {
+      height: 20px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      background-color: #1e3a5f;
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+
+    .sidebar-toggle-btn {
+      width: 24px;
+      height: 24px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .nav-section-title {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 6px 8px 4px 8px;
+      letter-spacing: 0.6px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 35px;
+      padding: 0 10px;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 500;
+      transition: background-color 0.1s ease, color 0.1s ease;
+    }
+
+    .nav-item:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background-color: var(--bg-sidebar-active);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      border-radius: 2px;
+      background-color: var(--accent-indicator);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 10px;
+      background-color: var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    /* Sidebar Bottom: Service status and system environment */
+    .sidebar-bottom {
+      padding: 10px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .service-info-box {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .service-status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .service-error-banner {
+      display: none;
+      min-height: 38px;
+      padding: 5px 10px;
+      align-items: center;
+      gap: 8px;
+      background: rgba(217, 107, 102, 0.12);
+      border-bottom: 1px solid rgba(217, 107, 102, 0.45);
+      color: var(--text-primary);
+      font-size: 11px;
+    }
+
+    .service-error-banner.visible { display: flex; }
+    .service-error-banner strong { color: var(--status-missing-color); white-space: nowrap; }
+    .service-error-message { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: Consolas, "Courier New", monospace; }
+
+    .service-state-grid {
+      display: grid;
+      grid-template-columns: 150px minmax(180px, 1fr) 150px minmax(180px, 1fr);
+      gap: 8px 14px;
+      font-size: 11.5px;
+    }
+
+    .service-state-grid .label { color: var(--text-muted); }
+    .service-state-grid .value { color: var(--text-primary); font-weight: 600; }
+
+    .latest-error-box {
+      display: none;
+      padding: 8px 10px;
+      border: 1px solid rgba(217, 107, 102, 0.45);
+      border-radius: 4px;
+      background: rgba(217, 107, 102, 0.08);
+      color: var(--status-missing-color);
+      font: 11px/1.45 Consolas, "Courier New", monospace;
+    }
+
+    .latest-error-box.visible { display: block; }
+
+    .status-indicator-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--status-online-green);
+      line-height: 1;
+    }
+
+    .status-indicator-badge.offline {
+      color: var(--status-missing-color);
+    }
+
+    .indicator-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--status-online-green);
+      box-shadow: 0 0 6px rgba(52, 199, 89, 0.5);
+      flex: 0 0 7px;
+    }
+
+    .status-indicator-badge.offline .indicator-dot {
+      background-color: var(--status-missing-color);
+      box-shadow: 0 0 6px rgba(217, 107, 102, 0.5);
+    }
+
+    .service-port-tag {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: monospace;
+      background: var(--bg-card-inner);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .service-detail-line {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 10.5px;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+    }
+
+    .detail-val {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .badge-mini {
+      display: inline-block;
+      padding: 0 4px;
+      border-radius: 3px;
+      font-size: 9.5px;
+      font-weight: 600;
+    }
+
+    .badge-mini.success {
+      background-color: rgba(52, 199, 89, 0.15);
+      color: var(--status-online-green);
+      border: 1px solid rgba(52, 199, 89, 0.3);
+    }
+
+    .badge-mini.offline {
+      background-color: rgba(217, 107, 102, 0.15);
+      color: var(--status-missing-color);
+      border: 1px solid rgba(217, 107, 102, 0.3);
+    }
+
+    .sidebar-theme-switch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      height: 28px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+
+    .sidebar-theme-switch:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    /* Main Viewport */
+    .main-viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-window);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .view-panel {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      height: calc(100% - 24px);
+      overflow: hidden;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* Unified 2-Row Toolbar on Game List (Always Visible) */
+    .toolbar-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      background-color: var(--bg-toolbar);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Row 1: Thao tác game hàng loạt (Action Task Bar) */
+    .toolbar-row-actions {
+      display: flex;
+      align-items: center;
+      height: 35px;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 8px;
+      overflow-x: auto;
+      background-color: var(--bg-toolbar);
+    }
+
+    .toolbar-actions-list {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    /* Row 2: Cụm tìm kiếm bên trái + Cụm action bên phải */
+    .toolbar-row-search {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 37px;
+      padding: 0 10px;
+      gap: 12px;
+      overflow-x: auto;
+      background-color: var(--bg-toolbar);
+    }
+
+    .toolbar-search-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .toolbar-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Fallbacks for backward compatibility */
+    .toolbar-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 38px;
+      padding: 0 10px;
+      background-color: var(--bg-toolbar);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+      gap: 10px;
+      overflow-x: auto;
+    }
+    .toolbar-cluster { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .toolbar-left { min-width: 320px; }
+    .toolbar-center { flex: 1; justify-content: center; }
+    .toolbar-right { justify-content: flex-end; }
+
+    /* Search & Filter Inputs */
+    .search-box-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 170px;
+      height: 28px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0 24px 0 24px;
+      color: var(--text-primary);
+      font-size: 11.5px;
+      outline: none;
+      transition: border-color 0.15s, width 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+      width: 195px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 7px;
+      width: 13px;
+      height: 13px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 6px;
+      width: 14px;
+      height: 14px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .search-clear-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .adv-search-select {
+      height: 28px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0 8px;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .adv-search-select:focus {
+      border-color: var(--accent-blue);
+      color: var(--text-primary);
+    }
+
+    /* Fluent Action Buttons */
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 28px;
+      padding: 0 9px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-panel);
+      color: var(--text-primary);
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.1s ease;
+    }
+
+    .btn-action svg {
+      width: 13px;
+      height: 13px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .btn-action:hover:not(:disabled) {
+      background-color: var(--bg-sidebar-hover);
+      border-color: var(--border-header);
+    }
+
+    .btn-action:active:not(:disabled) {
+      background-color: var(--bg-sidebar-active);
+    }
+
+    .btn-action.primary {
+      background-color: var(--accent-blue);
+      border-color: var(--accent-blue-hover);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .btn-action.primary:hover:not(:disabled) {
+      background-color: var(--accent-blue-hover);
+    }
+
+    .btn-action.danger:hover:not(:disabled) {
+      background-color: rgba(217, 107, 102, 0.2);
+      border-color: var(--status-missing-color);
+      color: var(--status-missing-color);
+    }
+
+    .btn-action:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      border-color: transparent;
+      background-color: rgba(128, 128, 128, 0.08);
+      color: var(--text-muted);
+    }
+
+    .btn-sep {
+      width: 1px;
+      height: 18px;
+      background-color: var(--border-color);
+      margin: 0 2px;
+    }
+
+    .selection-indicator {
+      font-size: 11px;
+      color: var(--accent-blue-hover);
+      background: rgba(31, 117, 184, 0.15);
+      border: 1px solid rgba(31, 117, 184, 0.3);
+      padding: 2px 7px;
+      border-radius: 3px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Data Table View (Center, Dense, Full Columns) */
+    .grid-viewport {
+      flex: 1;
+      overflow: auto;
+      background-color: var(--bg-window);
+    }
+
+    table.data-grid {
+      width: 100%;
+      min-width: 1260px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    table.data-grid thead {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    table.data-grid th {
+      background-color: var(--bg-table-header);
+      color: var(--text-header);
+      font-size: 11.5px;
+      font-weight: 600;
+      text-align: left;
+      padding: 0 8px;
+      height: 31px;
+      border-bottom: 1px solid var(--border-header);
+      border-right: 1px solid var(--border-subtle);
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    table.data-grid th:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    table.data-grid th.no-sort {
+      cursor: default;
+    }
+
+    .th-inner {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .sort-arrow {
+      font-size: 11px;
+      color: var(--text-primary);
+      margin-left: 2px;
+    }
+
+    .col-resizer {
+      position: absolute;
+      top: 0;
+      right: -2px;
+      width: 4px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 1;
+    }
+
+    .col-resizer:hover {
+      background-color: var(--accent-indicator);
+    }
+
+    /* Table Rows (Dense 32-34px) */
+    table.data-grid tbody tr {
+      height: 33px;
+      background-color: var(--bg-table-row);
+      transition: background-color 0.08s ease;
+      cursor: default;
+    }
+
+    table.data-grid tbody tr:nth-child(even) {
+      background-color: var(--bg-table-alt);
+    }
+
+    table.data-grid tbody tr:hover {
+      background-color: var(--bg-table-hover);
+    }
+
+    table.data-grid tbody tr.selected {
+      background-color: var(--bg-table-selected) !important;
+    }
+
+    table.data-grid tbody tr.context-target {
+      outline: 1px solid var(--accent-indicator);
+    }
+
+    table.data-grid td {
+      padding: 0 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      border-right: 1px solid transparent;
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .col-cb {
+      width: 34px;
+      text-align: center;
+      padding: 0 !important;
+    }
+
+    .native-checkbox {
+      width: 14px;
+      height: 14px;
+      accent-color: var(--accent-blue);
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    .cell-category {
+      color: var(--text-secondary);
+      font-size: 11px;
+    }
+
+    .cell-name {
+      font-weight: 600;
+      color: var(--text-game-name);
+    }
+
+    .cell-version {
+      font-family: monospace;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+    }
+
+    .cell-size {
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cell-path {
+      color: var(--text-muted);
+      font-size: 11px;
+      direction: rtl;
+      text-align: left;
+    }
+
+    /* Priority Badges */
+    .priority-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+
+    .priority-badge.cao {
+      background: var(--priority-high-bg);
+      color: var(--priority-high-text);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .priority-badge.binh-thuong {
+      background: var(--priority-normal-bg);
+      color: var(--priority-normal-text);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .priority-badge.thap {
+      background: var(--priority-low-bg);
+      color: var(--priority-low-text);
+      border: 1px solid rgba(156, 163, 175, 0.3);
+    }
+
+    /* Status Cell Badge with Bottom Progress Bar (Kích thước đồng đều 138px x 25px) */
+    .status-cell-badge {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 138px;
+      height: 25px;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 0 4px 3px 4px;
+      border: 1px solid transparent;
+      user-select: none;
+      vertical-align: middle;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-cell-text {
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.1;
+      letter-spacing: 0.1px;
+    }
+
+    .status-cell-progress-track {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .status-cell-progress-bar {
+      height: 100%;
+      border-radius: 0 2px 2px 0;
+      transition: width 0.3s ease;
+    }
+
+    /* Biến thể màu Dark Mode */
+    .status-cell-badge.badge-seeding {
+      background-color: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+    }
+    .status-cell-badge.badge-downloading {
+      background-color: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.3);
+      color: #38bdf8;
+    }
+    .status-cell-badge.badge-checking {
+      background-color: rgba(6, 182, 212, 0.16);
+      border-color: rgba(6, 182, 212, 0.35);
+      color: #22d3ee;
+    }
+    .status-cell-badge.badge-ready {
+      background-color: rgba(52, 199, 89, 0.14);
+      border-color: rgba(52, 199, 89, 0.3);
+      color: #34c759;
+    }
+    .status-cell-badge.badge-paused {
+      background-color: rgba(156, 163, 175, 0.12);
+      border-color: rgba(156, 163, 175, 0.22);
+      color: #9ca3af;
+    }
+    .status-cell-badge.badge-not-download {
+      background-color: rgba(234, 179, 8, 0.14);
+      border-color: rgba(234, 179, 8, 0.3);
+      color: #facc15;
+    }
+    .status-cell-badge.badge-missing,
+    .status-cell-badge.badge-error {
+      background-color: rgba(239, 68, 68, 0.14);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    /* Biến thể màu Light Mode */
+    [data-theme="light"] .status-cell-badge.badge-seeding {
+      background-color: #dbeafe;
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+    }
+    [data-theme="light"] .status-cell-badge.badge-downloading {
+      background-color: #e0f2fe;
+      border-color: #bae6fd;
+      color: #0284c7;
+    }
+    [data-theme="light"] .status-cell-badge.badge-checking {
+      background-color: #cffafe;
+      border-color: #a5f3fc;
+      color: #0891b2;
+    }
+    [data-theme="light"] .status-cell-badge.badge-ready {
+      background-color: #dcfce7;
+      border-color: #bbf7d0;
+      color: #15803d;
+    }
+    [data-theme="light"] .status-cell-badge.badge-paused {
+      background-color: #f3f4f6;
+      border-color: #e5e7eb;
+      color: #4b5563;
+    }
+    [data-theme="light"] .status-cell-badge.badge-not-download {
+      background-color: #fef9c3;
+      border-color: #fef08a;
+      color: #a16207;
+    }
+    [data-theme="light"] .status-cell-badge.badge-missing,
+    [data-theme="light"] .status-cell-badge.badge-error {
+      background-color: #fee2e2;
+      border-color: #fecaca;
+      color: #b91c1c;
+    }
+
+    /* Fallback classes */
+    .status-text-checking { color: #38bdf8; font-weight: 500; }
+    .status-text-seeding { color: var(--status-seed-color); font-weight: 500; }
+    .status-text-missing { color: var(--status-missing-color); font-weight: 500; }
+    .status-text-paused { color: var(--status-paused-color); }
+    .status-text-tested { color: var(--status-tested-color); }
+    .status-text-not-download { color: var(--status-not-download-color); font-weight: 500; }
+
+    .col-menu, .col-actions {
+      width: 175px;
+      text-align: center;
+      padding: 0 4px !important;
+      white-space: nowrap;
+    }
+
+    .row-actions-group {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+
+    .row-btn-icon {
+      width: 23px;
+      height: 23px;
+      padding: 0;
+      border-radius: 3px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      flex-shrink: 0;
+    }
+
+    .row-btn-icon svg {
+      width: 12.5px;
+      height: 12.5px;
+      fill: currentColor;
+    }
+
+    .row-btn-icon:hover:not(:disabled) {
+      background-color: var(--bg-table-hover);
+      border-color: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .row-btn-icon:active:not(:disabled) {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .row-btn-icon:disabled {
+      opacity: 0.28;
+      cursor: not-allowed;
+    }
+
+    .row-more-btn {
+      width: 23px;
+      height: 23px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      border-radius: 3px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .row-more-btn:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    /* Bottom Status Bar */
+    .status-bar {
+      height: 24px;
+      background-color: var(--bg-status-bar);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .status-bar-left,
+    .status-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .status-divider {
+      width: 1px;
+      height: 12px;
+      background-color: var(--border-color);
+    }
+
+    /* Subviews (P2P, Storage, Logs, Settings) */
+    .subview-container {
+      flex: 1;
+      padding: 16px 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 1200px;
+    }
+
+    .subview-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .subview-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .subview-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-subtext {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .settings-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .form-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-input {
+      height: 29px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 0 8px;
+      color: var(--text-primary);
+      font-size: 12px;
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    /* Terminal & Logs */
+    .terminal-box {
+      background-color: var(--bg-card-inner);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11.5px;
+      height: 280px;
+      overflow-y: auto;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    .terminal-line-info {
+      color: #38bdf8;
+    }
+
+    .terminal-line-ok {
+      color: #4ade80;
+    }
+
+    .terminal-line-warn {
+      color: #facc15;
+    }
+
+    .terminal-line-err {
+      color: #f87171;
+    }
+
+    /* Context Menu */
+    .context-menu {
+      position: fixed;
+      z-index: 1000;
+      background-color: var(--bg-context-menu);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      padding: 4px 0;
+      min-width: 220px;
+      display: none;
+      font-size: 12px;
+    }
+
+    .context-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color 0.05s ease;
+    }
+
+    .context-item:hover:not(.disabled) {
+      background-color: var(--bg-context-hover);
+    }
+
+    .context-item.disabled {
+      color: var(--text-muted);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .context-item.danger {
+      color: var(--status-missing-color);
+    }
+
+    .context-item.danger:hover:not(.disabled) {
+      background-color: rgba(217, 107, 102, 0.15);
+    }
+
+    .context-divider {
+      height: 1px;
+      background-color: var(--border-subtle);
+      margin: 4px 0;
+    }
+
+    .context-shortcut {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-left: 12px;
+    }
+
+    /* Modal Dialogs */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-header);
+      border-radius: 8px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      width: 90%;
+      max-width: 580px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalFadeIn 0.15s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 40px;
+      padding: 0 14px;
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .modal-close-btn {
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .modal-close-btn:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 75vh;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    .game-editor-modal .modal-body {
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 10px 14px;
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Toast Notification */
+    .toast-pill {
+      position: fixed;
+      bottom: 34px;
+      right: 20px;
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--accent-indicator);
+      padding: 7px 14px;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      font-size: 11.5px;
+      z-index: 3000;
+      display: none;
+      animation: toastIn 0.15s ease-out;
+    }
+
+    .toast-pill.show {
+      display: block;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Native Windows titlebar preview: product logo + title only. -->
+  <header class="titlebar">
+    <div class="titlebar-left">
+      <div class="titlebar-logo">
+        <img src="../logo-server.svg" alt="Ting Server Logo" style="height: 22px; width: 22px; object-fit: contain;">
+      </div>
+      <span class="titlebar-title">Ting Server</span>
+    </div>
+  </header>
+
+  <!-- App Body Frame -->
+  <div class="app-frame">
+
+    <!-- Left Sidebar: 5 chức năng chuẩn (Không có Bản Quyền) -->
+    <aside class="sidebar" id="app-sidebar">
+      <div class="sidebar-resizer" id="sidebar-resizer" title="Kéo để chỉnh độ rộng hoặc nhấp đúp để thu nhỏ / mở rộng"></div>
+
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <div class="brand-logo-wrap">
+            <img src="../logo-server.svg" alt="Ting Server Logo" class="brand-logo-img">
+            <span class="brand-tag">Server</span>
+          </div>
+          <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Thu nhỏ sidebar">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+              <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+            </svg>
+          </button>
+        </div>
+
+        <div>
+          <div class="nav-section-title">Chức năng</div>
+          <ul class="nav-list">
+            <!-- Tab 1: Danh sách Game -->
+            <li class="nav-item active" data-tab="games" title="Danh sách Game">
+              <div class="nav-left">
+                <span class="nav-icon">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h11A1.5 1.5 0 0 1 15 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9zM2.5 3a.5.5 0 0 0-.5.5V5h12V3.5a.5.5 0 0 0-.5-.5h-11zM14 6H2v6.5a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5V6z" />
+                  </svg>
+                </span>
+                <span>Danh sách Game</span>
+              </div>
+              <span class="nav-badge" id="nav-count">10</span>
+            </li>
+            <!-- Tab 2: Mạng P2P -->
+            <li class="nav-item" data-tab="p2p" title="Mạng P2P (Seeder Swarm)">
+              <div class="nav-left">
+                <span class="nav-icon">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M11.5 8a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                  </svg>
+                </span>
+                <span>Mạng P2P</span>
+              </div>
+              <span class="nav-badge" style="background-color: rgba(56, 189, 248, 0.2); color: #38bdf8;">16881</span>
+            </li>
+            <!-- Tab 3: Lưu trữ -->
+            <li class="nav-item" data-tab="storage" title="Quản lý Lưu trữ Ổ G:\">
+              <div class="nav-left">
+                <span class="nav-icon">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm0 1h12a1 1 0 0 1 1 1v2H1V4a1 1 0 0 1 1-1zm13 4v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7h14zM12 9a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
+                  </svg>
+                </span>
+                <span>Lưu trữ</span>
+              </div>
+            </li>
+            <!-- Tab 4: Log / Trợ giúp -->
+            <li class="nav-item" data-tab="logs" title="Log / Trợ giúp">
+              <div class="nav-left">
+                <span class="nav-icon">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z" />
+                    <path d="M4.5 7.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5z" />
+                  </svg>
+                </span>
+                <span>Log / Trợ giúp</span>
+              </div>
+            </li>
+            <!-- Tab 5: Cài đặt -->
+            <li class="nav-item" data-tab="settings" title="Cài đặt hệ thống">
+              <div class="nav-left">
+                <span class="nav-icon">
+                  <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
+                  </svg>
+                </span>
+                <span>Cài đặt</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom: Server Configuration & Environment Info -->
+      <div class="sidebar-bottom">
+        <div class="service-info-box" id="sidebar-service-box" title="Cấu hình Ting Server:&#10;• Trạng thái: Service online (:3211)&#10;• Ổ game: G:\ (412 GB trống / 1.8 TB)&#10;• P2P Seeder: Port 16881 (Active)&#10;• Đồng bộ: SSE 1000ms&#10;• Tiến trình: PID 4892 · v0.1.0">
+          <div class="service-status-line" id="service-status-toggle" title="Nhấp để chuyển Online / Offline">
+            <div class="status-indicator-badge" id="service-status-badge">
+              <span class="indicator-dot" id="service-indicator-dot"></span>
+              <span id="service-status-text">Service online</span>
+            </div>
+            <span class="service-port-tag" id="service-port-tag">:3211</span>
+          </div>
+          <div class="service-detail-line">
+            <span class="detail-label">Ổ game</span>
+            <span class="detail-val" title="Thư mục game gốc G:\">G:\ (412 GB trống)</span>
+          </div>
+          <div class="service-detail-line">
+            <span class="detail-label">P2P Seeder</span>
+            <span class="detail-val" id="service-seeder-val"><span class="badge-mini success">Port 16881</span> Active</span>
+          </div>
+          <div class="service-detail-line">
+            <span class="detail-label">Đồng bộ</span>
+            <span class="detail-val">SSE 1000ms</span>
+          </div>
+          <div class="service-detail-line">
+            <span class="detail-label">Tiến trình</span>
+            <span class="detail-val">PID 4892 · v0.1.0</span>
+          </div>
+        </div>
+
+        <button class="sidebar-theme-switch" id="btn-theme-toggle" title="Đổi giao diện Sáng / Tối">
+          <svg id="theme-icon" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z" />
+          </svg>
+          <span id="theme-text">Giao diện Tối</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Viewport -->
+    <main class="main-viewport">
+
+      <div class="service-error-banner" id="service-error-banner" role="alert">
+        <strong>Service gặp lỗi</strong>
+        <span class="service-error-message" id="service-error-message">[2026-09-09 19:14:02.310] [ERROR] Không kết nối được Ting Server Service tại 127.0.0.1:3211</span>
+        <button class="btn-action" onclick="refreshServiceState()">Thử lại</button>
+        <button class="btn-action primary" onclick="restartService()">Restart service</button>
+        <button class="btn-action" onclick="showToast('Đang mở thư mục Log của Ting Server...')">Mở Log</button>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 1: DANH SÁCH GAME (game-grid hiển thị luôn lập tức) -->
+      <!-- ======================================================== -->
+      <div class="view-panel active" id="view-games">
+        
+        <!-- Toolbar 2 hàng: Hàng 1 (Thao tác game hàng loạt) - Hàng 2 (Tìm kiếm bên trái & Action bên phải) -->
+        <div class="toolbar-wrapper">
+          <!-- Hàng 1: Thao tác game hàng loạt (disable nghiêm ngặt theo trạng thái toàn bộ game đã chọn) -->
+          <div class="toolbar-row-actions">
+            <div class="toolbar-actions-list" id="toolbar-center-actions">
+              <span class="selection-indicator" id="selection-count-badge" style="display: none;">Đã chọn: 0</span>
+              
+              <!-- 1. Tải Game từ P2P: chỉ enable khi tất cả game đều chưa tải -->
+              <button class="btn-action" id="btn-p2p-fetch" disabled title="Tải Game từ P2P (Chỉ kích hoạt khi TẤT CẢ game đã chọn đều chưa tải)">
+                <svg viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                <span>Tải Game từ P2P</span>
+              </button>
+
+              <!-- 2. Tạm dừng seed: chỉ enable khi tất cả game đều đang seeding -->
+              <button class="btn-action" id="btn-stop-seed" disabled title="Tạm dừng seed (Chỉ kích hoạt khi TẤT CẢ game đã chọn đang seeding)">
+                <svg viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
+                <span>Tạm dừng</span>
+              </button>
+
+              <!-- 3. Tiếp tục/chia sẻ lại các torrent game đã chọn -->
+              <button class="btn-action" id="btn-reseed" disabled title="Chia sẻ lại game">
+                <svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
+                <span>Chia sẻ lại game</span>
+              </button>
+
+              <!-- 4. Stop ngay sau nhóm Pause/Resume -->
+              <button class="btn-action" id="btn-hard-stop" disabled title="Dừng tác vụ P2P, seed, hash hoặc check đang chạy">
+                <svg viewBox="0 0 16 16"><path d="M4 4h8v8H4z"/></svg>
+                <span>Dừng</span>
+              </button>
+
+              <!-- 5. Kiểm tra Game: verify integrity ngầm qua libtorrent -->
+              <button class="btn-action" id="btn-recheck" disabled title="Kiểm tra tính toàn vẹn file game qua libtorrent ngầm">
+                <svg viewBox="0 0 16 16"><path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z"/></svg>
+                <span>Kiểm tra Game</span>
+              </button>
+
+              <!-- 6. Set ưu tiên seed: mở modal set ưu tiên cho các game đã chọn -->
+              <button class="btn-action" id="btn-set-priority" disabled title="Set mức ưu tiên seed cho các game đã chọn">
+                <svg viewBox="0 0 16 16"><path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm4.5 3a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3z"/></svg>
+                <span>Set ưu tiên</span>
+              </button>
+
+              <!-- 7. Xóa game: có confirm hỏi xóa dữ liệu game -->
+              <button class="btn-action danger" id="btn-delete-game" disabled title="Xóa game khỏi danh sách (có xác nhận xóa dữ liệu game)">
+                <svg viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
+                <span>Xóa game</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Hàng 2: Cụm action tìm kiếm (bên trái) + Cụm action bên phải (Thêm Game, Làm mới) -->
+          <div class="toolbar-row-search">
+            <!-- Cụm tìm kiếm bên trái -->
+            <div class="toolbar-search-left">
+              <div class="search-box-wrap">
+                <svg class="search-icon" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+                <input type="text" class="search-input" id="search-box" placeholder="Tìm theo tên game...">
+                <button class="search-clear-btn" id="btn-clear-search" title="Xóa tìm kiếm">✕</button>
+              </div>
+
+              <!-- Combobox tìm kiếm nâng cao -->
+              <select class="adv-search-select" id="adv-filter-type" title="Bộ lọc trường tìm kiếm nâng cao">
+                <option value="all">Tất cả trường</option>
+                <option value="id">Theo ID</option>
+                <option value="version">Theo Version</option>
+                <option value="category">Theo Loại (Online/Offline/Tools)</option>
+                <option value="status">Theo Trạng thái</option>
+                <option value="priority">Theo Mức ưu tiên</option>
+              </select>
+
+              <select class="adv-search-select" id="adv-filter-val" title="Giá trị bộ lọc nhanh">
+                <option value="all">-- Tất cả giá trị --</option>
+                <option value="cat:Online">Loại: Online</option>
+                <option value="cat:Offline">Loại: Offline</option>
+                <option value="cat:Tools">Loại: Tools</option>
+                <option value="status:seeding">Trạng thái: Đang seed</option>
+                <option value="status:paused">Trạng thái: Tạm dừng</option>
+                <option value="status:stopped">Trạng thái: Đã dừng</option>
+                <option value="status:not_downloaded">Trạng thái: Chưa tải</option>
+                <option value="status:missing">Trạng thái: Game không tồn tại</option>
+                <option value="priority:Cao">Ưu tiên: Cao</option>
+                <option value="priority:Bình thường">Ưu tiên: Bình thường</option>
+                <option value="priority:Thấp">Ưu tiên: Thấp</option>
+              </select>
+            </div>
+
+            <!-- Cụm action bên phải -->
+            <div class="toolbar-actions-right">
+              <button class="btn-action primary" id="btn-add-game" title="Thêm Game mới vào Server">
+                <svg viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/></svg>
+                <span>Thêm Game</span>
+              </button>
+              <button class="btn-action" id="btn-refresh" title="Làm mới danh sách game (F5)">
+                <svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
+                <span>Làm mới</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bảng dữ liệu Game (game-grid) -->
+        <div class="grid-viewport" id="grid-viewport">
+          <table class="data-grid" id="game-table">
+            <thead>
+              <tr>
+                <th class="col-cb no-sort">
+                  <input type="checkbox" class="native-checkbox" id="check-all" title="Chọn / bỏ chọn tất cả">
+                </th>
+                <th data-col="category" style="width: 90px;">
+                  <div class="th-inner"><span>Loại</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="name" style="width: 210px;">
+                  <div class="th-inner"><span>Tên game</span><span class="sort-arrow">↑</span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="version" style="width: 170px;">
+                  <div class="th-inner"><span>Version</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="publishedAt" style="width: 145px;">
+                  <div class="th-inner"><span>Tạo bản cập nhật</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="priority" style="width: 105px;">
+                  <div class="th-inner"><span>Ưu tiên seed</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="size" style="width: 105px;">
+                  <div class="th-inner"><span>Dung lượng</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="path" style="width: 200px;">
+                  <div class="th-inner"><span>Thư mục Game</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="status" style="width: 145px;">
+                  <div class="th-inner"><span>Trạng thái</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="speed" style="width: 95px;">
+                  <div class="th-inner"><span>Upload</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="eta" style="width: 75px;">
+                  <div class="th-inner"><span>ETA</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th data-col="peers" style="width: 95px;">
+                  <div class="th-inner"><span>Peers/Seeds</span><span class="sort-arrow"></span></div>
+                  <div class="col-resizer"></div>
+                </th>
+                <th class="col-actions no-sort" style="width: 275px; text-align: center;">
+                  <div class="th-inner" style="justify-content: center;"><span>Thao tác</span></div>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="grid-body">
+              <!-- Sẽ được nạp tự động ngay khi renderGrid() chạy -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 2: MẠNG P2P (Seeder Swarm & Bandwidth Dashboard)   -->
+      <!-- ======================================================== -->
+      <div class="view-panel" id="view-p2p">
+        <div class="subview-container">
+          <div class="subview-header">
+            <h2 class="subview-title">Mạng P2P & Seeder Swarm</h2>
+            <p class="subview-desc">Giám sát các swarms chia sẻ P2P, băng thông truyền tải và danh sách client Ting Update đang kết nối kéo game</p>
+          </div>
+
+          <!-- Cards chỉ số Seeder -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Cổng Seeder Lắng Nghe</span>
+              <span class="stat-value" style="color: #38bdf8;">16881</span>
+              <span class="stat-subtext">TCP/UDP Active (Mặc định Server)</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Băng Thông Upload</span>
+              <span class="stat-value" style="color: var(--status-online-green);">38.6 MB/s</span>
+              <span class="stat-subtext">Đỉnh tải LAN: 92.4 MB/s</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Ting Update kết nối</span>
+              <span class="stat-value">18 peers</span>
+              <span class="stat-subtext">Đang nhận torrent chunks</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Active Swarms</span>
+              <span class="stat-value" style="color: var(--status-seed-color);">6 game</span>
+              <span class="stat-subtext">Torrent InfoHash hợp lệ</span>
+            </div>
+          </div>
+
+          <!-- Bảng Ting Update (peers) đang kết nối -->
+          <div class="settings-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h3 style="font-size: 13.5px; font-weight: 700; color: var(--text-primary);">Danh sách Ting Update đang kết nối</h3>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Cập nhật thời gian thực qua socket P2P Seeder daemon (:16881)</div>
+              </div>
+              <button class="btn-action" onclick="showToast('Đang quét lại danh sách swarms...')">
+                <span>Quét lại Peers</span>
+              </button>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px;">
+              <thead>
+                <tr style="background: var(--bg-table-header); height: 28px; color: var(--text-header); text-align: left;">
+                  <th style="padding: 0 10px;">Địa chỉ IP Ting Update</th>
+                  <th style="padding: 0 10px;">Client Agent</th>
+                  <th style="padding: 0 10px;">Game đang tải</th>
+                  <th style="padding: 0 10px;">Tốc độ Upload</th>
+                  <th style="padding: 0 10px;">Tiến độ</th>
+                  <th style="padding: 0 10px;">Thời gian</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="height: 32px; border-bottom: 1px solid var(--border-subtle);">
+                  <td style="padding: 0 10px; font-family: monospace;">192.168.1.101:16882</td>
+                  <td style="padding: 0 10px; color: var(--text-secondary);">Ting Update (Node 01)</td>
+                  <td style="padding: 0 10px; font-weight: 600;">Counter-Strike 2</td>
+                  <td style="padding: 0 10px; color: var(--status-online-green);">↑ 12.4 MB/s</td>
+                  <td style="padding: 0 10px;"><span class="badge-mini success">68%</span></td>
+                  <td style="padding: 0 10px; color: var(--text-muted);">4m 12s</td>
+                </tr>
+                <tr style="height: 32px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-table-alt);">
+                  <td style="padding: 0 10px; font-family: monospace;">192.168.1.105:16882</td>
+                  <td style="padding: 0 10px; color: var(--text-secondary);">Ting Update (Node 05)</td>
+                  <td style="padding: 0 10px; font-weight: 600;">Black Myth: Wukong</td>
+                  <td style="padding: 0 10px; color: var(--status-online-green);">↑ 14.8 MB/s</td>
+                  <td style="padding: 0 10px;"><span class="badge-mini success">12%</span></td>
+                  <td style="padding: 0 10px; color: var(--text-muted);">18m 05s</td>
+                </tr>
+                <tr style="height: 32px; border-bottom: 1px solid var(--border-subtle);">
+                  <td style="padding: 0 10px; font-family: monospace;">192.168.1.112:16882</td>
+                  <td style="padding: 0 10px; color: var(--text-secondary);">Ting Update (Node 12)</td>
+                  <td style="padding: 0 10px; font-weight: 600;">Liên Minh Huyền Thoại</td>
+                  <td style="padding: 0 10px; color: var(--status-online-green);">↑ 8.2 MB/s</td>
+                  <td style="padding: 0 10px;"><span class="badge-mini success">89%</span></td>
+                  <td style="padding: 0 10px; color: var(--text-muted);">2m 44s</td>
+                </tr>
+                <tr style="height: 32px; background: var(--bg-table-alt);">
+                  <td style="padding: 0 10px; font-family: monospace;">192.168.1.118:16882</td>
+                  <td style="padding: 0 10px; color: var(--text-secondary);">Ting Update (Node 18)</td>
+                  <td style="padding: 0 10px; font-weight: 600;">Grand Theft Auto V</td>
+                  <td style="padding: 0 10px; color: var(--status-online-green);">↑ 3.2 MB/s</td>
+                  <td style="padding: 0 10px;"><span class="badge-mini success">45%</span></td>
+                  <td style="padding: 0 10px; color: var(--text-muted);">32m 10s</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 3: LƯU TRỮ (Quản lý dung lượng ổ game G:\)  -->
+      <!-- ======================================================== -->
+      <div class="view-panel" id="view-storage">
+        <div class="subview-container">
+          <div class="subview-header">
+            <h2 class="subview-title">Lưu trữ</h2>
+            <p class="subview-desc">Theo dõi dung lượng ổ đĩa lưu trữ G:\, phân bổ theo từng danh mục game và kiểm tra tính toàn vẹn I/O</p>
+          </div>
+
+          <div class="settings-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Ổ LƯU TRỮ CHÍNH</span>
+                <div style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-top: 2px;">
+                  Ổ G:\ (Tổng: 1.80 TB · Đã dùng: 1.39 TB · Trống: 412 GB)
+                </div>
+              </div>
+              <button class="btn-action" onclick="showToast('Đang kiểm tra tốc độ đọc/ghi I/O ổ G:\\...')">
+                <span>Kiểm tra I/O ổ đĩa</span>
+              </button>
+            </div>
+
+            <!-- Visual Capacity Bar -->
+            <div style="width: 100%; height: 12px; background: #262830; border-radius: 6px; overflow: hidden; display: flex; margin-top: 4px;">
+              <div style="width: 45%; background: #0078d4;" title="Game Online: 820 GB (45%)"></div>
+              <div style="width: 21%; background: #3bb273;" title="Game Offline: 390 GB (21%)"></div>
+              <div style="width: 1%; background: #eab308;" title="Tools & Drivers: 20 GB (1%)"></div>
+              <div style="width: 11%; background: #737783;" title="Dữ liệu khác trên ổ: 198 GB (11%)"></div>
+              <div style="width: 22%; background: transparent;" title="Dung lượng trống: 412 GB (22%)"></div>
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 11px; color: var(--text-secondary);">
+              <span><strong style="color: #60a5fa;">■</strong> Online: 820 GB</span>
+              <span><strong style="color: #4ade80;">■</strong> Offline: 390 GB</span>
+              <span><strong style="color: #facc15;">■</strong> Tools: 20 GB</span>
+              <span><strong style="color: #9ca3af;">■</strong> Khác: 198 GB</span>
+              <span><strong style="color: #9ca3af;">□</strong> Trống: 412 GB</span>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 6px 0;">
+
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-action primary" onclick="showToast('Đang quét lại toàn bộ thư mục ổ G:\\...')">
+                <span>Quét lại toàn bộ thư mục game</span>
+              </button>
+              <button class="btn-action" onclick="showToast('Đang mở thư mục G:\\ trong Windows Explorer...')">
+                <span>Mở ổ G:\ trong Explorer</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 4: LOG / TRỢ GIÚP                                   -->
+      <!-- ======================================================== -->
+      <div class="view-panel" id="view-logs">
+        <div class="subview-container">
+          <div class="subview-header">
+            <h2 class="subview-title">Log Hệ thống & Trợ giúp Kỹ thuật</h2>
+            <p class="subview-desc">Xem log hoạt động của Ting Server Service (:3211), seeder daemon (:16881) và bảng tra cứu phím tắt</p>
+          </div>
+
+          <div class="settings-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-weight: 600; font-size: 13px;">Log Ting Server</span>
+                <select class="adv-search-select" id="log-filter-level" style="height: 26px;">
+                  <option value="all">Tất cả cấp độ</option>
+                  <option value="info">Chỉ [INFO]</option>
+                  <option value="success">Chỉ [SUCCESS]</option>
+                  <option value="warn">Chỉ [WARN]</option>
+                  <option value="err">Chỉ [ERROR]</option>
+                </select>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn-action" onclick="clearLogs()">Xóa log hiển thị</button>
+                <button class="btn-action" onclick="showToast('Đang mở thư mục C:\\ProgramData\\Ting\\ting-server\\logs...')">Mở thư mục Log</button>
+              </div>
+            </div>
+
+            <div class="terminal-box" id="terminal-log-content">
+              <div>[2026-09-09 19:10:02.105] <span class="terminal-line-info">[INFO]</span> ting_server_service khởi động trên loopback 127.0.0.1:3211</div>
+              <div>[2026-09-09 19:10:02.122] <span class="terminal-line-ok">[SUCCESS]</span> Khởi tạo P2P Seeder daemon trên cổng TCP/UDP: 16881 (Open)</div>
+              <div>[2026-09-09 19:10:02.190] <span class="terminal-line-info">[INFO]</span> Kiểm tra ổ game: G:\ (412 GB khả dụng / 1.80 TB)</div>
+              <div>[2026-09-09 19:10:02.240] <span class="terminal-line-ok">[SUCCESS]</span> Đã nạp 10 game trong danh sách · 6 torrent swarm đang seeding</div>
+              <div>[2026-09-09 19:10:04.108] <span class="terminal-line-info">[INFO]</span> SSE event stream mở cho GUI loopback (:3211/v1/events) interval 1000ms</div>
+              <div>[2026-09-09 19:12:15.820] <span class="terminal-line-ok">[TRANSFER]</span> Peer 192.168.1.101:16882 kết nối swarm 'Counter-Strike 2' (↑ 12.4 MB/s)</div>
+              <div>[2026-09-09 19:14:02.310] <span class="terminal-line-warn">[WARN]</span> Game 'Valorant Client' chưa được tải về ổ game G:\</div>
+            </div>
+          </div>
+
+          <!-- Bảng tra cứu phím tắt -->
+          <div class="settings-card">
+            <h3 style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Phím tắt và Thao tác nhanh</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; font-size: 11.5px; color: var(--text-secondary);">
+              <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">F5</kbd> : Làm mới danh sách game và swarms</div>
+              <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Ctrl + A</kbd> : Chọn tất cả game trong bảng</div>
+              <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Shift + Click</kbd> : Chọn dải hàng liên tiếp</div>
+              <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Chuột phải vào row</kbd> : Mở menu context tại row đó</div>
+              <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Nhấp đúp vào row</kbd> : Xem thông tin chi tiết game</div>
+              <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Esc</kbd> : Đóng menu chuột phải hoặc dialog đang mở</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 5: CÀI ĐẶT                                          -->
+      <!-- ======================================================== -->
+      <div class="view-panel" id="view-settings">
+        <div class="subview-container">
+          <div class="subview-header">
+            <h2 class="subview-title">Cài đặt Ting Server</h2>
+            <p class="subview-desc">Quản lý service, ổ game, cổng loopback REST, cổng P2P Seeder và tùy chọn khay hệ thống</p>
+          </div>
+
+          <div class="settings-card">
+            <div class="form-row" style="justify-content: space-between;">
+              <div>
+                <div class="form-label">Ting Server Service</div>
+                <div class="form-hint">GUI chạy quyền thường; Windows chỉ yêu cầu UAC khi thao tác SCM cần nâng quyền.</div>
+              </div>
+              <div class="form-row">
+                <button class="btn-action" onclick="refreshServiceState()">Làm mới trạng thái</button>
+                <button class="btn-action primary" id="btn-restart-service" onclick="restartService()">Restart service</button>
+                <button class="btn-action" onclick="showToast('Đang mở C:\\ProgramData\\Ting\\ting-server\\logs...')">Mở Log</button>
+              </div>
+            </div>
+            <div class="service-state-grid">
+              <span class="label">Trạng thái</span><span class="value" id="settings-service-status">Running · Healthy</span>
+              <span class="label">Startup</span><span class="value">Automatic (Windows SCM)</span>
+              <span class="label">REST loopback</span><span class="value">127.0.0.1:3211</span>
+              <span class="label">Tiến trình</span><span class="value" id="settings-service-process">PID 4892 · v0.1.0</span>
+              <span class="label">Kiểm tra gần nhất</span><span class="value" id="settings-service-check">[2026-09-09 19:14:02.310]</span>
+              <span class="label">Quyền điều khiển</span><span class="value">SCM · UAC khi cần</span>
+            </div>
+            <div class="latest-error-box" id="settings-latest-error"><strong>Lỗi gần nhất:</strong> <span id="settings-latest-error-text">[2026-09-09 19:14:02.310] [ERROR] Không kết nối được Ting Server Service tại 127.0.0.1:3211</span></div>
+          </div>
+
+          <div class="settings-card">
+            <div class="form-group">
+              <label class="form-label">Ổ game chính</label>
+              <div class="form-row">
+                <input type="text" class="form-input" id="cfg-root-drive" value="G:\" style="width: 240px;">
+                <button class="btn-action" onclick="showToast('Đang mở hộp thoại chọn ổ game...')">Chọn ổ đĩa...</button>
+                <button class="btn-action primary" onclick="showToast('Đã lưu ổ game: G:\\')">Lưu ổ game</button>
+              </div>
+              <span class="form-hint">Chỉ lưu tên ổ game chính, không lưu thư mục con. Ổ này chứa dữ liệu game để hash torrent và chia sẻ cho Ting Update; cần khởi động lại service nếu đổi ổ.</span>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+            <div class="form-group">
+              <label class="form-label">Cổng P2P Seeder (TCP / UDP)</label>
+              <div class="form-row">
+                <input type="number" class="form-input" id="cfg-p2p-port" value="16881" min="1024" max="65535" style="width: 140px;">
+                <span style="font-size: 11px; color: var(--text-muted);">(Mặc định Server: 16881, có thể đổi được)</span>
+                <button class="btn-action primary" onclick="showToast('Đã áp dụng cổng Seeder: ' + document.getElementById('cfg-p2p-port').value)">Lưu cổng Seeder</button>
+              </div>
+              <span class="form-hint">Cổng P2P để các peer kết nối qua Internet/private tracker. Hãy mở firewall và cấu hình NAT khi cần.</span>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+            <div class="form-group">
+              <label class="form-label">Cổng REST Loopback cục bộ</label>
+              <div class="form-row">
+                <input type="text" class="form-input" value="127.0.0.1:3211" disabled style="width: 160px; opacity: 0.7;">
+                <span class="badge-mini success">Cố định Service</span>
+              </div>
+              <span class="form-hint">Cổng giao tiếp nội bộ giữa giao diện GUI và tiến trình chạy nền ting-server-service.</span>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+            <div class="form-group">
+              <label class="form-label">Tần suất đồng bộ SSE (Server-Sent Events)</label>
+              <div class="form-row">
+                <input type="number" class="form-input" value="1000" min="250" max="10000" style="width: 140px;">
+                <span style="font-size: 12px; color: var(--text-secondary);">ms</span>
+                <button class="btn-action primary" onclick="showToast('Đã cập nhật tần suất SSE: 1000ms')">Lưu</button>
+              </div>
+              <span class="form-hint">Tần suất nhận cập nhật trạng thái torrent và client từ service (250 - 10000 ms).</span>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+            <div class="form-group">
+              <label class="form-label">Khi đóng cửa sổ</label>
+              <div class="form-row">
+                <select class="form-select" style="width: 180px;">
+                  <option>Ẩn xuống tray</option>
+                  <option>Đóng</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Status Bar -->
+      <footer class="status-bar">
+        <div class="status-bar-left">
+          <span id="selected-summary">Chưa chọn game</span>
+          <div class="status-divider"></div>
+          <span id="health-summary">6 đang seeding · 2 chưa tải · 1 đã dừng</span>
+        </div>
+        <div class="status-bar-right">
+          <span>Seeder: <strong>16881</strong> (Active)</span>
+          <div class="status-divider"></div>
+          <span>Ổ game: G:\ (412 GB trống / 1.8 TB)</span>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- CONTEXT MENU (Fix hiển thị đúng row đang click chuột phải) -->
+  <!-- ======================================================== -->
+  <div class="context-menu" id="context-menu">
+    <!-- 1. Tải Game từ P2P (enable nếu chưa tải) -->
+    <div class="context-item" id="ctx-p2p-fetch">
+      <span>Tải Game từ P2P</span>
+    </div>
+    <!-- 2. Chia sẻ (enable nếu đã có dữ liệu game và đang stopped/paused) -->
+    <div class="context-item" id="ctx-seed">
+      <span>Chia sẻ Game</span>
+    </div>
+    <!-- 3. Chia sẻ lại game -->
+    <div class="context-item" id="ctx-reseed">
+      <span>Chia sẻ lại game</span>
+    </div>
+    <!-- 4. Tạm dừng seed (enable nếu đang seeding) -->
+    <div class="context-item" id="ctx-pause">
+      <span>Tạm dừng</span>
+    </div>
+    <!-- 5. Stop hẳn tác vụ -->
+    <div class="context-item" id="ctx-stop">
+      <span>Dừng</span>
+    </div>
+    <!-- 6. Kiểm tra game -->
+    <div class="context-item" id="ctx-recheck">
+      <span>Kiểm tra Game</span>
+    </div>
+    <div class="context-divider"></div>
+    <!-- 7. Tạo bản cập nhật (mở Dialog Tạo phiên bản mới) -->
+    <div class="context-item" id="ctx-version">
+      <span>Tạo bản cập nhật...</span>
+    </div>
+    <!-- 8. Sửa game, ngay sau tạo bản cập nhật -->
+    <div class="context-item" id="ctx-edit">
+      <span>Sửa Game...</span>
+    </div>
+    <!-- 9. Lịch sử release đã publish -->
+    <div class="context-item" id="ctx-history">
+      <span>Lịch sử release...</span>
+    </div>
+    <!-- 9. Set ưu tiên seed -->
+    <div class="context-item" id="ctx-priority">
+      <span>Set ưu tiên seed...</span>
+    </div>
+    <div class="context-divider"></div>
+    <!-- 11. Mở file chạy, trước mở thư mục -->
+    <div class="context-item" id="ctx-open-executable">
+      <span>Mở file chạy</span>
+    </div>
+    <!-- 12. Mở thư mục -->
+    <div class="context-item" id="ctx-open-folder">
+      <span>Mở thư mục chứa Game</span>
+    </div>
+    <!-- 10. Thông tin game chi tiết -->
+    <div class="context-item" id="ctx-properties">
+      <span>Thông tin game chi tiết...</span>
+    </div>
+    <div class="context-divider"></div>
+    <!-- 11. Xóa game -->
+    <div class="context-item danger" id="ctx-delete">
+      <span>Xóa Game khỏi Ting Server...</span>
+    </div>
+  </div>
+
+  <!-- Action Toast Notice -->
+  <div class="toast-pill" id="toast-pill"></div>
+
+  <!-- ======================================================== -->
+  <!-- MODALS / DIALOGS                                         -->
+  <!-- ======================================================== -->
+
+  <!-- Modal 1: Thêm Game mới (Ưu tiên File chạy EXE theo chuẩn ting-server-gui) -->
+  <div class="modal-overlay" id="modal-import">
+    <div class="modal-card game-editor-modal" style="max-width: 680px;">
+      <div class="modal-header">
+        <span class="modal-title" id="import-modal-title">Thêm Game mới</span>
+        <button class="modal-close-btn" onclick="closeModal('modal-import')">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- 1. ƯU TIÊN HÀNG ĐẦU: File chạy (EXE) -->
+        <div class="form-group">
+          <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>File chạy</span>
+            <span id="exe-validation-msg" style="font-size: 11px; font-weight: normal; color: #f59e0b;">⚠ Chọn file EXE để bắt đầu</span>
+          </label>
+          <div class="form-row">
+            <input type="text" class="form-input" id="add-game-exe" placeholder="Đường dẫn tương đối tới file EXE (ví dụ: b1\Binaries\Win64\b1-Win64-Shipping.exe)" style="flex: 1;" oninput="onExeInputChanged()">
+            <button class="btn-action primary" id="btn-browse-exe" onclick="simulateBrowseExe()">Chọn EXE...</button>
+          </div>
+          <span class="form-hint">Chọn file thực thi chính để hệ thống tự động suy luận Thư mục Game, tên game và ID.</span>
+        </div>
+
+        <!-- 2. Thư mục Game -->
+        <div class="form-group">
+          <label class="form-label">Thư mục Game</label>
+          <div class="form-row">
+            <input type="text" class="form-input" id="add-game-folder" placeholder="Thư mục Game (ví dụ: G:\Online Games\wukong)" style="flex: 1;">
+            <button class="btn-action" onclick="showToast('Đổi Thư mục Game')">Đổi folder...</button>
+          </div>
+        </div>
+
+        <!-- 3. Game ID & Tên Game (Grid 2 cột) -->
+        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label">Game ID</label>
+            <input type="text" class="form-input" id="add-game-id" placeholder="game-id">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tên Game</label>
+            <input type="text" class="form-input" id="add-game-name" placeholder="Tên hiển thị của Game">
+          </div>
+        </div>
+
+        <!-- 4. Phiên bản & Loại Game & Ưu tiên seed -->
+        <div style="display: grid; grid-template-columns: 110px 1fr 130px; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label">Phiên bản</label>
+            <input type="text" class="form-input" id="add-game-version" value="v1" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Loại Game</label>
+            <select class="adv-search-select" id="add-game-cat" style="width: 100%;">
+              <option value="Online">Online</option>
+              <option value="Offline" selected>Offline</option>
+              <option value="Tools">Tools</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ưu tiên seed</label>
+            <select class="adv-search-select" id="add-game-priority" style="width: 100%;">
+              <option value="Bình thường" selected>Bình thường</option>
+              <option value="Cao">Cao</option>
+              <option value="Thấp">Thấp</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label">File icon</label>
+            <div class="form-row"><input type="text" class="form-input" id="add-game-icon" placeholder="game.ico" style="flex: 1;"><button class="btn-action" type="button" onclick="document.getElementById('add-game-icon').value='game.ico'">Chọn</button></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">File thumbnail</label>
+            <div class="form-row"><input type="text" class="form-input" id="add-game-thumbnail" placeholder="thumbnail.jpg" style="flex: 1;"><button class="btn-action" type="button" onclick="document.getElementById('add-game-thumbnail').value='thumbnail.jpg'">Chọn</button></div>
+          </div>
+        </div>
+
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px;">
+          <input type="checkbox" id="add-game-force-download" class="native-checkbox">
+          <span>Bắt buộc máy trạm tự tải phiên bản này</span>
+        </label>
+
+      </div>
+      <!-- CHỈ CÓ 2 BUTTON: HỦY VÀ THÊM -->
+      <div class="modal-footer" style="justify-content: flex-end; gap: 8px;">
+        <button class="btn-action" onclick="closeModal('modal-import')">Hủy</button>
+        <button class="btn-action primary" id="btn-submit-add-game" onclick="submitAddGame()">Thêm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Tạo phiên bản mới (Tạo bản cập nhật) -->
+  <div class="modal-overlay" id="modal-version">
+    <div class="modal-card" style="max-width: 580px;">
+      <div class="modal-header">
+        <span class="modal-title">Tạo phiên bản mới</span>
+        <button class="modal-close-btn" onclick="closeModal('modal-version')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <div style="font-size: 14px; font-weight: 700; color: var(--text-primary);" id="version-modal-game-name">Counter-Strike 2</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Tạo torrent snapshot toàn bộ thư mục game; Ting Update hash lại trên folder cũ rồi chỉ nhận piece còn thiếu.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Version / Revision mới</label>
+          <input type="text" class="form-input" id="new-version-tag" value="v35" readonly>
+        </div>
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px;">
+          <input type="checkbox" id="quick-force-download" class="native-checkbox">
+          <span>Bắt buộc máy trạm tự tải phiên bản này</span>
+        </label>
+        <button class="btn-action" id="btn-toggle-version-paths" type="button" onclick="toggleVersionPaths()" style="align-self: flex-start;">Chỉnh đường dẫn nâng cao...</button>
+        <div id="version-advanced-paths" style="display: none; flex-direction: column; gap: 8px;">
+          <div class="form-row"><input type="text" class="form-input" placeholder="Thư mục Game" style="flex: 1;"><button class="btn-action">Chọn folder...</button></div>
+          <div class="form-row"><input type="text" class="form-input" placeholder="File chạy tương đối" style="flex: 1;"><button class="btn-action">Chọn EXE...</button></div>
+          <div class="form-row"><input type="text" class="form-input" placeholder="Icon (tùy chọn)" style="flex: 1;"><button class="btn-action">Chọn...</button></div>
+          <div class="form-row"><input type="text" class="form-input" placeholder="Thumbnail (tùy chọn)" style="flex: 1;"><button class="btn-action">Chọn...</button></div>
+        </div>
+        <span class="form-hint">Service sẽ hash, tạo torrent và publish release sau khi xác nhận.</span>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeModal('modal-version')">Hủy</button>
+        <button class="btn-action primary" onclick="submitCreateVersion()">Phát hành bản mới</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Set ưu tiên seed -->
+  <div class="modal-overlay" id="modal-priority">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <span class="modal-title">Set Ưu Tiên Seed</span>
+        <button class="modal-close-btn" onclick="closeModal('modal-priority')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="priority-modal-desc" style="font-size: 12px; color: var(--text-secondary);">
+          Chọn mức ưu tiên seed cho các game đã chọn:
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="priority-val" value="Cao">
+            <span class="priority-badge cao">Cao</span>
+            <span style="color: var(--text-muted); font-size: 11px;">- Ưu tiên cấp băng thông seeding tối đa cho Ting Update</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="priority-val" value="Bình thường" checked>
+            <span class="priority-badge binh-thuong">Bình thường</span>
+            <span style="color: var(--text-muted); font-size: 11px;">- Phân bổ băng thông đồng đều</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="radio" name="priority-val" value="Thấp">
+            <span class="priority-badge thap">Thấp</span>
+            <span style="color: var(--text-muted); font-size: 11px;">- Giới hạn tốc độ seeding khi mạng bận</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeModal('modal-priority')">Hủy</button>
+        <button class="btn-action primary" onclick="submitSetPriority()">Áp dụng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Xác nhận xóa Game (Có hỏi xóa dữ liệu game) -->
+  <div class="modal-overlay" id="modal-delete-confirm">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <span class="modal-title" style="color: var(--status-missing-color);">Xác nhận xóa Game khỏi Ting Server</span>
+        <button class="modal-close-btn" onclick="closeModal('modal-delete-confirm')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="delete-confirm-text" style="font-size: 12.5px;">
+          Bạn có chắc chắn muốn xóa game này khỏi danh sách quản lý của Ting Server?
+        </div>
+        <div style="background: rgba(217, 107, 102, 0.1); border: 1px solid rgba(217, 107, 102, 0.3); padding: 10px 12px; border-radius: 4px; margin-top: 6px;">
+          <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; color: var(--status-missing-color); font-weight: 600;">
+            <input type="checkbox" id="chk-delete-game-files" class="native-checkbox" style="margin-top: 2px;">
+            <span>Đồng thời xóa toàn bộ tệp tin dữ liệu gốc của game trên ổ đĩa G:\</span>
+          </label>
+          <div style="font-size: 11px; color: var(--text-muted); margin-left: 22px; margin-top: 2px;">
+            Cảnh báo: Tệp tin bị xóa vĩnh viễn trên ổ cứng và không thể khôi phục từ thùng rác!
+          </div>
+        </div>
+        <div style="font-size: 11px; color: var(--text-muted);">Có thể xóa ở mọi trạng thái; service dừng/abort tác vụ trước và gửi progress thật.</div>
+        <div style="height: 5px; background: var(--bg-card-inner); border-radius: 3px; overflow: hidden;"><div id="delete-operation-progress" style="height: 100%; width: 0%; background: #3b82f6;"></div></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeModal('modal-delete-confirm')">Hủy</button>
+        <button class="btn-action danger" onclick="submitDeleteGame()">Xác nhận Xóa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7: Thông tin game chi tiết -->
+  <div class="modal-overlay" id="modal-properties">
+    <div class="modal-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <span class="modal-title">Thông tin Game chi tiết</span>
+        <button class="modal-close-btn" onclick="closeModal('modal-properties')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <div style="font-size: 15px; font-weight: 700; color: var(--text-game-name);" id="prop-game-name">Counter-Strike 2</div>
+            <div style="font-size: 11px; color: var(--text-muted);" id="prop-game-id">ID: cs2 • Online</div>
+          </div>
+          <span class="badge-mini success" id="prop-game-status">Đang seeding</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; margin-top: 4px;">
+          <div><strong style="color: var(--text-muted);">Phiên bản:</strong> <span id="prop-game-ver">v34</span></div>
+          <div><strong style="color: var(--text-muted);">Mức ưu tiên:</strong> <span id="prop-game-prio">Cao</span></div>
+          <div><strong style="color: var(--text-muted);">Dung lượng:</strong> <span id="prop-game-size">34.2 GB</span></div>
+          <div><strong style="color: var(--text-muted);">Port Seeder:</strong> 16881 (Active)</div>
+          <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">Thư mục Game:</strong> <span id="prop-game-path" style="font-family: monospace;">G:\Online Games\cs2</span></div>
+          <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">File chạy:</strong> <span id="prop-game-exe" style="font-family: monospace; color: #38bdf8;">bin\cs2.exe</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeModal('modal-properties')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 8: Lịch sử release thật từ Ting Server Service -->
+  <div class="modal-overlay" id="modal-release-history">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <span class="modal-title">Lịch sử release</span>
+        <button class="modal-close-btn" onclick="closeModal('modal-release-history')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="release-history-content" style="background: var(--bg-card-inner); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 12px; white-space: pre-wrap; font-family: monospace; font-size: 11.5px; color: var(--text-primary);">Chọn game để tải lịch sử release từ service.</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeModal('modal-release-history')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT LOGIC                                         -->
+  <!-- ======================================================== -->
+  <script>
+    // Bộ dữ liệu thực tế 10 game với đầy đủ trạng thái đa dạng
+    let games = [
+      {
+        id: "cs2",
+        category: "Online",
+        name: "Counter-Strike 2",
+        version: "v34",
+        size: "34.2 GB",
+        sizeBytes: 36720000000,
+        path: "G:\\Online Games\\cs2",
+        publishedAt: "2026-09-05 19:40",
+        statusType: "seeding",
+        statusText: "● Đang seeding",
+        priority: "Cao",
+        speed: "↑ 12.4 MB/s",
+        eta: "-",
+        peers: "14 / 2",
+        hasGameFiles: true
+      },
+      {
+        id: "lol",
+        category: "Online",
+        name: "Liên Minh Huyền Thoại",
+        version: "v82",
+        size: "28.5 GB",
+        sizeBytes: 30600000000,
+        path: "G:\\Online Games\\lol",
+        publishedAt: "2026-09-06 08:15",
+        statusType: "seeding",
+        statusText: "● Đang seeding",
+        priority: "Cao",
+        speed: "↑ 8.2 MB/s",
+        eta: "-",
+        peers: "8 / 1",
+        hasGameFiles: true
+      },
+      {
+        id: "wukong",
+        category: "Offline",
+        name: "Black Myth: Wukong",
+        version: "v3",
+        size: "118.4 GB",
+        sizeBytes: 127100000000,
+        path: "G:\\Offline Games\\wukong",
+        publishedAt: "2026-08-30 21:05",
+        statusType: "paused",
+        statusText: "⏸ Đã dừng",
+        priority: "Bình thường",
+        speed: "-",
+        eta: "-",
+        peers: "-",
+        hasGameFiles: true
+      },
+      {
+        id: "valorant",
+        category: "Online",
+        name: "Valorant Client",
+        version: "v45",
+        size: "42.1 GB",
+        sizeBytes: 45200000000,
+        path: "G:\\Online Games\\valorant",
+        publishedAt: "2026-09-07 10:25",
+        statusType: "not_downloaded",
+        statusText: "○ Chưa tải",
+        priority: "Thấp",
+        speed: "-",
+        eta: "-",
+        peers: "-",
+        hasGameFiles: false
+      },
+      {
+        id: "pubg",
+        category: "Online",
+        name: "PUBG: BATTLEGROUNDS",
+        version: "v29",
+        size: "52.8 GB",
+        sizeBytes: 56690000000,
+        path: "G:\\Online Games\\pubg",
+        publishedAt: "2026-09-04 14:20",
+        statusType: "not_downloaded",
+        statusText: "○ Chưa tải",
+        priority: "Bình thường",
+        speed: "-",
+        eta: "-",
+        peers: "-",
+        hasGameFiles: false
+      },
+      {
+        id: "gtav",
+        category: "Online",
+        name: "Grand Theft Auto V",
+        version: "v9",
+        size: "105.2 GB",
+        sizeBytes: 112950000000,
+        path: "G:\\Online Games\\GTAV",
+        publishedAt: "2026-08-20 16:45",
+        statusType: "seeding",
+        statusText: "● Đang seeding",
+        priority: "Bình thường",
+        speed: "↑ 3.2 MB/s",
+        eta: "-",
+        peers: "5 / 1",
+        hasGameFiles: true
+      },
+      {
+        id: "fconline",
+        category: "Online",
+        name: "FC Online Vietnam",
+        version: "v15",
+        size: "45.0 GB",
+        sizeBytes: 48318000000,
+        path: "G:\\Online Games\\fconline",
+        publishedAt: "2026-09-02 09:12",
+        statusType: "seeding",
+        statusText: "● Đang seeding",
+        priority: "Cao",
+        speed: "↑ 6.1 MB/s",
+        eta: "-",
+        peers: "6 / 1",
+        hasGameFiles: true
+      },
+      {
+        id: "cyberpunk",
+        category: "Offline",
+        name: "Cyberpunk 2077",
+        version: "v12",
+        size: "74.5 GB",
+        sizeBytes: 80000000000,
+        path: "G:\\Offline Games\\cyberpunk",
+        publishedAt: "2026-08-10 18:30",
+        statusType: "paused",
+        statusText: "⏸ Đã dừng",
+        priority: "Bình thường",
+        speed: "-",
+        eta: "-",
+        peers: "-",
+        hasGameFiles: true
+      },
+      {
+        id: "7z",
+        category: "Tools",
+        name: "7z Utility",
+        version: "v11",
+        size: "653.0 KB",
+        sizeBytes: 668672,
+        path: "G:\\Tools\\7z",
+        publishedAt: "2026-09-06 11:50",
+        statusType: "seeding",
+        statusText: "● Đang seeding",
+        priority: "Thấp",
+        speed: "↑ 0.1 MB/s",
+        eta: "-",
+        peers: "1 / 0",
+        hasGameFiles: true
+      },
+      {
+        id: "vcredist",
+        category: "Tools",
+        name: "DirectX & Visual C++ AIO",
+        version: "v2",
+        size: "1.2 GB",
+        sizeBytes: 1288490188,
+        path: "G:\\Tools\\vcredist",
+        publishedAt: "2026-06-01 07:45",
+        statusType: "tested",
+        statusText: "✓ Đã test",
+        priority: "Thấp",
+        speed: "-",
+        eta: "-",
+        peers: "-",
+        hasGameFiles: true
+      }
+    ];
+
+    // State Variables
+    let selectedIds = new Set();
+    let currentContextGameId = null;
+    let editingGameId = null;
+    let lastClickedIndex = -1;
+    let sortColumn = "name";
+    let sortAsc = true;
+
+    // DOM References
+    const gridBody = document.getElementById("grid-body");
+    const checkAll = document.getElementById("check-all");
+    const searchBox = document.getElementById("search-box");
+    const btnClearSearch = document.getElementById("btn-clear-search");
+    const advFilterType = document.getElementById("adv-filter-type");
+    const advFilterVal = document.getElementById("adv-filter-val");
+    const selectedSummary = document.getElementById("selected-summary");
+    const healthSummary = document.getElementById("health-summary");
+    const selectionBadge = document.getElementById("selection-count-badge");
+    const contextMenu = document.getElementById("context-menu");
+    const toastPill = document.getElementById("toast-pill");
+
+    // Center Action Buttons
+    const btnP2pFetch = document.getElementById("btn-p2p-fetch");
+    const btnReseed = document.getElementById("btn-reseed");
+    const btnStopSeed = document.getElementById("btn-stop-seed");
+    const btnHardStop = document.getElementById("btn-hard-stop");
+    const btnRecheck = document.getElementById("btn-recheck");
+    const btnSetPriority = document.getElementById("btn-set-priority");
+    const btnDeleteGame = document.getElementById("btn-delete-game");
+
+    // Toast Notice helper
+    let toastTimer;
+    function showToast(msg) {
+      clearTimeout(toastTimer);
+      toastPill.textContent = msg;
+      toastPill.classList.add("show");
+      toastTimer = setTimeout(() => toastPill.classList.remove("show"), 2400);
+    }
+
+    function utc7Minute(date = new Date()) {
+      const utc7 = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+      return utc7.toISOString().slice(0, 16).replace("T", " ");
+    }
+
+    // Escape HTML helper
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    // Lấy danh sách game sau khi lọc và sắp xếp
+    
+    // Format Status Badge với Progress Bar ở đáy (Kích thước đồng đều 138px x 25px)
+    function formatStatusBadge(game) {
+      const type = game.statusType || "paused";
+      let progress = typeof game.progress === "number" ? game.progress : 0;
+      let text = game.statusText || "";
+      let badgeClass = "badge-paused";
+      let barColor = "#6b7280";
+
+      if (type === "downloading") {
+        badgeClass = "badge-downloading";
+        barColor = "#0078d4";
+        const pctStr = progress % 1 !== 0 ? (progress.toString().includes(".") && progress.toString().split(".")[1].length > 2 ? progress.toString() : progress.toFixed(2)) : progress;
+        text = `${pctStr}% · Đang tải`;
+      } else if (type === "checking") {
+        badgeClass = "badge-checking";
+        barColor = "#06b6d4";
+        const pctStr = progress > 0 ? `${progress.toFixed(1)}%` : "⟳";
+        text = `${pctStr} · Kiểm tra...`;
+      } else if (type === "seeding") {
+        progress = 100;
+        badgeClass = "badge-seeding";
+        barColor = "#3b82f6";
+        text = "Đang seed";
+      } else if (type === "ready") {
+        progress = 100;
+        badgeClass = "badge-ready";
+        barColor = "#34c759";
+        text = "Sẵn sàng";
+      } else if (type === "paused") {
+        badgeClass = "badge-paused";
+        barColor = "#6b7280";
+        text = progress > 0 && progress < 100 ? `${progress.toFixed(1)}% · Tạm dừng` : "Tạm dừng";
+      } else if (type === "stopped") {
+        progress = 0;
+        badgeClass = "badge-paused";
+        barColor = "#6b7280";
+        text = "Đã dừng";
+      } else if (type === "not_downloaded") {
+        progress = 0;
+        badgeClass = "badge-not-download";
+        barColor = "#eab308";
+        text = "Chưa tải";
+      } else if (type === "missing") {
+        progress = 0;
+        badgeClass = "badge-missing";
+        barColor = "#ef4444";
+        text = "Game không tồn tại";
+      } else if (type === "error") {
+        progress = 100;
+        badgeClass = "badge-error";
+        barColor = "#ef4444";
+        text = "Lỗi hash";
+      }
+
+      return `
+        <div class="status-cell-badge ${badgeClass}" title="${escapeHtml(text)}">
+          <span class="status-cell-text">${escapeHtml(text)}</span>
+          <div class="status-cell-progress-track">
+            <div class="status-cell-progress-bar" style="width: ${Math.min(100, Math.max(0, progress))}%; background-color: ${barColor};"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Modal Thêm Game: Xử lý chọn file EXE theo chuẩn ting-server-gui
+    function simulateBrowseExe() {
+      const exeInput = document.getElementById("add-game-exe");
+      const folderInput = document.getElementById("add-game-folder");
+      const idInput = document.getElementById("add-game-id");
+      const nameInput = document.getElementById("add-game-name");
+      const verInput = document.getElementById("add-game-version");
+      const iconInput = document.getElementById("add-game-icon");
+      const thumbnailInput = document.getElementById("add-game-thumbnail");
+      const catSelect = document.getElementById("add-game-cat");
+      const msg = document.getElementById("exe-validation-msg");
+
+      // Điền mẫu game mới
+      exeInput.value = "b1\\Binaries\\Win64\\b1-Win64-Shipping.exe";
+      folderInput.value = "G:\\Offline Games\\wukong";
+      idInput.value = "wukong";
+      nameInput.value = "Black Myth: Wukong";
+      verInput.value = "v1";
+      iconInput.value = "b1.ico";
+      thumbnailInput.value = "thumbnail.jpg";
+      catSelect.value = "Offline";
+
+      msg.textContent = "✓ Đã nhận diện file chạy và thư mục game";
+      msg.style.color = "#34c759";
+      showToast("Đã chọn file b1-Win64-Shipping.exe. Tự động nhận diện 'Black Myth: Wukong'");
+    }
+
+    function onExeInputChanged() {
+      const exeVal = document.getElementById("add-game-exe").value.trim();
+      const msg = document.getElementById("exe-validation-msg");
+      if (exeVal) {
+        msg.textContent = "✓ Đã nhập đường dẫn file chạy";
+        msg.style.color = "#34c759";
+      } else {
+        msg.textContent = "⚠ Chọn file EXE để bắt đầu";
+        msg.style.color = "#f59e0b";
+      }
+    }
+
+    function getFilteredList() {
+      const q = searchBox.value.trim().toLowerCase();
+      const fType = advFilterType.value;
+      const fVal = advFilterVal.value;
+
+      let list = games.filter(g => {
+        // Search textbox (theo tên game)
+        if (q && !g.name.toLowerCase().includes(q)) return false;
+
+        // Combobox tìm kiếm nâng cao (giá trị chọn)
+        if (fVal !== "all") {
+          if (fVal.startsWith("cat:") && g.category !== fVal.substring(4)) return false;
+          if (fVal.startsWith("status:") && g.statusType !== fVal.substring(7)) return false;
+          if (fVal.startsWith("priority:") && g.priority !== fVal.substring(9)) return false;
+        }
+
+        // Dropdown theo trường
+        if (fType === "id" && q && !g.id.toLowerCase().includes(q)) return false;
+        if (fType === "version" && q && !g.version.toLowerCase().includes(q)) return false;
+
+        return true;
+      });
+
+      // Sắp xếp
+      list.sort((a, b) => {
+        let va = a[sortColumn];
+        let vb = b[sortColumn];
+        if (sortColumn === "size") {
+          va = a.sizeBytes;
+          vb = b.sizeBytes;
+        }
+        if (typeof va === "string") {
+          return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        }
+        return sortAsc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+      });
+
+      return list;
+    }
+
+    // Render Bảng Dữ Liệu Game (game-grid hiển thị ngay)
+    function renderGrid() {
+      const filtered = getFilteredList();
+      gridBody.innerHTML = "";
+
+      document.getElementById("nav-count").textContent = games.length;
+
+      filtered.forEach((game, idx) => {
+        const tr = document.createElement("tr");
+        tr.dataset.id = game.id;
+        const isSelected = selectedIds.has(game.id);
+        if (isSelected) tr.classList.add("selected");
+
+        // Priority class
+        let prioClass = "thap";
+        if (game.priority === "Cao") prioClass = "cao";
+        else if (game.priority === "Bình thường") prioClass = "binh-thuong";
+
+        tr.innerHTML = `
+          <td class="col-cb">
+            <input type="checkbox" class="native-checkbox row-cb" data-id="${game.id}" ${isSelected ? "checked" : ""}>
+          </td>
+          <td class="cell-category">${escapeHtml(game.category)}</td>
+          <td class="cell-name">${escapeHtml(game.name)}</td>
+          <td class="cell-version">${escapeHtml(game.version)}</td>
+          <td style="font-variant-numeric: tabular-nums; color: var(--text-secondary);">${escapeHtml(game.publishedAt || "—")}</td>
+          <td><span class="priority-badge ${prioClass}">${escapeHtml(game.priority)}</span></td>
+          <td class="cell-size">${escapeHtml(game.size)}</td>
+          <td class="cell-path" title="${escapeHtml(game.path)}">${escapeHtml(game.path)}</td>
+          <td style="text-align: center; vertical-align: middle;">${formatStatusBadge(game)}</td>
+          <td style="color: var(--status-online-green); font-variant-numeric: tabular-nums;">${escapeHtml(game.speed)}</td>
+          <td style="color: var(--text-muted);">${escapeHtml(game.eta)}</td>
+          <td>${escapeHtml(game.peers)}</td>
+          <td class="col-actions">
+            <div class="row-actions-group">
+              <!-- 1. Chia sẻ: enable nếu không đang seeding -->
+              <button class="row-btn-icon" data-action="${game.hasGameFiles ? 'reseed_game' : 'download_game_from_p2p'}" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${game.statusType === 'seeding' ? 'display:none;' : ''}" title="${game.hasGameFiles ? 'Chia sẻ lại game' : 'Tải game qua P2P'}">
+                <svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
+              </button>
+
+              <!-- 2. Tạm dừng: enable nếu đang seeding -->
+              <button class="row-btn-icon" data-action="pause" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${game.statusType !== 'seeding' ? 'display:none;' : ''}" title="Tạm dừng seed">
+                <svg viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
+              </button>
+
+              <!-- 3. Stop hẳn tác vụ -->
+              <button class="row-btn-icon" data-action="stop" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${!['seeding', 'checking'].includes(game.statusType) ? 'display:none;' : ''}" title="Dừng tác vụ seed/hash/check">
+                <svg viewBox="0 0 16 16"><path d="M4 4h8v8H4z"/></svg>
+              </button>
+
+              <!-- 4. Tạo bản cập nhật -->
+              <button class="row-btn-icon" data-action="version" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} title="Tạo bản cập nhật mới...">
+                <svg viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/></svg>
+              </button>
+
+              <!-- 5. Sửa Game, ngay sau tạo bản cập nhật -->
+              <button class="row-btn-icon" data-action="edit_game" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${!game.hasGameFiles ? 'display:none;' : ''}" title="Sửa Game...">
+                <svg viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/></svg>
+              </button>
+
+              <!-- 6. Mở file chạy -->
+              <button class="row-btn-icon" data-action="open_executable" data-id="${game.id}" style="${!game.hasGameFiles ? 'display:none;' : ''}" title="Mở file chạy">
+                <svg viewBox="0 0 16 16"><path d="M6.79 5.093 10.5 7.25a.87.87 0 0 1 0 1.5l-3.71 2.157A.87.87 0 0 1 5.5 10.157V5.843a.87.87 0 0 1 1.29-.75z"/><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11z" fill-rule="evenodd"/></svg>
+              </button>
+
+              <!-- 7. Mở Explorer -->
+              <button class="row-btn-icon" data-action="open_game_folder" data-id="${game.id}" style="${!game.hasGameFiles ? 'display:none;' : ''}" title="Mở thư mục game">
+                <svg viewBox="0 0 16 16"><path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h4.69z"/></svg>
+              </button>
+
+              <!-- 8. Chi tiết Game -->
+              <button class="row-btn-icon" data-action="properties" data-id="${game.id}" title="Thông tin game chi tiết...">
+                <svg viewBox="0 0 16 16"><path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/></svg>
+              </button>
+
+              <!-- 9. Tùy chọn khác (...) -->
+              <button class="row-more-btn" data-id="${game.id}" title="Tùy chọn khác (Chuột phải)">⋯</button>
+            </div>
+          </td>
+        `;
+
+        // Click Handler (Multi-selection & Row Select)
+        tr.addEventListener("click", (e) => {
+          // Xử lý các quick action button trên từng row
+          const actionBtn = e.target.closest(".row-btn-icon");
+          if (actionBtn) {
+            e.stopPropagation();
+            const act = actionBtn.dataset.action;
+            if (act === "reseed_game") {
+              game.statusType = "seeding";
+              game.progress = 100;
+              game.statusText = "Đang seed";
+              game.speed = "↑ 12.8 MB/s";
+              renderGrid();
+              showToast(`Bắt đầu chia sẻ P2P game '${game.name}'.`);
+            } else if (act === "pause") {
+              game.statusType = "paused";
+              game.statusText = "Đã tạm dừng";
+              game.speed = "0 B/s";
+              renderGrid();
+              showToast(`Đã tạm dừng seed game '${game.name}'.`);
+            } else if (act === "download_game_from_p2p") {
+              game.statusType = "downloading";
+              game.progress = 0;
+              game.statusText = "Đang tải";
+              game.hasGameFiles = true;
+              renderGrid();
+              showToast(`Bắt đầu tải game '${game.name}' qua P2P.`);
+            } else if (act === "stop") {
+              game.statusType = "stopped";
+              game.statusText = "Đã dừng";
+              game.speed = "0 B/s";
+              renderGrid();
+              showToast(`Đã Stop tác vụ của game '${game.name}'.`);
+            } else if (act === "version") {
+              document.getElementById("version-modal-game-name").textContent = game.name;
+              openModal("modal-version");
+            } else if (act === "edit_game") {
+              openGameEditor(game);
+            } else if (act === "open_executable") {
+              showToast(`Đang mở file chạy của game '${game.name}'.`);
+            } else if (act === "open_game_folder") {
+              showToast(`Đang mở thư mục trong Explorer: ${game.path}`);
+            } else if (act === "properties") {
+              openGameProperties(game.id);
+            }
+            return;
+          }
+
+          if (e.target.closest(".row-more-btn")) {
+            e.stopPropagation();
+            if (!selectedIds.has(game.id)) {
+              selectedIds.clear();
+              selectedIds.add(game.id);
+              syncSelection();
+            }
+            openContextMenu(e, game.id, tr);
+            return;
+          }
+
+          if (e.target.closest(".row-cb")) {
+            if (e.target.checked) selectedIds.add(game.id);
+            else selectedIds.delete(game.id);
+            lastClickedIndex = idx;
+            syncSelection();
+            return;
+          }
+
+          if (e.ctrlKey || e.metaKey) {
+            if (selectedIds.has(game.id)) selectedIds.delete(game.id);
+            else selectedIds.add(game.id);
+            lastClickedIndex = idx;
+          } else if (e.shiftKey && lastClickedIndex !== -1) {
+            const start = Math.min(lastClickedIndex, idx);
+            const end = Math.max(lastClickedIndex, idx);
+            if (!e.ctrlKey) selectedIds.clear();
+            for (let i = start; i <= end; i++) {
+              selectedIds.add(filtered[i].id);
+            }
+          } else {
+            selectedIds.clear();
+            selectedIds.add(game.id);
+            lastClickedIndex = idx;
+          }
+
+          syncSelection();
+        });
+
+        // Double click xem thông tin chi tiết
+        tr.addEventListener("dblclick", () => {
+          openGameProperties(game.id);
+        });
+
+        // Right Click: Mở Context Menu tại đúng Row đang nhấn
+        tr.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          // Nếu row này chưa nằm trong selection, chọn row này
+          if (!selectedIds.has(game.id)) {
+            selectedIds.clear();
+            selectedIds.add(game.id);
+            lastClickedIndex = idx;
+            syncSelection();
+          }
+          openContextMenu(e, game.id, tr);
+        });
+
+        gridBody.appendChild(tr);
+      });
+
+      syncSelection();
+    }
+
+    // Đồng bộ trạng thái Selection và đánh giá quy tắc disable của Toolbar giữa
+    function syncSelection() {
+      const filtered = getFilteredList();
+      const rows = gridBody.querySelectorAll("tr");
+      rows.forEach(tr => {
+        const id = tr.dataset.id;
+        const cb = tr.querySelector(".row-cb");
+        if (selectedIds.has(id)) {
+          tr.classList.add("selected");
+          if (cb) cb.checked = true;
+        } else {
+          tr.classList.remove("selected");
+          if (cb) cb.checked = false;
+        }
+      });
+
+      // Master Checkbox
+      const allSelected = filtered.length > 0 && filtered.every(g => selectedIds.has(g.id));
+      const someSelected = filtered.some(g => selectedIds.has(g.id));
+      checkAll.checked = allSelected;
+      checkAll.indeterminate = !allSelected && someSelected;
+
+      // Cập nhật Footer Summary & Badge
+      const count = selectedIds.size;
+      if (!isSrvOnline || count === 0) {
+        selectedSummary.textContent = "Chưa chọn game";
+        selectionBadge.style.display = "none";
+      } else if (count === 1) {
+        const id = Array.from(selectedIds)[0];
+        const g = games.find(x => x.id === id);
+        selectedSummary.textContent = `Đã chọn: ${g ? g.name : id}`;
+        selectionBadge.textContent = "Đã chọn: 1";
+        selectionBadge.style.display = "inline-block";
+      } else {
+        selectedSummary.textContent = `Đã chọn: ${count} game`;
+        selectionBadge.textContent = `Đã chọn: ${count}`;
+        selectionBadge.style.display = "inline-block";
+      }
+
+      // Đánh giá quy tắc Disable nghiêm ngặt của Cụm Action ở giữa:
+      // "Disable theo trạng thái của toàn bộ game đã chọn, dù 1 game ko thỏa mãn thì cũng disable"
+      updateCenterToolbarState();
+    }
+
+    function updateCenterToolbarState() {
+      const selectedGames = games.filter(g => selectedIds.has(g.id));
+      const count = selectedGames.length;
+
+      if (count === 0) {
+        // Chưa chọn game nào -> disable toàn bộ cụm giữa
+        btnP2pFetch.disabled = true;
+        btnReseed.disabled = true;
+        btnStopSeed.disabled = true;
+        btnHardStop.disabled = true;
+        btnRecheck.disabled = true;
+        btnSetPriority.disabled = true;
+        btnDeleteGame.disabled = true;
+        return;
+      }
+
+      // 1. Tải Game từ P2P: CHỈ enable khi TẤT CẢ game đã chọn đều CHƯA TẢI
+      const allNotDownloaded = selectedGames.every(g => g.statusType === "not_downloaded" || !g.hasGameFiles);
+      btnP2pFetch.disabled = !allNotDownloaded;
+
+      // 2. Chia sẻ lại: enable khi TẤT CẢ game đã chọn đều có dữ liệu game
+      const allHaveGameFiles = selectedGames.every(g => g.hasGameFiles);
+      btnReseed.disabled = !selectedGames.every(g => g.hasGameFiles && g.statusType !== "seeding");
+
+      // 3. Tạm dừng: CHỈ enable khi TẤT CẢ game đã chọn đều ĐANG SEEDING
+      const allSeeding = selectedGames.every(g => g.statusType === "seeding");
+      btnStopSeed.disabled = !allSeeding;
+
+      // 4. Stop: enable khi tất cả game đang seed/hash/check.
+      btnHardStop.disabled = !selectedGames.every(g => ["seeding", "checking"].includes(g.statusType));
+
+      // 5. Kiểm tra Game: enable khi tất cả game đã chọn có dữ liệu local
+      btnRecheck.disabled = !allHaveGameFiles;
+
+      // 6. Set ưu tiên seed: enable khi có game được chọn
+      btnSetPriority.disabled = false;
+
+      // 7. Xóa game: enable khi có game được chọn
+      btnDeleteGame.disabled = false;
+    }
+
+    // ========================================================
+    // CONTEXT MENU LOGIC (Fix vị trí và disable theo trạng thái game)
+    // ========================================================
+    function openContextMenu(e, gameId, targetRow) {
+      currentContextGameId = gameId;
+      const game = games.find(g => g.id === gameId);
+      if (!game) return;
+
+      // Đánh dấu highlight row đang được click chuột phải
+      document.querySelectorAll("table.data-grid tr.context-target").forEach(r => r.classList.remove("context-target"));
+      if (targetRow) targetRow.classList.add("context-target");
+
+      // Cập nhật disable các item trong menu context theo trạng thái game
+      const itemP2p = document.getElementById("ctx-p2p-fetch");
+      const itemSeed = document.getElementById("ctx-seed");
+      const itemReseed = document.getElementById("ctx-reseed");
+      const itemPause = document.getElementById("ctx-pause");
+      const itemStop = document.getElementById("ctx-stop");
+      const itemRecheck = document.getElementById("ctx-recheck");
+      const itemHistory = document.getElementById("ctx-history");
+
+      // 1. Tải Game từ P2P: enable nếu chưa tải
+      setContextItemState(itemP2p, isSrvOnline && (game.statusType === "not_downloaded" || !game.hasGameFiles));
+
+      // 2. Chia sẻ: enable nếu có dữ liệu game và không đang seeding
+      setContextItemState(itemSeed, isSrvOnline && game.hasGameFiles && game.statusType !== "seeding");
+
+      // 3. Chia sẻ lại: enable nếu có dữ liệu game
+      setContextItemState(itemReseed, isSrvOnline && game.hasGameFiles && game.statusType !== "seeding");
+
+      // 4. Tạm dừng: CHỈ enable khi game đang seeding
+      setContextItemState(itemPause, isSrvOnline && game.statusType === "seeding");
+
+      // 5. Stop: seed/hash/check.
+      setContextItemState(itemStop, isSrvOnline && ["seeding", "checking"].includes(game.statusType));
+
+      // 6. Kiểm tra game: enable nếu có dữ liệu local
+      setContextItemState(itemRecheck, isSrvOnline && game.hasGameFiles);
+      setContextItemState(itemHistory, isSrvOnline && game.hasGameFiles);
+      setContextItemState(document.getElementById("ctx-edit"), isSrvOnline && game.hasGameFiles);
+      setContextItemState(document.getElementById("ctx-open-executable"), game.hasGameFiles);
+      ["ctx-version", "ctx-priority", "ctx-delete"].forEach(id => {
+        setContextItemState(document.getElementById(id), isSrvOnline);
+      });
+
+      // Hiển thị và định vị menu context ngay tại con trỏ chuột trên row
+      contextMenu.style.display = "block";
+      let x = e.clientX;
+      let y = e.clientY;
+      const mw = 220;
+      const mh = 373;
+
+      if (x + mw > window.innerWidth) x = window.innerWidth - mw - 8;
+      if (y + mh > window.innerHeight) y = window.innerHeight - mh - 8;
+
+      contextMenu.style.left = x + "px";
+      contextMenu.style.top = y + "px";
+    }
+
+    function setContextItemState(el, isEnabled) {
+      if (!el) return;
+      if (isEnabled) {
+        el.classList.remove("disabled");
+      } else {
+        el.classList.add("disabled");
+      }
+    }
+
+    function closeContextMenu() {
+      contextMenu.style.display = "none";
+      document.querySelectorAll("table.data-grid tr.context-target").forEach(r => r.classList.remove("context-target"));
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!contextMenu.contains(e.target)) closeContextMenu();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeContextMenu();
+        closeAllModals();
+        return;
+      }
+
+      if (e.key === "F5") {
+        e.preventDefault();
+        document.getElementById("btn-refresh").click();
+        return;
+      }
+
+      const targetIsEditor = e.target instanceof HTMLInputElement
+        || e.target instanceof HTMLTextAreaElement
+        || e.target instanceof HTMLSelectElement;
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a" && !targetIsEditor) {
+        e.preventDefault();
+        getFilteredList().forEach(game => selectedIds.add(game.id));
+        syncSelection();
+      }
+    });
+
+    // Context Menu Actions
+    document.getElementById("ctx-p2p-fetch").addEventListener("click", () => {
+      if (document.getElementById("ctx-p2p-fetch").classList.contains("disabled")) return;
+      closeContextMenu();
+      triggerP2pFetch();
+    });
+
+    document.getElementById("ctx-seed").addEventListener("click", () => {
+      if (document.getElementById("ctx-seed").classList.contains("disabled")) return;
+      closeContextMenu();
+      triggerStartSeed();
+    });
+
+    document.getElementById("ctx-reseed").addEventListener("click", () => {
+      if (document.getElementById("ctx-reseed").classList.contains("disabled")) return;
+      closeContextMenu();
+      triggerReseed();
+    });
+
+    document.getElementById("ctx-pause").addEventListener("click", () => {
+      if (document.getElementById("ctx-pause").classList.contains("disabled")) return;
+      closeContextMenu();
+      triggerStopSeed();
+    });
+
+    document.getElementById("ctx-stop").addEventListener("click", () => {
+      if (document.getElementById("ctx-stop").classList.contains("disabled")) return;
+      closeContextMenu();
+      triggerHardStop();
+    });
+
+    document.getElementById("ctx-recheck").addEventListener("click", () => {
+      if (document.getElementById("ctx-recheck").classList.contains("disabled")) return;
+      closeContextMenu();
+      triggerRecheck();
+    });
+
+    document.getElementById("ctx-version").addEventListener("click", () => {
+      closeContextMenu();
+      openVersionModal();
+    });
+
+    document.getElementById("ctx-edit").addEventListener("click", () => {
+      if (document.getElementById("ctx-edit").classList.contains("disabled")) return;
+      closeContextMenu();
+      const game = games.find(g => g.id === currentContextGameId);
+      if (game) openGameEditor(game);
+    });
+
+    document.getElementById("ctx-history").addEventListener("click", () => {
+      if (document.getElementById("ctx-history").classList.contains("disabled")) return;
+      closeContextMenu();
+      openReleaseHistoryModal(currentContextGameId);
+    });
+
+    document.getElementById("ctx-priority").addEventListener("click", () => {
+      closeContextMenu();
+      openPriorityModal();
+    });
+
+    document.getElementById("ctx-open-executable").addEventListener("click", () => {
+      if (document.getElementById("ctx-open-executable").classList.contains("disabled")) return;
+      closeContextMenu();
+      const game = games.find(g => g.id === currentContextGameId);
+      if (game) showToast(`Đang mở file chạy của game '${game.name}'.`);
+    });
+
+    document.getElementById("ctx-open-folder").addEventListener("click", () => {
+      closeContextMenu();
+      const g = games.find(x => x.id === currentContextGameId);
+      showToast(`Đang mở thư mục: ${g ? g.path : "G:\\"}...`);
+    });
+
+    document.getElementById("ctx-properties").addEventListener("click", () => {
+      closeContextMenu();
+      openGameProperties(currentContextGameId);
+    });
+
+    document.getElementById("ctx-delete").addEventListener("click", () => {
+      closeContextMenu();
+      openDeleteConfirmModal();
+    });
+
+    // ========================================================
+    // TOOLBAR CENTER ACTIONS
+    // ========================================================
+    btnP2pFetch.addEventListener("click", triggerP2pFetch);
+    btnReseed.addEventListener("click", triggerReseed);
+    btnStopSeed.addEventListener("click", triggerStopSeed);
+    btnHardStop.addEventListener("click", triggerHardStop);
+    btnRecheck.addEventListener("click", triggerRecheck);
+    btnSetPriority.addEventListener("click", openPriorityModal);
+    btnDeleteGame.addEventListener("click", openDeleteConfirmModal);
+
+    function triggerP2pFetch() {
+      selectedIds.forEach(id => {
+        const g = games.find(x => x.id === id);
+        if (g && (g.statusType === "not_downloaded" || !g.hasGameFiles)) {
+          g.statusType = "seeding";
+          g.statusText = "● Đang seeding";
+          g.hasGameFiles = true;
+          g.speed = "↑ 10.5 MB/s";
+          g.peers = "4 / 1";
+        }
+      });
+      showToast(`Đã kéo thành công từ P2P và bắt đầu seeding ${selectedIds.size} game.`);
+      renderGrid();
+    }
+
+    function triggerStartSeed() {
+      selectedIds.forEach(id => {
+        const g = games.find(x => x.id === id);
+        if (g && g.hasGameFiles) {
+          g.statusType = "seeding";
+          g.statusText = "● Đang seeding";
+          g.speed = "↑ 8.0 MB/s";
+          g.peers = "3 / 1";
+        }
+      });
+      showToast(`Đã bắt đầu chia sẻ torrent cho các game đã chọn.`);
+      renderGrid();
+    }
+
+    function triggerReseed() {
+      selectedIds.forEach(id => {
+        const g = games.find(x => x.id === id);
+        if (g && g.hasGameFiles) {
+          g.statusType = "seeding";
+          g.statusText = "● Đang seeding";
+          g.speed = "↑ 14.2 MB/s";
+          g.peers = "6 / 1";
+        }
+      });
+      showToast(`Đã reseed các torrent game đã chọn.`);
+      renderGrid();
+    }
+
+    function triggerStopSeed() {
+      selectedIds.forEach(id => {
+        const g = games.find(x => x.id === id);
+        if (g && g.statusType === "seeding") {
+          g.statusType = "paused";
+          g.statusText = "⏸ Đã tạm dừng";
+          g.speed = "-";
+          g.peers = "-";
+        }
+      });
+      showToast(`Đã tạm dừng seed các game đã chọn.`);
+      renderGrid();
+    }
+
+    function triggerHardStop() {
+      selectedIds.forEach(id => {
+        const g = games.find(x => x.id === id);
+        if (g && ["seeding", "checking"].includes(g.statusType)) {
+          g.statusType = "stopped";
+          g.statusText = "Đã dừng";
+          g.speed = "-";
+          g.eta = "-";
+          g.peers = "-";
+        }
+      });
+      showToast(`Đã Stop tác vụ seed/hash/check cho các game đã chọn.`);
+      renderGrid();
+    }
+
+    function triggerRecheck() {
+      const targetGames = games.filter(g => selectedIds.has(g.id));
+      if (targetGames.length === 0) return;
+
+      // libtorrent tự kiểm tra ngầm, GUI hiển thị tiến trình % hash check qua progressbar
+      targetGames.forEach(g => {
+        g.statusType = "checking";
+        g.progress = 18.5;
+        g.statusText = "18.5% · Kiểm tra...";
+        g.speed = "-";
+      });
+      renderGrid();
+      showToast(`[SSE] Đã gửi lệnh re-check tới service. libtorrent đang kiểm tra ngầm ${targetGames.length} game...`);
+
+      // Thêm dòng log vào Terminal Log
+      const term = document.getElementById("terminal-log-content");
+      if (term) {
+        const timeStr = new Date().toISOString().replace('T', ' ').substring(0, 23);
+        targetGames.forEach(g => {
+          const logLine = document.createElement("div");
+          logLine.innerHTML = `[${timeStr}] <span class="terminal-line-info">[LIBTORRENT]</span> Bắt đầu re-check hash torrent cho '${escapeHtml(g.name)}'`;
+          term.appendChild(logLine);
+        });
+        term.scrollTop = term.scrollHeight;
+      }
+
+      setTimeout(() => {
+        targetGames.forEach(g => {
+          if (g.statusType === "checking") {
+            g.progress = 58.0;
+            g.statusText = "58.0% · Kiểm tra...";
+          }
+        });
+        renderGrid();
+      }, 600);
+
+      setTimeout(() => {
+        targetGames.forEach(g => {
+          if (g.statusType === "checking") {
+            g.progress = 92.5;
+            g.statusText = "92.5% · Kiểm tra...";
+          }
+        });
+        renderGrid();
+      }, 1200);
+
+      // Giả lập SSE event stream từ service trả về sau khi libtorrent hoàn tất 100%
+      setTimeout(() => {
+        targetGames.forEach(g => {
+          g.statusType = "seeding";
+          g.progress = 100;
+          g.statusText = "Đang seed";
+          g.speed = "↑ 12.4 MB/s";
+          g.peers = "4 / 1";
+        });
+        renderGrid();
+        showToast(`[SSE event: torrent_checked] libtorrent đã kiểm tra xong ${targetGames.length} game! Đã tự động chia sẻ lại (seed).`);
+
+        if (term) {
+          const timeStr = new Date().toISOString().replace('T', ' ').substring(0, 23);
+          targetGames.forEach(g => {
+            const logLine = document.createElement("div");
+            logLine.innerHTML = `[${timeStr}] <span class="terminal-line-ok">[SUCCESS]</span> libtorrent hoàn tất hash check 100% cho '${escapeHtml(g.name)}'. Swarm chuyển sang Seeding.`;
+            term.appendChild(logLine);
+          });
+          term.scrollTop = term.scrollHeight;
+        }
+      }, 1800);
+    }
+
+    // ========================================================
+    // MODAL DIALOG CONTROLS
+    // ========================================================
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add("open");
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove("open");
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("open"));
+    }
+
+    // Modal Set Ưu Tiên Seed
+    function openPriorityModal() {
+      const count = selectedIds.size || 1;
+      document.getElementById("priority-modal-desc").textContent = `Chọn mức ưu tiên seed cho ${count} game đã chọn:`;
+      openModal("modal-priority");
+    }
+
+    function submitSetPriority() {
+      const selectedPrio = document.querySelector('input[name="priority-val"]:checked').value;
+      selectedIds.forEach(id => {
+        const g = games.find(x => x.id === id);
+        if (g) g.priority = selectedPrio;
+      });
+      closeModal("modal-priority");
+      showToast(`Đã đặt ưu tiên seed thành "${selectedPrio}" cho các game đã chọn.`);
+      renderGrid();
+    }
+
+    // Modal Tạo Bản Cập Nhật
+    function openVersionModal() {
+      const g = games.find(x => selectedIds.has(x.id)) || games[0];
+      document.getElementById("version-modal-game-name").textContent = g ? g.name : "Tất cả game đã chọn";
+      openModal("modal-version");
+    }
+
+    function submitCreateVersion() {
+      games.filter(g => selectedIds.has(g.id)).forEach(g => {
+        const current = Number.parseInt(g.version.replace(/^v/i, ""), 10) || 0;
+        g.version = `v${current + 1}`;
+        g.publishedAt = utc7Minute();
+      });
+      closeModal("modal-version");
+      showToast(`Đã tạo torrent toàn bộ thư mục game và xuất bản phiên bản mới.`);
+      renderGrid();
+    }
+
+    function toggleVersionPaths() {
+      const panel = document.getElementById("version-advanced-paths");
+      const button = document.getElementById("btn-toggle-version-paths");
+      const expanded = panel.style.display === "flex";
+      panel.style.display = expanded ? "none" : "flex";
+      button.textContent = expanded ? "Chỉnh đường dẫn nâng cao..." : "Ẩn đường dẫn nâng cao";
+    }
+
+    function openReleaseHistoryModal(gameId) {
+      const g = games.find(x => x.id === gameId) || games.find(x => selectedIds.has(x.id)) || games[0];
+      document.getElementById("release-history-content").textContent = g
+        ? `Game: ${g.id}\nĐầy đủ: Có\n\n${g.version}\nTrạng thái: Published\nThư mục Game: ${g.path}`
+        : "Không có release để hiển thị.";
+      openModal("modal-release-history");
+    }
+
+    // Modal Thêm Game
+    document.getElementById("btn-add-game").addEventListener("click", () => {
+      openNewGameEditor();
+    });
+
+    function openNewGameEditor() {
+      editingGameId = null;
+      document.getElementById("import-modal-title").textContent = "Thêm Game mới";
+      document.getElementById("btn-submit-add-game").textContent = "Thêm";
+      document.getElementById("add-game-id").disabled = false;
+      ["add-game-exe", "add-game-folder", "add-game-id", "add-game-name", "add-game-icon", "add-game-thumbnail"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
+      document.getElementById("add-game-version").value = "v1";
+      openModal("modal-import");
+    }
+
+    function openGameEditor(game) {
+      editingGameId = game.id;
+      document.getElementById("import-modal-title").textContent = "Sửa thông tin Game";
+      document.getElementById("btn-submit-add-game").textContent = "Lưu";
+      document.getElementById("add-game-id").value = game.id;
+      document.getElementById("add-game-id").disabled = true;
+      document.getElementById("add-game-name").value = game.name;
+      document.getElementById("add-game-folder").value = game.path;
+      document.getElementById("add-game-exe").value = game.executable || "game.exe";
+      document.getElementById("add-game-version").value = game.version;
+      document.getElementById("add-game-icon").value = game.icon || "game.ico";
+      document.getElementById("add-game-thumbnail").value = game.thumbnail || "thumbnail.jpg";
+      document.getElementById("add-game-cat").value = game.category;
+      document.getElementById("add-game-priority").value = game.priority;
+      openModal("modal-import");
+    }
+
+    function submitAddGame() {
+      const exe = document.getElementById("add-game-exe").value.trim();
+      const folder = document.getElementById("add-game-folder").value.trim() || "G:\\Offline Games\\custom-game";
+      const name = document.getElementById("add-game-name").value.trim() || "Game Mới";
+      const id = document.getElementById("add-game-id").value.trim() || ("game-" + Date.now().toString().slice(-4));
+      const version = document.getElementById("add-game-version").value.trim() || "v1";
+      const icon = document.getElementById("add-game-icon").value.trim();
+      const thumbnail = document.getElementById("add-game-thumbnail").value.trim();
+      const cat = document.getElementById("add-game-cat").value;
+      const prio = document.getElementById("add-game-priority").value;
+
+      if (editingGameId) {
+        const game = games.find(item => item.id === editingGameId);
+        if (game) {
+          game.name = name;
+          game.category = cat;
+          game.version = version;
+          game.path = folder;
+          game.executable = exe || "game.exe";
+          game.icon = icon;
+          game.thumbnail = thumbnail;
+          game.priority = prio;
+        }
+        editingGameId = null;
+        closeModal("modal-import");
+        showToast(`Đã sửa thông tin game '${name}'.`);
+        renderGrid();
+        return;
+      }
+
+      games.unshift({
+        id: id,
+        category: cat,
+        name: name,
+        version: "v1",
+        size: "42.8 GB",
+        sizeBytes: 45900000000,
+        path: folder,
+        publishedAt: utc7Minute(),
+        executable: exe || "game.exe",
+        icon,
+        thumbnail,
+        statusType: "seeding",
+        statusText: "Đang seed",
+        progress: 100,
+        priority: prio,
+        speed: "↑ 18.0 MB/s",
+        eta: "-",
+        peers: "1 / 0",
+        hasGameFiles: true
+      });
+
+      closeModal("modal-import");
+      showToast(`Đã thêm thành công game '${name}' và bắt đầu chia sẻ P2P.`);
+      renderGrid();
+    }
+
+    // Modal Xác Nhận Xóa Game
+    function openDeleteConfirmModal() {
+      const count = selectedIds.size || 1;
+      document.getElementById("delete-confirm-text").textContent = `Bạn có chắc chắn muốn xóa ${count} game đã chọn khỏi danh sách Ting Server?`;
+      document.getElementById("chk-delete-game-files").checked = false;
+      document.getElementById("delete-operation-progress").style.width = "0%";
+      openModal("modal-delete-confirm");
+    }
+
+    function submitDeleteGame() {
+      const deleteGameFiles = document.getElementById("chk-delete-game-files").checked;
+      document.getElementById("delete-operation-progress").style.width = "100%";
+      games = games.filter(g => !selectedIds.has(g.id));
+      selectedIds.clear();
+      closeModal("modal-delete-confirm");
+      showToast(deleteGameFiles ? "Đã xóa game và toàn bộ dữ liệu game trên ổ G:\\." : "Đã xóa game khỏi Ting Server.");
+      renderGrid();
+    }
+
+    // Modal Thuộc Tính Chi Tiết
+    function openGameProperties(gameId) {
+      const g = games.find(x => x.id === gameId);
+      if (!g) return;
+      document.getElementById("prop-game-name").textContent = g.name;
+      document.getElementById("prop-game-id").textContent = `ID: ${g.id} • ${g.category}`;
+      document.getElementById("prop-game-status").textContent = g.statusText;
+      document.getElementById("prop-game-ver").textContent = g.version;
+      document.getElementById("prop-game-prio").textContent = g.priority;
+      document.getElementById("prop-game-size").textContent = g.size;
+      document.getElementById("prop-game-path").textContent = g.path;
+      const exeEl = document.getElementById("prop-game-exe");
+      if (exeEl) exeEl.textContent = g.executable || "-";
+      openModal("modal-properties");
+    }
+
+    // Master Checkbox Header
+    checkAll.addEventListener("change", () => {
+      const filtered = getFilteredList();
+      if (checkAll.checked) {
+        filtered.forEach(g => selectedIds.add(g.id));
+      } else {
+        filtered.forEach(g => selectedIds.delete(g.id));
+      }
+      syncSelection();
+    });
+
+    // Lọc & Tìm Kiếm
+    searchBox.addEventListener("input", () => {
+      btnClearSearch.style.display = searchBox.value ? "flex" : "none";
+      renderGrid();
+    });
+
+    btnClearSearch.addEventListener("click", () => {
+      searchBox.value = "";
+      btnClearSearch.style.display = "none";
+      renderGrid();
+    });
+
+    advFilterType.addEventListener("change", renderGrid);
+    advFilterVal.addEventListener("change", renderGrid);
+
+    document.getElementById("btn-refresh").addEventListener("click", () => {
+      showToast("Đang làm mới danh sách game và kiểm tra tiến trình service...");
+      renderGrid();
+    });
+
+    // Sắp xếp Table Headers
+    const headers = document.querySelectorAll("table.data-grid th[data-col]");
+    headers.forEach(th => {
+      th.addEventListener("click", (e) => {
+        if (e.target.classList.contains("col-resizer")) return;
+        const col = th.dataset.col;
+        if (sortColumn === col) {
+          sortAsc = !sortAsc;
+        } else {
+          sortColumn = col;
+          sortAsc = true;
+        }
+        headers.forEach(h => {
+          const arrow = h.querySelector(".sort-arrow");
+          if (arrow) arrow.textContent = "";
+        });
+        const arrow = th.querySelector(".sort-arrow");
+        if (arrow) arrow.textContent = sortAsc ? "↑" : "↓";
+        renderGrid();
+      });
+    });
+
+    // Kéo đổi chiều rộng cột (Column Resizer)
+    document.querySelectorAll(".col-resizer").forEach(resizer => {
+      resizer.addEventListener("mousedown", (e) => {
+        e.stopPropagation();
+        const th = resizer.parentElement;
+        const startX = e.pageX;
+        const startWidth = th.offsetWidth;
+
+        function onMouseMove(e) {
+          const newWidth = Math.max(40, startWidth + (e.pageX - startX));
+          th.style.width = newWidth + "px";
+        }
+
+        function onMouseUp() {
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
+        }
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      });
+    });
+
+    // Sidebar Resizer
+    const sidebar = document.getElementById("app-sidebar");
+    const sidebarResizer = document.getElementById("sidebar-resizer");
+    if (sidebarResizer) {
+      sidebarResizer.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        const startX = e.pageX;
+        const startW = sidebar.offsetWidth;
+        function onMouseMove(e) {
+          const newW = Math.min(360, Math.max(160, startW + (e.pageX - startX)));
+          sidebar.style.width = newW + "px";
+        }
+        function onMouseUp() {
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onMouseUp);
+        }
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+      });
+    }
+
+    // Toggle thu nhỏ Sidebar (Ẩn logo khi thu nhỏ)
+    const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
+    btnToggleSidebar.addEventListener("click", () => {
+      sidebar.classList.toggle("collapsed");
+      const isCollapsed = sidebar.classList.contains("collapsed");
+      btnToggleSidebar.title = isCollapsed ? "Mở rộng sidebar" : "Thu nhỏ sidebar";
+    });
+
+    // Theme Toggle
+    const btnTheme = document.getElementById("btn-theme-toggle");
+    const themeText = document.getElementById("theme-text");
+    btnTheme.addEventListener("click", () => {
+      const html = document.documentElement;
+      const isDark = html.getAttribute("data-theme") === "dark";
+      if (isDark) {
+        html.setAttribute("data-theme", "light");
+        themeText.textContent = "Giao diện Sáng";
+      } else {
+        html.setAttribute("data-theme", "dark");
+        themeText.textContent = "Giao diện Tối";
+      }
+    });
+
+    function fullLogTimestamp(date = new Date()) {
+      const pad = (value, width = 2) => String(value).padStart(width, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}`;
+    }
+
+    function applyServiceState(online, errorMessage = "") {
+      isSrvOnline = online;
+      const badge = document.getElementById("service-status-badge");
+      const text = document.getElementById("service-status-text");
+      const port = document.getElementById("service-port-tag");
+      const seeder = document.getElementById("service-seeder-val");
+      const banner = document.getElementById("service-error-banner");
+      const errorText = document.getElementById("service-error-message");
+      const settingsStatus = document.getElementById("settings-service-status");
+      const settingsProcess = document.getElementById("settings-service-process");
+      const settingsCheck = document.getElementById("settings-service-check");
+      const settingsError = document.getElementById("settings-latest-error");
+      const settingsErrorText = document.getElementById("settings-latest-error-text");
+      settingsCheck.textContent = `[${fullLogTimestamp()}]`;
+      badge.classList.toggle("offline", !online);
+      banner.classList.toggle("visible", !online);
+      settingsError.classList.toggle("visible", !online);
+      if (online) {
+        text.textContent = "Service online";
+        port.textContent = ":3211";
+        settingsStatus.textContent = "Running · Healthy";
+        settingsProcess.textContent = "PID 4892 · v0.1.0";
+        if (seeder) seeder.innerHTML = '<span class="badge-mini success">Port 16881</span> Active';
+      } else {
+        const latest = errorMessage || `[${fullLogTimestamp()}] [ERROR] Mất kết nối Ting Server Service tại 127.0.0.1:3211`;
+        text.textContent = "Service error";
+        port.textContent = "Offline";
+        settingsStatus.textContent = "Đã dừng · Lỗi";
+        settingsProcess.textContent = "Không có tiến trình";
+        errorText.textContent = latest;
+        settingsErrorText.textContent = latest;
+        if (seeder) seeder.innerHTML = '<span class="badge-mini offline">Tắt</span>';
+      }
+      const addGame = document.getElementById("btn-add-game");
+      if (addGame) {
+        addGame.disabled = !online;
+        addGame.title = online ? "Thêm Game mới vào Server" : "Cần kết nối Ting Server Service trước khi thêm game";
+      }
+      renderGrid();
+      syncSelection();
+    }
+
+    function refreshServiceState() {
+      applyServiceState(isSrvOnline);
+      showToast(isSrvOnline ? "Service đang Running và health check thành công" : "Service vẫn lỗi; xem lỗi gần nhất hoặc Restart service");
+    }
+
+    function restartService() {
+      const button = document.getElementById("btn-restart-service");
+      if (button) { button.disabled = true; button.textContent = "Đang restart..."; }
+      document.getElementById("settings-service-status").textContent = "Restarting...";
+      showToast("Đang yêu cầu Windows SCM restart TingServer...");
+      setTimeout(() => {
+        applyServiceState(true);
+        if (button) { button.disabled = false; button.textContent = "Restart service"; }
+        const term = document.getElementById("terminal-log-content");
+        if (term) term.insertAdjacentHTML("beforeend", `<div>[${fullLogTimestamp()}] <span class="terminal-line-ok">[SUCCESS]</span> TingServer đã restart và health check thành công</div>`);
+        showToast("TingServer đã restart thành công");
+      }, 900);
+    }
+
+    // Service state demo: click status simulates a recoverable service error.
+    let isSrvOnline = true;
+    document.getElementById("service-status-toggle").addEventListener("click", () => {
+      applyServiceState(!isSrvOnline);
+      showToast(isSrvOnline ? "Service online :3211" : "Service lỗi — lỗi gần nhất đã hiển thị tại màn hình hiện tại");
+    });
+
+    // Chuyển Tab Sidebar
+    document.querySelectorAll(".nav-item").forEach(item => {
+      item.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+        item.classList.add("active");
+        const t = item.dataset.tab;
+
+        document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+        if (t === "games") document.getElementById("view-games").classList.add("active");
+        else if (t === "p2p") document.getElementById("view-p2p").classList.add("active");
+        else if (t === "storage") document.getElementById("view-storage").classList.add("active");
+        else if (t === "logs") document.getElementById("view-logs").classList.add("active");
+        else if (t === "settings") document.getElementById("view-settings").classList.add("active");
+      });
+    });
+
+    // Deep-link trạng thái để visual QA có thể render từng màn hình ở cùng
+    // viewport/DPI mà không cần tạo bản sao riêng của design specification.
+    const previewParams = new URLSearchParams(window.location.search);
+    const previewTheme = previewParams.get("theme");
+    if (["dark", "light"].includes(previewTheme)) {
+      document.documentElement.setAttribute("data-theme", previewTheme);
+    }
+    const previewView = previewParams.get("view");
+    if (["games", "p2p", "storage", "logs", "settings"].includes(previewView)) {
+      document.querySelector(`.nav-item[data-tab="${previewView}"]`).click();
+    }
+
+    function clearLogs() {
+      document.getElementById("terminal-log-content").innerHTML = `<div>[${fullLogTimestamp()}] [INFO] Log hiển thị đã được xóa bởi người dùng</div>`;
+      showToast("Đã xóa nội dung log hiển thị.");
+    }
+
+    // Initial render: Hiển thị ngay lập tức danh sách game
+    renderGrid();
+    const previewModal = previewParams.get("modal");
+    if (previewModal === "properties") openGameProperties(games[0]?.id);
+    else if (previewModal === "priority") openPriorityModal();
+    else if (previewModal === "version") openVersionModal();
+    else if (previewModal === "delete") openDeleteConfirmModal();
+    else if (previewModal === "import") openNewGameEditor();
+    else if (previewModal === "history") openReleaseHistoryModal(games[0]?.id);
+  </script>
+</body>
+
+</html>

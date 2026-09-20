@@ -1,0 +1,3186 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ting Admin — Quản Trị Phòng Máy & Máy Tính Tiền POS</title>
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS — CHUẨN WINDOWS 11 SLINT FLUENT UI (ĐỒNG BỘ 1:1 TING-SERVER & TING-UPDATE)
+       ========================================================================== */
+    :root {
+      /* Windows 11 Desktop Dark Theme Tokens */
+      --bg-window: #131417;
+      --bg-sidebar: #17181c;
+      --bg-sidebar-hover: #22232a;
+      --bg-sidebar-active: #282a33;
+      --bg-panel: #1b1c20;
+      --bg-toolbar: #1a1b1f;
+      --bg-table-header: #202126;
+      --bg-table-row: #16171b;
+      --bg-table-alt: #1a1b1f;
+      --bg-table-hover: #23252c;
+      --bg-table-selected: #1d3b53;
+      --bg-table-selected-hover: #224562;
+      --bg-input: #121316;
+      --bg-dropdown: #202126;
+      --bg-status-bar: #16171a;
+      --bg-card: #1f2026;
+      --bg-card-inner: #16171b;
+
+      --border-color: #2e3038;
+      --border-subtle: #24252c;
+      --border-header: #353740;
+
+      --text-primary: #f2f3f5;
+      --text-title: #ffffff;
+      --text-secondary: #9aa1a9;
+      --text-muted: #6b7280;
+      --text-header: #8a949e;
+
+      /* Microsoft Fluent Accent */
+      --accent-blue: #0078d4;
+      --accent-blue-hover: #1084d9;
+      --accent-blue-active: #0067b8;
+      --accent-indicator: #0078d4;
+
+      /* Ting Brand Mark */
+      --brand-gradient: linear-gradient(135deg, #FFCC05 0%, #E41865 50%, #721980 100%);
+      --brand-accent: #E41865;
+
+      /* Workstation Operational Status */
+      --status-online-green: #34c759;
+      --status-warning-color: #f59e0b;
+      --status-missing-color: #d96b66;
+      --status-cyan-color: #38bdf8;
+      --status-purple-color: #a855f7;
+
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: Consolas, "Courier New", "Roboto Mono", monospace;
+    }
+
+    [data-theme="light"] {
+      /* Windows 11 Desktop Light Theme Tokens */
+      --bg-window: #f3f4f6;
+      --bg-sidebar: #eaebee;
+      --bg-sidebar-hover: #dee0e5;
+      --bg-sidebar-active: #d2d6df;
+      --bg-panel: #ffffff;
+      --bg-toolbar: #ffffff;
+      --bg-table-header: #f2f3f5;
+      --bg-table-row: #ffffff;
+      --bg-table-alt: #f8f9fa;
+      --bg-table-hover: #eef1f5;
+      --bg-table-selected: #d7eaf8;
+      --bg-table-selected-hover: #cbe3f5;
+      --bg-input: #ffffff;
+      --bg-dropdown: #ffffff;
+      --bg-status-bar: #eaebee;
+      --bg-card: #ffffff;
+      --bg-card-inner: #f9fafb;
+
+      --border-color: #d5d8de;
+      --border-subtle: #e5e7eb;
+      --border-header: #ccd0d8;
+
+      --text-primary: #191b1f;
+      --text-title: #000000;
+      --text-secondary: #5c6470;
+      --text-muted: #8c939e;
+      --text-header: #59636e;
+
+      --accent-blue: #0067b8;
+      --accent-blue-hover: #1075c7;
+      --accent-blue-active: #005a9e;
+      --accent-indicator: #0067b8;
+
+      --status-online-green: #16a34a;
+      --status-warning-color: #d97706;
+      --status-missing-color: #c93b36;
+      --status-cyan-color: #0284c7;
+      --status-purple-color: #9333ea;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-window);
+      color: var(--text-primary);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 12.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .tabular-num {
+      font-family: var(--font-mono);
+      font-feature-settings: "tnum";
+    }
+
+    /* Common SVG Icon Base */
+    .ico {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      display: inline-block;
+      vertical-align: middle;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ==========================================================================
+       1. WINDOWS NATIVE TITLEBAR (Height: 32px — Chuẩn Ting-Server & Ting-Update)
+       ========================================================================== */
+    .titlebar {
+      height: 32px;
+      background-color: var(--bg-sidebar);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 10px 0 12px;
+      flex-shrink: 0;
+    }
+
+    .titlebar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .titlebar-logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .titlebar-logo-img {
+      height: 16px;
+      width: auto;
+    }
+
+    .titlebar-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.2px;
+    }
+
+    .titlebar-right {
+      display: flex;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .titlebar-btn {
+      width: 32px;
+      height: 24px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 10px;
+      border-radius: 2px;
+    }
+
+    .titlebar-btn:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    .titlebar-btn.close:hover {
+      background-color: #e81123;
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       2. MAIN APP FRAME (Sidebar + Content Area)
+       ========================================================================== */
+    .app-frame {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 32px - 26px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Left Sidebar: 220px, Collapsible */
+    .sidebar {
+      width: 220px;
+      min-width: 170px;
+      max-width: 340px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: relative;
+      transition: width 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.collapsed {
+      width: 52px !important;
+      min-width: 52px !important;
+    }
+
+    .sidebar.collapsed .brand-logo-wrap,
+    .sidebar.collapsed .brand-tag,
+    .sidebar.collapsed .nav-item span:not(.nav-icon),
+    .sidebar.collapsed .nav-badge,
+    .sidebar.collapsed .nav-section-title,
+    .sidebar.collapsed #theme-text,
+    .sidebar.collapsed .service-detail-line,
+    .sidebar.collapsed #service-status-text,
+    .sidebar.collapsed .service-port-tag {
+      display: none !important;
+    }
+
+    .sidebar.collapsed .sidebar-brand {
+      justify-content: center;
+      padding: 0 0 8px 0;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .sidebar-top {
+      padding: 10px 8px 6px 8px;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 10px 4px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 8px;
+    }
+
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .brand-logo-img {
+      height: 26px;
+      width: 26px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-title-text {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--text-title);
+      letter-spacing: -0.2px;
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      background-color: rgba(0, 120, 212, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(0, 120, 212, 0.3);
+    }
+
+    .sidebar-toggle-btn {
+      width: 24px;
+      height: 24px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .nav-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 8px 8px 4px 8px;
+      letter-spacing: 0.6px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 34px;
+      padding: 0 10px;
+      border-radius: 4px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: background-color 0.1s ease, color 0.1s ease;
+    }
+
+    .nav-item:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background-color: var(--bg-sidebar-active);
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .nav-item.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      border-radius: 2px;
+      background-color: var(--accent-indicator);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    .nav-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 8px;
+      background-color: var(--border-color);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .nav-badge.alert {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: #F87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    /* Sidebar Bottom: Service Status & Theme */
+    .sidebar-bottom {
+      padding: 10px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .service-info-box {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .service-status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .status-indicator-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--status-online-green);
+      line-height: 1;
+    }
+
+    .indicator-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--status-online-green);
+      box-shadow: 0 0 6px rgba(52, 199, 89, 0.5);
+      flex: 0 0 7px;
+    }
+
+    .service-port-tag {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      background: var(--bg-card-inner);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    .service-detail-line {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-secondary);
+      font-size: 10.5px;
+    }
+
+    .detail-label { color: var(--text-muted); }
+    .detail-val { font-weight: 500; color: var(--text-primary); }
+
+    .sidebar-theme-switch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      height: 28px;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+
+    .sidebar-theme-switch:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       3. CONTENT AREA & UNIFIED 2-ROW TOOLBAR
+       ========================================================================== */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--bg-window);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .toolbar-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      background-color: var(--bg-toolbar);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Row 1: Thao tác & Chỉ số tài chính thu ngân */
+    .toolbar-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 38px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 12px;
+      overflow-x: auto;
+    }
+
+    .financial-telemetry-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .metric-badge-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      font-size: 11.5px;
+    }
+
+    .metric-badge-label {
+      color: var(--text-muted);
+      font-size: 10.5px;
+    }
+
+    .metric-badge-value {
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+    }
+
+    .metric-badge-value.green { color: var(--status-online-green); }
+    .metric-badge-value.cyan { color: var(--status-cyan-color); }
+    .metric-badge-value.gold { color: #FFCC05; }
+
+    .cashier-actions-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-fluent {
+      height: 27px;
+      padding: 0 10px;
+      border-radius: 4px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-fluent:hover {
+      background-color: var(--bg-sidebar-hover);
+      border-color: var(--border-header);
+    }
+
+    .btn-fluent.primary {
+      background-color: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .btn-fluent.primary:hover {
+      background-color: var(--accent-blue-hover);
+    }
+
+    .cashier-tag {
+      font-size: 11px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px;
+      border-left: 1px solid var(--border-subtle);
+    }
+
+    /* Row 2: Bộ lọc phân khu & Tìm kiếm */
+    .toolbar-row-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 36px;
+      padding: 0 12px;
+      gap: 12px;
+      overflow-x: auto;
+    }
+
+    .zone-filter-chips {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .chip-btn {
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 3px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.1s;
+    }
+
+    .chip-btn:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+    }
+
+    .chip-btn.active {
+      background: var(--bg-sidebar-active);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+      font-weight: 600;
+    }
+
+    .toolbar-search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .toolbar-search-input {
+      width: 200px;
+      height: 25px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      padding: 0 8px 0 26px;
+      font-size: 11.5px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .toolbar-search-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .toolbar-search-box .ico {
+      position: absolute;
+      left: 7px;
+      width: 13px;
+      height: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       4. WORKSPACE PANELS & SEAT MATRIX
+       ========================================================================== */
+    .view-panel {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* Matrix Workstations Layout */
+    .matrix-workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .matrix-grid-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
+      align-content: start;
+    }
+
+    /* Individual Seat Node — Fluent Desktop Cybercafe Ergonomics */
+    .seat-node {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: background-color 0.1s, border-color 0.1s;
+    }
+
+    .seat-node:hover {
+      background-color: var(--bg-table-hover);
+      border-color: var(--border-header);
+    }
+
+    .seat-node.selected {
+      border-color: var(--accent-indicator) !important;
+      background-color: var(--bg-table-selected) !important;
+    }
+
+    .seat-node.active {
+      border-left: 3px solid var(--status-online-green);
+    }
+
+    .seat-node.warning {
+      border-left: 3px solid var(--status-warning-color);
+      background-color: rgba(245, 158, 11, 0.04);
+    }
+
+    .seat-node.vacant {
+      border-left: 3px solid var(--border-color);
+      opacity: 0.75;
+    }
+
+    .seat-node.locked {
+      border-left: 3px solid var(--status-missing-color);
+      opacity: 0.65;
+    }
+
+    .seat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .seat-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-title);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .seat-zone-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+
+    .seat-zone-badge.vip { background: rgba(255, 204, 5, 0.15); color: #FFCC05; border: 1px solid rgba(255,204,5,0.3); }
+    .seat-zone-badge.esports { background: rgba(56, 189, 248, 0.15); color: var(--status-cyan-color); border: 1px solid rgba(56, 189, 248, 0.3); }
+    .seat-zone-badge.stream { background: rgba(168, 85, 247, 0.15); color: var(--status-purple-color); border: 1px solid rgba(168, 85, 247, 0.3); }
+    .seat-zone-badge.std { background: rgba(154, 161, 169, 0.15); color: var(--text-secondary); border: 1px solid rgba(154, 161, 169, 0.3); }
+
+    .seat-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .seat-user-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+    }
+
+    .seat-username {
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+    }
+
+    .seat-game-chip {
+      font-size: 9px;
+      padding: 0 4px;
+      border-radius: 2px;
+      background: var(--bg-card-inner);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .seat-balance-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      font-size: 10.5px;
+      color: var(--text-secondary);
+    }
+
+    .seat-time-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card-inner);
+      padding: 3px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--border-subtle);
+      margin-top: 2px;
+    }
+
+    .seat-time-label {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .seat-countdown {
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--status-online-green);
+    }
+
+    .seat-countdown.warning {
+      color: var(--status-warning-color);
+      animation: blinkTimer 1s infinite;
+    }
+
+    @keyframes blinkTimer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .seat-progress-track {
+      height: 2px;
+      background: var(--border-subtle);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+
+    .seat-progress-fill {
+      height: 100%;
+      background: var(--status-online-green);
+    }
+
+    .seat-progress-fill.warning {
+      background: var(--status-warning-color);
+    }
+
+    /* Seat Actions Ribbon */
+    .seat-actions-ribbon {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      margin-top: 2px;
+    }
+
+    .btn-seat-action {
+      flex: 1;
+      padding: 2px 0;
+      border-radius: 2px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .btn-seat-action:hover {
+      background: var(--bg-sidebar-hover);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .btn-seat-action.primary {
+      color: #FFCC05;
+    }
+
+    /* Right-Side Workstation Inspector Drawer */
+    .inspector-panel {
+      width: 320px;
+      background-color: var(--bg-panel);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .inspector-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--bg-toolbar);
+    }
+
+    .inspector-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-title);
+      font-family: var(--font-mono);
+    }
+
+    .inspector-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .inspector-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .inspector-section-label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-header);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .inspector-telemetry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .telemetry-tile {
+      background: var(--bg-card-inner);
+      border: 1px solid var(--border-subtle);
+      border-radius: 3px;
+      padding: 5px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .telemetry-label {
+      font-size: 9.5px;
+      color: var(--text-muted);
+    }
+
+    .telemetry-value {
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       TAB 2: KITCHEN ORDER DISPLAY (KDS)
+       ========================================================================== */
+    .kds-board {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .kds-lane {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .kds-lane-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-title);
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kds-order-ticket {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .kds-order-ticket.pending {
+      border-left: 3px solid #E41865;
+    }
+
+    .ticket-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ticket-seat {
+      font-weight: 800;
+      font-size: 12.5px;
+      color: #FFCC05;
+      font-family: var(--font-mono);
+    }
+
+    .ticket-time {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .ticket-paytag {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 2px;
+      width: fit-content;
+    }
+
+    .ticket-paytag.prepaid {
+      background: rgba(52, 199, 89, 0.15);
+      color: var(--status-online-green);
+      border: 1px solid rgba(52, 199, 89, 0.3);
+    }
+
+    .ticket-paytag.cash {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--status-warning-color);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .ticket-item-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11.5px;
+    }
+
+    .ticket-item-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .ticket-modifier {
+      font-size: 10px;
+      color: #F59E0B;
+      font-style: italic;
+    }
+
+    /* ==========================================================================
+       TAB 3: PREPAID MEMBERS LEDGER TABLE (Chuẩn Table ting-server/ting-update)
+       ========================================================================== */
+    .table-container {
+      flex: 1;
+      overflow-y: auto;
+      background-color: var(--bg-table-row);
+    }
+
+    .fluent-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .fluent-table th {
+      background-color: var(--bg-table-header);
+      color: var(--text-header);
+      font-weight: 600;
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-subtle);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .fluent-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      border-right: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .fluent-table tr:hover td {
+      background-color: var(--bg-table-hover);
+    }
+
+    .fluent-table tr.selected td {
+      background-color: var(--bg-table-selected);
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       5. BOTTOM STATUS BAR (Height: 26px — Chuẩn TingServer & TingUpdate)
+       ========================================================================== */
+    .status-bar {
+      height: 26px;
+      background-color: var(--bg-status-bar);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .status-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-key-badge {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+
+    .status-key-badge:hover {
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       6. MODAL DIALOGS (Chuẩn Windows 11 Slint Desktop)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-window {
+      width: 480px;
+      max-width: 95vw;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 10px 14px;
+      background-color: var(--bg-sidebar);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-title);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-footer {
+      padding: 10px 14px;
+      background-color: var(--bg-sidebar);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-input {
+      height: 28px;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 3px;
+      padding: 0 8px;
+      font-size: 12px;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    /* Toast Notification */
+    .app-toast {
+      position: fixed;
+      bottom: 34px;
+      right: 16px;
+      background: var(--bg-panel);
+      border: 1px solid var(--accent-indicator);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .app-toast.show {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ====================================================================
+       1. WINDOWS NATIVE STYLE TITLEBAR (32px — Chuẩn TingServer & TingUpdate)
+       ==================================================================== -->
+  <div class="titlebar">
+    <div class="titlebar-left">
+      <div class="titlebar-logo">
+        <img src="../logo-admin.svg" alt="Ting Admin Logo" class="titlebar-logo-img">
+      </div>
+      <span class="titlebar-title">Ting Admin — Hệ Thống Quản Trị Phòng Máy & Máy Tính Tiền POS</span>
+    </div>
+    <div class="titlebar-right">
+      <button class="titlebar-btn" onclick="showToast('Thu nhỏ cửa sổ [Tauri IPC]')">🗕</button>
+      <button class="titlebar-btn" onclick="showToast('Phóng to cửa sổ [Tauri IPC]')">🗖</button>
+      <button class="titlebar-btn close" onclick="showToast('Đóng ứng dụng [Tauri IPC]')">✕</button>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       2. MAIN APP FRAME (Sidebar + Content Area)
+       ==================================================================== -->
+  <div class="app-frame">
+
+    <!-- LEFT SIDEBAR (220px, Collapsible) -->
+    <aside class="sidebar" id="app-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <div class="brand-logo-wrap">
+            <img src="../logo-admin.svg" alt="Ting Admin Logo" class="brand-logo-img">
+            <div class="brand-title-wrap">
+              <span class="brand-title-text">Ting Admin</span>
+              <span class="brand-tag">POS</span>
+            </div>
+          </div>
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()" title="Thu gọn / Mở rộng menu">◀</button>
+        </div>
+
+        <div class="nav-section-title">PHÒNG MÁY</div>
+        <ul class="nav-list">
+          <li class="nav-item active" onclick="switchView('matrix', this)">
+            <div class="nav-left">
+              <span class="nav-icon">
+                <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              </span>
+              <span>Sơ Đồ Máy Trạm</span>
+            </div>
+            <span class="nav-badge">48</span>
+          </li>
+          <li class="nav-item" onclick="switchView('kds', this)">
+            <div class="nav-left">
+              <span class="nav-icon">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+              </span>
+              <span>Điều Phối Bếp (KDS)</span>
+            </div>
+            <span class="nav-badge alert" id="sidebar-kds-badge">2</span>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">TÀI KHOẢN & SỔ CÁI</div>
+        <ul class="nav-list">
+          <li class="nav-item" onclick="switchView('members', this)">
+            <div class="nav-left">
+              <span class="nav-icon">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </span>
+              <span>Sổ Cái Hội Viên</span>
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">BÁO CÁO & THUẾ</div>
+        <ul class="nav-list">
+          <li class="nav-item" onclick="switchView('fiscal', this)">
+            <div class="nav-left">
+              <span class="nav-icon">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              </span>
+              <span>Hóa Đơn Thuế POS (NĐ123)</span>
+            </div>
+          </li>
+          <li class="nav-item" onclick="switchView('shift', this)">
+            <div class="nav-left">
+              <span class="nav-icon">
+                <svg class="ico" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+              </span>
+              <span>Ca Trực & Két Tiền</span>
+            </div>
+          </li>
+        </ul>
+
+        <div class="nav-section-title">HỆ THỐNG</div>
+        <ul class="nav-list">
+          <li class="nav-item" onclick="switchView('rules', this)">
+            <div class="nav-left">
+              <span class="nav-icon">
+                <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              </span>
+              <span>Bảng Giá & Khung Giờ</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Sidebar Bottom: Service Status Box -->
+      <div class="sidebar-bottom">
+        <div class="service-info-box">
+          <div class="service-status-line">
+            <div class="status-indicator-badge">
+              <span class="indicator-dot"></span>
+              <span id="service-status-text">TingAdmin Engine</span>
+            </div>
+            <span class="service-port-tag">:3212</span>
+          </div>
+          <div class="service-detail-line">
+            <span class="detail-label">Độ trễ LAN:</span>
+            <span class="detail-val tabular-num">0.2ms</span>
+          </div>
+          <div class="service-detail-line">
+            <span class="detail-label">Cơ sở dữ liệu:</span>
+            <span class="detail-val">billing.db</span>
+          </div>
+          <div class="service-detail-line">
+            <span class="detail-label">Giờ pháp lý:</span>
+            <span class="detail-val" style="color: var(--status-warning-color);">08h - 22h</span>
+          </div>
+        </div>
+
+        <button class="sidebar-theme-switch" onclick="toggleTheme()">
+          <span class="ico">🌓</span>
+          <span id="theme-text">Giao diện Sáng/Tối</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENT AREA -->
+    <main class="content-area">
+      <!-- 2-ROW TOOLBAR (Đặc trưng Ting-Server / Ting-Update) -->
+      <div class="toolbar-wrapper">
+        <!-- Row 1: Thao tác ca & Chỉ số tài chính -->
+        <div class="toolbar-row-top">
+          <div class="financial-telemetry-group">
+            <div class="metric-badge-box">
+              <span class="metric-badge-label">Két tiền mặt:</span>
+              <span class="metric-badge-value green tabular-num">1.450.000 đ</span>
+            </div>
+            <div class="metric-badge-box">
+              <span class="metric-badge-label">VietQR Direct:</span>
+              <span class="metric-badge-value cyan tabular-num">3.820.000 đ</span>
+            </div>
+            <div class="metric-badge-box">
+              <span class="metric-badge-label">Tổng thu ca:</span>
+              <span class="metric-badge-value gold tabular-num">5.270.000 đ</span>
+            </div>
+          </div>
+
+          <div class="cashier-actions-group">
+            <button class="btn-fluent primary" onclick="openModal('modal-topup')">
+              <span>[F1] Nạp Giờ</span>
+            </button>
+            <button class="btn-fluent" onclick="openModal('modal-member')">
+              <span>[F2] Hội Viên</span>
+            </button>
+            <button class="btn-fluent" onclick="switchView('kds')">
+              <span>[F3] Đơn Bếp</span>
+            </button>
+            <button class="btn-fluent" onclick="openModal('modal-handover')">
+              <span>[F4] Chốt Ca</span>
+            </button>
+
+            <div class="cashier-tag">
+              <span>Thu ngân: <strong>Nguyễn Văn A</strong> (Ca 1: 07h-15h)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Bộ lọc & Tìm kiếm -->
+        <div class="toolbar-row-bottom">
+          <div class="zone-filter-chips">
+            <button class="chip-btn active" onclick="filterZone('all', this)">Tất cả (48)</button>
+            <button class="chip-btn" onclick="filterZone('vip', this)">Khu VIP (16)</button>
+            <button class="chip-btn" onclick="filterZone('esports', this)">Sân Khấu Esports (10)</button>
+            <button class="chip-btn" onclick="filterZone('stream', this)">Phòng Đôi Stream (6)</button>
+            <button class="chip-btn" onclick="filterZone('std', this)">Khu Thường (16)</button>
+          </div>
+
+          <div class="toolbar-search-box">
+            <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="toolbar-search-input" placeholder="Tìm số máy, hội viên (Ctrl+F)..." oninput="searchStations(this.value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- WORKSPACE VIEWS -->
+
+      <!-- VIEW 1: SEAT MATRIX (SƠ ĐỒ MÁY TRẠM) -->
+      <div class="view-panel active" id="view-matrix">
+        <div class="matrix-workspace">
+          <div class="matrix-grid-scroll" id="grid-stations">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Right-Side Telemetry Inspector Panel -->
+          <aside class="inspector-panel" id="inspector-drawer">
+            <div class="inspector-header">
+              <span class="inspector-title" id="inspect-title">VIP-05</span>
+              <span class="seat-zone-badge vip" id="inspect-zone">VIP · 12k/h</span>
+            </div>
+            <div class="inspector-body">
+              <div class="inspector-card">
+                <span class="inspector-section-label">Thông Tin Phiên Chơi</span>
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px;">
+                  <span style="color: var(--text-muted);">Hội viên:</span>
+                  <strong style="color: #FFCC05;" id="inspect-user">kehuydiet6789</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px;">
+                  <span style="color: var(--text-muted);">Dịch vụ trả trước:</span>
+                  <strong class="tabular-num" id="inspect-bal">45.000 đ</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px;">
+                  <span style="color: var(--text-muted);">Thời gian khả dụng:</span>
+                  <strong class="tabular-num" style="color: var(--status-online-green);" id="inspect-countdown">02:45:18</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11.5px;">
+                  <span style="color: var(--text-muted);">Game đang chạy:</span>
+                  <span class="seat-game-chip" id="inspect-game">LOL</span>
+                </div>
+              </div>
+
+              <div class="inspector-card">
+                <span class="inspector-section-label">Giám Sát Phần Cứng LAN</span>
+                <div class="inspector-telemetry-grid">
+                  <div class="telemetry-tile">
+                    <span class="telemetry-label">CPU i7-14700KF</span>
+                    <span class="telemetry-value">58°C · 34%</span>
+                  </div>
+                  <div class="telemetry-tile">
+                    <span class="telemetry-label">RTX 4070 Ti S</span>
+                    <span class="telemetry-value">62°C · 78%</span>
+                  </div>
+                  <div class="telemetry-tile">
+                    <span class="telemetry-label">RAM DDR5 6000</span>
+                    <span class="telemetry-value">17.8/32 GB</span>
+                  </div>
+                  <div class="telemetry-tile">
+                    <span class="telemetry-label">Ping LAN :3210</span>
+                    <span class="telemetry-value" style="color: var(--status-online-green);">0.2ms</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="inspector-card">
+                <span class="inspector-section-label">Thao Tác Máy Trạm</span>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                  <button class="btn-fluent primary" style="justify-content: center;" onclick="promptTopupSelected()">Nạp Giờ</button>
+                  <button class="btn-fluent" style="justify-content: center;" onclick="promptChangeSeat()">Đổi Máy</button>
+                  <button class="btn-fluent" style="justify-content: center;" onclick="promptSendMessage()">Gửi Tin Nhắn</button>
+                  <button class="btn-fluent" style="justify-content: center; color: var(--status-warning-color);" onclick="promptLockStation()">Khóa Máy</button>
+                  <button class="btn-fluent" style="justify-content: center;" onclick="promptRemoteAction('reboot')">Khởi Động Lại</button>
+                  <button class="btn-fluent" style="justify-content: center; color: var(--status-missing-color);" onclick="promptRemoteAction('shutdown')">Tắt Máy</button>
+                </div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <!-- VIEW 2: KITCHEN ORDER DISPLAY (KDS) -->
+      <div class="view-panel" id="view-kds">
+        <div style="padding: 8px 12px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <span style="font-weight: 700; color: var(--text-title);">ĐIỀU PHỐI BẾP & CANTEEN F&B (KDS)</span>
+            <span class="seat-zone-badge std">Máy in bếp: LAN 192.168.1.200 (80mm)</span>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-fluent primary" onclick="openNewOrderPosModal()">+ Gọi Món Tại Quầy</button>
+            <button class="btn-fluent" onclick="openModal('modal-kot-preview')">🧾 Xem Lại Phiếu Bếp KOT</button>
+            <button class="btn-fluent" onclick="showToast('🔔 Ping chuông báo bếp kêu: Ting! Có đơn mới')">🔔 Test Chuông</button>
+          </div>
+        </div>
+        <div class="kds-board">
+          <div class="kds-lane">
+            <div class="kds-lane-title">
+              <span>ĐƠN CHỜ TIẾP NHẬN</span>
+              <span class="nav-badge alert" id="kds-badge-p">2</span>
+            </div>
+            <div id="lane-p" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+          <div class="kds-lane">
+            <div class="kds-lane-title">
+              <span>BẾP ĐANG CHẾ BIẾN</span>
+              <span class="nav-badge" id="kds-badge-c">1</span>
+            </div>
+            <div id="lane-c" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+          <div class="kds-lane">
+            <div class="kds-lane-title">
+              <span>ĐANG GIAO BÀN & HOÀN TẤT</span>
+              <span class="nav-badge" id="kds-badge-d">1</span>
+            </div>
+            <div id="lane-d" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: PREPAID MEMBERS LEDGER (SỔ CÁI HỘI VIÊN) -->
+      <div class="view-panel" id="view-members">
+        <div style="padding: 8px 12px; background: rgba(217, 107, 102, 0.1); border-bottom: 1px solid var(--border-color); font-size: 11.5px; color: #f87171;">
+          <strong>LƯU Ý PHÁP LÝ (NGHỊ ĐỊNH 52/2024/NĐ-CP):</strong> Tài khoản hội viên là khoản trả trước tiền dịch vụ nội bộ (Prepaid Usage). Tuyệt đối cấm rút tiền mặt (Cash-out) hoặc chuyển tiền ngang hàng (P2P) giữa các máy trạm. Khi khách thôi chơi chỉ thanh lý hợp đồng và hoàn tiền tại quầy thu ngân kèm phiếu chi.
+        </div>
+        <div style="padding: 8px 12px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px; flex: 1; max-width: 400px;">
+            <input type="text" class="form-input" id="search-members-input" style="width: 100%;" placeholder="Tìm tên hội viên, SĐT, CCCD..." oninput="searchMembers(this.value)">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn-fluent primary" onclick="openModal('modal-member')">+ [F2] Thêm Hội Viên Mới</button>
+            <button class="btn-fluent" onclick="showToast('✓ Đã xuất sổ cái hội viên ra tệp Excel/CSV thành công!')">📥 Xuất Báo Cáo Excel</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="fluent-table">
+            <thead>
+              <tr>
+                <th>Tên Hội Viên</th>
+                <th>Số Điện Thoại</th>
+                <th>Số Định Danh (CCCD)</th>
+                <th>Hạng Thẻ</th>
+                <th>Số Dư Trả Trước</th>
+                <th>Giờ Quy Đổi (VIP)</th>
+                <th>Lần Cuối Truy Cập</th>
+                <th style="text-align: right;">Thao Tác Kế Toán</th>
+              </tr>
+            </thead>
+            <tbody id="members-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW 4: FISCAL E-INVOICE & TAX REPORT (HÓA ĐƠN ĐIỆN TỬ NĐ123) -->
+      <div class="view-panel" id="view-fiscal">
+        <div style="padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            <div class="inspector-card">
+              <span class="inspector-section-label">DOANH THU GIỜ MÁY</span>
+              <span style="font-size: 18px; font-weight: 700; color: var(--status-cyan-color);" class="tabular-num">3.650.000 đ</span>
+              <span style="font-size: 11px; color: var(--text-muted);">304.2 giờ dịch vụ (VAT 10%)</span>
+            </div>
+            <div class="inspector-card">
+              <span class="inspector-section-label">DOANH THU CANTEEN F&B</span>
+              <span style="font-size: 18px; font-weight: 700; color: #FFCC05;" class="tabular-num">1.620.000 đ</span>
+              <span style="font-size: 11px; color: var(--text-muted);">62 suất ăn & uống (VAT 8%)</span>
+            </div>
+            <div class="inspector-card">
+              <span class="inspector-section-label">TIỀN MẶT TRONG KÉT</span>
+              <span style="font-size: 18px; font-weight: 700; color: var(--status-online-green);" class="tabular-num">1.450.000 đ</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Thu tại quầy</span>
+            </div>
+            <div class="inspector-card">
+              <span class="inspector-section-label">VIETQR DIRECT (BANK)</span>
+              <span style="font-size: 18px; font-weight: 700; color: #E41865;" class="tabular-num">3.820.000 đ</span>
+              <span style="font-size: 11px; color: var(--text-muted);">MBBank 9999TING</span>
+            </div>
+          </div>
+
+          <div class="inspector-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+              <span class="inspector-section-label">HÓA ĐƠN ĐIỆN TỬ KHỞI TẠO TỪ MÁY TÍNH TIỀN (E-INVOICE POS)</span>
+              <button class="btn-fluent primary" onclick="showToast('✓ Đã đồng bộ 48 hóa đơn điện tử ca lên Tổng Cục Thuế!')">Phát Hành Hóa Đơn Ca</button>
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.6; font-family: var(--font-mono); margin-top: 6px;">
+              ● Ký hiệu hóa đơn: <strong>1C26TNG</strong> (Vé cước dịch vụ máy tính tiền Nghị định 123/2020 & TT 78/2021)<br>
+              ● Đơn vị truyền nhận: <strong>MISA meInvoice / VNPT</strong> kết nối API HSM tập trung<br>
+              ● Trạng thái kết nối Tổng Cục Thuế: <span style="color: var(--status-online-green); font-weight: 700;">ĐÃ TRUYỀN DỮ LIỆU THÀNH CÔNG (Mã 20260918-0912)</span>
+            </div>
+          </div>
+
+          <!-- Recent Invoices Table -->
+          <div class="inspector-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px; margin-bottom: 8px;">
+              <span class="inspector-section-label">DANH SÁCH HÓA ĐƠN ĐIỆN TỬ MÁY TÍNH TIỀN (Nghị định 123/2020 & TT 78/2021)</span>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn-fluent primary" onclick="openNewInvoiceModal()">+ Phát Hành Hóa Đơn Mới</button>
+                <button class="btn-fluent" onclick="openModal('modal-invoice-detail')">📄 Xem Mẫu HĐĐT Chi Tiết</button>
+              </div>
+            </div>
+            <table class="fluent-table" style="font-size: 11px;">
+              <thead>
+                <tr>
+                  <th>Số HĐ</th>
+                  <th>Thời gian</th>
+                  <th>Máy Trạm / Khách</th>
+                  <th>Diễn Giải Dịch Vụ</th>
+                  <th>Trước Thuế</th>
+                  <th>Tiền Thuế</th>
+                  <th>Tổng Cộng</th>
+                  <th>Trạng Thái CQT</th>
+                  <th style="text-align: right;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="invoices-tbody">
+                <tr>
+                  <td><strong style="color: var(--text-title);">0004201</strong></td>
+                  <td>10:15:20 18/09</td>
+                  <td>Máy VIP-05 (kehuydiet)</td>
+                  <td>Giờ chơi VIP (3.5h) + Mì tôm 2 trứng + Sting</td>
+                  <td class="tabular-num">67.000 đ</td>
+                  <td class="tabular-num">6.200 đ</td>
+                  <td><strong class="tabular-num" style="color: #FFCC05;">73.200 đ</strong></td>
+                  <td><span class="seat-zone-badge std" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">Hợp Lệ CQT</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="openModal('modal-invoice-detail')">Xem</button>
+                    <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="showToast('✓ Đang in lại hóa đơn nhiệt 80mm...')">In Lại</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong style="color: var(--text-title);">0004200</strong></td>
+                  <td>09:40:12 18/09</td>
+                  <td>Máy ESP-01 (GAM_Levi)</td>
+                  <td>Giờ chơi Esports (5.0h) + Cà phê sữa</td>
+                  <td class="tabular-num">86.364 đ</td>
+                  <td class="tabular-num">8.636 đ</td>
+                  <td><strong class="tabular-num" style="color: #FFCC05;">95.000 đ</strong></td>
+                  <td><span class="seat-zone-badge std" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">Hợp Lệ CQT</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="openModal('modal-invoice-detail')">Xem</button>
+                    <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="showToast('✓ Đang in lại hóa đơn nhiệt 80mm...')">In Lại</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong style="color: var(--text-title);">0004199</strong></td>
+                  <td>08:55:04 18/09</td>
+                  <td>Máy STD-08 (Khách Lẻ)</td>
+                  <td>Giờ chơi Thường (2.0h) + Nước suối</td>
+                  <td class="tabular-num">23.636 đ</td>
+                  <td class="tabular-num">2.364 đ</td>
+                  <td><strong class="tabular-num" style="color: #FFCC05;">26.000 đ</strong></td>
+                  <td><span class="seat-zone-badge std" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">Hợp Lệ CQT</span></td>
+                  <td style="text-align: right;">
+                    <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="openModal('modal-invoice-detail')">Xem</button>
+                    <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="showToast('✓ Đang in lại hóa đơn nhiệt 80mm...')">In Lại</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 5: PRICING & CURFEW RULES (CẤU HÌNH BẢNG GIÁ & NĐ72) -->
+      <div class="view-panel" id="view-rules">
+        <div style="padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="inspector-card">
+            <span class="inspector-section-label">🏷️ BIỂU GIÁ CƯỚC GIỜ CHƠI NIÊM YẾT</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Khu VIP (2K 240Hz · i7/4070Ti)</span>
+              <input type="text" class="form-input" id="cfg-rate-vip" style="width: 110px; text-align: right;" value="12.000 đ/h">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Sân Khấu Esports (360Hz · i9/4080)</span>
+              <input type="text" class="form-input" id="cfg-rate-esp" style="width: 110px; text-align: right;" value="15.000 đ/h">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Phòng Đôi Stream (Cách âm riêng)</span>
+              <input type="text" class="form-input" id="cfg-rate-str" style="width: 110px; text-align: right;" value="18.000 đ/h">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Khu Thường (180Hz · i5/3060)</span>
+              <input type="text" class="form-input" id="cfg-rate-std" style="width: 110px; text-align: right;" value="8.000 đ/h">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Combo Đêm (23:00 - 06:00)</span>
+              <input type="text" class="form-input" id="cfg-rate-night" style="width: 110px; text-align: right;" value="40.000 đ">
+            </div>
+            <button class="btn-fluent primary" style="margin-top: 10px; justify-content: center;" onclick="savePricingRules()">Lưu & Đồng Bộ Toàn Bộ Máy Trạm</button>
+          </div>
+
+          <div class="inspector-card">
+            <span class="inspector-section-label">⚖️ CHÍNH SÁCH KHUNG GIỜ HOẠT ĐỘNG (NGHỊ ĐỊNH 72/2013)</span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Giờ mở cửa phục vụ công cộng</span>
+              <input type="text" class="form-input" style="width: 100px; text-align: right;" value="08:00">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Giờ dừng tiếp nhận khách</span>
+              <input type="text" class="form-input" style="width: 100px; text-align: right;" value="22:00">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Cảnh báo tự động trước giờ đóng</span>
+              <input type="text" class="form-input" style="width: 100px; text-align: right;" value="21:45">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Khóa máy tự động lúc 22:00</span>
+              <select class="form-input" style="width: 100px;">
+                <option selected>Bật (Khóa)</option>
+                <option>Chỉ cảnh báo</option>
+              </select>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Lưu trữ nhật ký truy cập (Session Log)</span>
+              <input type="text" class="form-input" style="width: 100px; text-align: right;" value="30 Ngày" readonly>
+            </div>
+            <button class="btn-fluent" style="margin-top: 10px; justify-content: center;" onclick="showToast('✓ Cấu hình tuân thủ pháp lý đã cập nhật!')">Lưu Quy Định Hoạt Động</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 6: SHIFT & CASH REGISTER (BÀN GIAO CA TRỰC & KÉT TIỀN) -->
+      <div class="view-panel" id="view-shift">
+        <div style="padding: 12px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px;">
+            <!-- Cột trái: Số liệu ca trực -->
+            <div class="inspector-card">
+              <span class="inspector-section-label">📊 BẢNG KÊ DOANH THU CA HIỆN TẠI (CA 1: 07:00 - 15:00)</span>
+              <div style="display: flex; justify-content: space-between; font-size: 11.5px; padding: 4px 0; border-bottom: 1px dashed var(--border-subtle);">
+                <span>Thu ngân trực ca:</span>
+                <strong>Nguyễn Văn A</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11.5px; padding: 4px 0; border-bottom: 1px dashed var(--border-subtle);">
+                <span>Quỹ tiền mặt đầu ca bàn giao:</span>
+                <span class="tabular-num">500.000 đ</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11.5px; padding: 4px 0; border-bottom: 1px dashed var(--border-subtle);">
+                <span>Thu tiền mặt giờ chơi tại quầy:</span>
+                <span class="tabular-num" style="color: var(--status-online-green); font-weight: 700;">+620.000 đ</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11.5px; padding: 4px 0; border-bottom: 1px dashed var(--border-subtle);">
+                <span>Thu tiền mặt dịch vụ ăn uống F&B:</span>
+                <span class="tabular-num" style="color: var(--status-online-green); font-weight: 700;">+330.000 đ</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 11.5px; padding: 4px 0; border-bottom: 1px dashed var(--border-subtle);">
+                <span>Chi hoàn tiền thanh lý hợp đồng:</span>
+                <span class="tabular-num" style="color: var(--status-missing-color); font-weight: 700;">-0 đ</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 12.5px; padding: 8px 0; font-weight: 800; border-top: 1px solid var(--border-color); margin-top: 4px;">
+                <span>TIỀN MẶT LÝ THUYẾT TRONG KÉT:</span>
+                <span class="tabular-num" style="color: #FFCC05; font-size: 14px;">1.450.000 đ</span>
+              </div>
+
+              <div style="margin-top: 12px; background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--status-cyan-color); padding: 8px 10px; font-size: 11px;">
+                <strong>Doanh thu chuyển khoản VietQR Direct:</strong> <span class="tabular-num" style="color: var(--status-cyan-color); font-weight: 700;">3.820.000 đ</span><br>
+                Tiền chuyển khoản tự động về tài khoản ngân hàng chính chủ của phòng máy, không giữ qua bên thứ ba (NĐ 52/2024).
+              </div>
+            </div>
+
+            <!-- Cột phải: Kiểm kê tiền két thực tế -->
+            <div class="inspector-card">
+              <span class="inspector-section-label">💵 ĐỐI SOÁT KIỂM KÊ KÉT TIỀN MẶT THỰC TẾ</span>
+              <div class="form-group">
+                <label class="form-label">Nhập tổng số tiền mặt đếm được trong két:</label>
+                <input type="text" class="form-input tabular-num" id="shift-actual-cash" style="font-size: 14px; font-weight: 700; color: var(--status-online-green); height: 32px;" value="1.450.000" oninput="calculateShiftDifference(this.value)">
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 12px;">
+                <span>Chênh lệch két (Thực tế - Sổ sách):</span>
+                <strong id="shift-diff-label" style="color: var(--status-online-green); font-size: 13px;">0 đ (Khớp 100%)</strong>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ghi chú bàn giao ca cho nhân viên tiếp theo:</label>
+                <textarea class="form-input" id="shift-handover-notes" style="height: 60px; resize: none; padding: 6px;" placeholder="Ví dụ: Két tiền khớp, máy trạm B-15 bảo trì phím cơ..."></textarea>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button class="btn-fluent" style="flex: 1; justify-content: center;" onclick="showToast('✓ Đang in biên bản bàn giao ca (ESC/POS 80mm)...')">🧾 In Biên Bản Bàn Giao</button>
+                <button class="btn-fluent primary" style="flex: 1; justify-content: center;" onclick="openModal('modal-handover')">📊 Xác Nhận Chốt Ca</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lịch sử ca trực -->
+          <div class="inspector-card">
+            <span class="inspector-section-label">LỊCH SỬ BÀN GIAO CA TRỰC GẦN ĐÂY</span>
+            <table class="fluent-table" style="font-size: 11px;">
+              <thead>
+                <tr>
+                  <th>Mã Ca</th>
+                  <th>Thời Gian Trực</th>
+                  <th>Thu Ngân Trực</th>
+                  <th>Tiền Mặt Két</th>
+                  <th>VietQR Bank</th>
+                  <th>Tổng Doanh Thu</th>
+                  <th>Chênh Lệch</th>
+                  <th>Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>CA-20260918-01</strong></td>
+                  <td>07:00 - 15:00 (Hôm nay)</td>
+                  <td>Nguyễn Văn A</td>
+                  <td class="tabular-num">1.450.000 đ</td>
+                  <td class="tabular-num">3.820.000 đ</td>
+                  <td class="tabular-num" style="color: #FFCC05; font-weight: 700;">5.270.000 đ</td>
+                  <td style="color: var(--status-online-green); font-weight: 700;">0 đ (Khớp)</td>
+                  <td><span class="seat-zone-badge std" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">Đang Chạy</span></td>
+                </tr>
+                <tr>
+                  <td><strong>CA-20260917-03</strong></td>
+                  <td>23:00 - 07:00 (Đêm qua)</td>
+                  <td>Trần Đình C</td>
+                  <td class="tabular-num">980.000 đ</td>
+                  <td class="tabular-num">2.450.000 đ</td>
+                  <td class="tabular-num" style="color: #FFCC05; font-weight: 700;">3.430.000 đ</td>
+                  <td style="color: var(--status-online-green); font-weight: 700;">0 đ (Khớp)</td>
+                  <td><span class="seat-zone-badge std">Đã Bàn Giao</span></td>
+                </tr>
+                <tr>
+                  <td><strong>CA-20260917-02</strong></td>
+                  <td>15:00 - 23:00 (Chiều qua)</td>
+                  <td>Lê Thị B</td>
+                  <td class="tabular-num">2.120.000 đ</td>
+                  <td class="tabular-num">4.560.000 đ</td>
+                  <td class="tabular-num" style="color: #FFCC05; font-weight: 700;">6.680.000 đ</td>
+                  <td style="color: var(--status-online-green); font-weight: 700;">0 đ (Khớp)</td>
+                  <td><span class="seat-zone-badge std">Đã Bàn Giao</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ====================================================================
+       5. BOTTOM STATUS BAR (Height: 26px — Chuẩn TingServer & TingUpdate)
+       ==================================================================== -->
+  <footer class="status-bar">
+    <div class="status-bar-left">
+      <span class="indicator-dot"></span>
+      <span><strong>TingAdmin:</strong> Online :3212 (0.2ms)</span>
+      <span style="color: var(--border-color);">|</span>
+      <span><strong>SQLite:</strong> billing.db</span>
+      <span style="color: var(--border-color);">|</span>
+      <span><strong>Máy In Nhiệt:</strong> TM-T82III Sẵn Sàng</span>
+      <span style="color: var(--border-color);">|</span>
+      <span><strong>Khung Giờ:</strong> 08:00 - 22:00 (NĐ 72/2013)</span>
+    </div>
+    <div class="status-bar-right">
+      <span class="status-key-badge" onclick="openModal('modal-topup')">[F1] Nạp Giờ</span>
+      <span class="status-key-badge" onclick="openModal('modal-member')">[F2] Hội Viên</span>
+      <span class="status-key-badge" onclick="switchView('kds')">[F3] Bếp F&B</span>
+      <span class="status-key-badge" onclick="openModal('modal-handover')">[F4] Chốt Ca</span>
+      <span class="status-key-badge" onclick="closeAllModals()">[Esc] Đóng Cửa Sổ</span>
+    </div>
+  </footer>
+
+  <!-- ====================================================================
+       6. MODAL DIALOGS (Chuẩn Windows 11 Slint Desktop)
+       ==================================================================== -->
+
+  <!-- MODAL F1: NẠP GIỜ NHANH -->
+  <div class="modal-backdrop" id="modal-topup">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">⚡ [F1] NẠP TIỀN GIỜ DỊCH VỤ TRẢ TRƯỚC</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-topup')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Số máy hoặc Tên tài khoản hội viên:</label>
+          <input type="text" id="target-seat-input" class="form-input" value="VIP-05">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Chọn số tiền nạp nhanh:</label>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+            <button class="btn-fluent" style="justify-content: center;" onclick="setTopupPreset(20000)">20k</button>
+            <button class="btn-fluent primary" style="justify-content: center;" onclick="setTopupPreset(50000)">50k</button>
+            <button class="btn-fluent" style="justify-content: center;" onclick="setTopupPreset(100000)">100k</button>
+            <button class="btn-fluent" style="justify-content: center;" onclick="setTopupPreset(200000)">200k</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hình thức thanh toán:</label>
+          <div style="display: flex; gap: 8px;">
+            <label style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 3px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="topup_pay_mode" value="cash" checked>
+              <span>Tiền mặt tại quầy</span>
+            </label>
+            <label style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 3px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="topup_pay_mode" value="vietqr">
+              <span>VietQR Direct (STK Net)</span>
+            </label>
+          </div>
+        </div>
+        <div style="padding: 6px 8px; background: rgba(255, 204, 5, 0.08); border-left: 2px solid #FFCC05; font-size: 10.5px; color: var(--text-secondary);">
+          Khoản nạp là phí trả trước dịch vụ nội bộ (Nghị định 52/2024/NĐ-CP). Tự động in hóa đơn máy tính tiền.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-topup')">Hủy</button>
+        <button class="btn-fluent primary" onclick="submitTopup()">Xác Nhận & In Hóa Đơn</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL F2: THÊM HỘI VIÊN MỚI -->
+  <div class="modal-backdrop" id="modal-member">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">👥 [F2] ĐĂNG KÝ HỘI VIÊN (LƯU ĐỊNH DANH THEO NĐ 72)</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-member')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Tên tài khoản (Username):</label>
+          <input type="text" id="reg-user" class="form-input" placeholder="VD: pro_player2026">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại:</label>
+          <input type="text" id="reg-phone" class="form-input" placeholder="09xxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số Căn Cước Công Dân (CCCD):</label>
+          <input type="text" id="reg-cccd" class="form-input" placeholder="12 chữ số CCCD (Quy định NĐ 72/2013)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tiền nạp ban đầu:</label>
+          <input type="text" id="reg-amount" class="form-input tabular-num" style="color: #FFCC05; font-weight: 700;" value="50.000 đ">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-member')">Hủy</button>
+        <button class="btn-fluent primary" onclick="submitNewMember()">Tạo Tài Khoản & Mở Phiên</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL F4: BÀN GIAO CA & CHỐT KÉT -->
+  <div class="modal-backdrop" id="modal-handover">
+    <div class="modal-window" style="width: 520px;">
+      <div class="modal-header">
+        <span class="modal-title">📊 [F4] BÀN GIAO CA TRỰC & ĐỐI SOÁT KÉT TIỀN</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-handover')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 4px; padding: 8px 10px; font-size: 11px; line-height: 1.5; font-family: var(--font-mono);">
+          <strong>Thu ngân trực ca:</strong> Nguyễn Văn A (Ca 1: 07:00 - 15:00)<br>
+          <strong>Tiền mặt lý thuyết trong két:</strong> <span style="color: var(--status-online-green); font-weight: 700;">1.450.000 đ</span><br>
+          <strong>Doanh thu VietQR Direct (Bank):</strong> <span style="color: var(--status-cyan-color); font-weight: 700;">3.820.000 đ</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tiền mặt thực tế đếm được trong két:</label>
+          <input type="text" class="form-input tabular-num" style="font-size: 14px; font-weight: 700; color: var(--status-online-green); height: 32px;" value="1.450.000 đ">
+        </div>
+        <div style="font-size: 11px; color: var(--status-online-green); font-weight: 600;">
+          ✓ Chênh lệch kiểm kê: 0 đ (Khớp 100%)
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-handover')">Hủy</button>
+        <button class="btn-fluent primary" onclick="submitHandover()">In Biên Bản & Kết Ca</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CHI TIẾT HÓA ĐƠN ĐIỆN TỬ MÁY TÍNH TIỀN (NĐ 123/2020) -->
+  <div class="modal-backdrop" id="modal-invoice-detail">
+    <div class="modal-window" style="width: 560px; max-width: 95vw;">
+      <div class="modal-header">
+        <span class="modal-title">📄 CHI TIẾT HÓA ĐƠN ĐIỆN TỬ MÁY TÍNH TIỀN (POS)</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-invoice-detail')">✕</button>
+      </div>
+      <div class="modal-body" style="font-size: 11.5px; line-height: 1.5; color: var(--text-secondary);">
+        <div style="text-align: center; border-bottom: 1px dashed var(--border-color); padding-bottom: 10px; margin-bottom: 12px;">
+          <h3 style="font-size: 15px; font-weight: 800; color: var(--text-title);">HÓA ĐƠN ĐIỆN TỬ KHỞI TẠO TỪ MÁY TÍNH TIỀN</h3>
+          <span style="font-size: 11px; color: var(--text-muted);">Ký hiệu: <strong>1C26TNG</strong> · Số: <strong style="color: #FFCC05;">0004201</strong> · Ngày: 18/09/2026 10:15</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 11px;">
+          <div>
+            <strong>Đơn vị bán:</strong> HỘ KINH DOANH CYBER GAME TING<br>
+            <strong>Mã số thuế:</strong> 8349281921<br>
+            <strong>Địa chỉ:</strong> 123 Đường Công Nghệ, Cầu Giấy, Hà Nội
+          </div>
+          <div>
+            <strong>Người mua hàng:</strong> Khách chơi Máy VIP-05<br>
+            <strong>Định danh:</strong> kehuydiet6789 (Hội viên VIP)<br>
+            <strong>Hình thức thanh toán:</strong> Trừ tài khoản trả trước
+          </div>
+        </div>
+
+        <table class="fluent-table" style="font-size: 11px; margin-bottom: 12px;">
+          <thead>
+            <tr>
+              <th>Mặt hàng / Dịch vụ</th>
+              <th>ĐVT</th>
+              <th>SL</th>
+              <th>Đơn giá</th>
+              <th>Thuế</th>
+              <th style="text-align: right;">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Dịch vụ Internet (Giờ chơi VIP)</td>
+              <td>Giờ</td>
+              <td>3.5</td>
+              <td class="tabular-num">12.000 đ</td>
+              <td>10%</td>
+              <td class="tabular-num" style="text-align: right;">42.000 đ</td>
+            </tr>
+            <tr>
+              <td>Mì tôm 2 trứng lòng đào</td>
+              <td>Tô</td>
+              <td>1</td>
+              <td class="tabular-num">25.000 đ</td>
+              <td>8%</td>
+              <td class="tabular-num" style="text-align: right;">25.000 đ</td>
+            </tr>
+            <tr>
+              <td>Nước ngọt Sting dâu lon</td>
+              <td>Lon</td>
+              <td>1</td>
+              <td class="tabular-num">15.000 đ</td>
+              <td>8%</td>
+              <td class="tabular-num" style="text-align: right;">15.000 đ</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 8px; font-size: 12px;">
+          <div>
+            <span style="display: block; font-size: 10.5px; color: var(--text-muted);">Mã CQT cấp: <strong>20260918-0912-8349281921</strong></span>
+            <span style="display: block; font-size: 10.5px; color: var(--status-online-green);">✓ Chữ ký số HSM máy tính tiền hợp lệ</span>
+          </div>
+          <div style="text-align: right;">
+            <div>Tổng cộng tiền hàng: <strong class="tabular-num">75.741 đ</strong></div>
+            <div>Tiền thuế GTGT: <strong class="tabular-num">6.259 đ</strong></div>
+            <div style="font-size: 14px; color: #FFCC05; font-weight: 800; margin-top: 4px;">Tổng thanh toán: 82.000 đ</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-invoice-detail')">Đóng</button>
+        <button class="btn-fluent primary" onclick="showToast('✓ Đang in hóa đơn nhiệt ESC/POS 80mm...')">In Hóa Đơn (80mm)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MẪU PHIẾU CHẾ BIẾN BẾP KOT 80MM -->
+  <div class="modal-backdrop" id="modal-kot-preview">
+    <div class="modal-window" style="width: 440px;">
+      <div class="modal-header">
+        <span class="modal-title">🧾 MẪU PHIẾU BẾP KOT (MÁY IN NHIỆT 80MM)</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-kot-preview')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #1e1e1e; border: 1px dashed #555; padding: 16px; font-family: var(--font-mono); font-size: 11px; line-height: 1.45; color: #EEE; border-radius: 4px;">
+          <div style="text-align: center; border-bottom: 1px dashed #777; padding-bottom: 8px; margin-bottom: 8px;">
+            <strong style="font-size: 14px; display: block;">PHIẾU CHẾ BIẾN BẾP (KOT)</strong>
+            <span>Mã đơn: ORD-20260918-0042</span><br>
+            <strong style="color: #FFCC05; font-size: 13px;">MÁY: VIP-08 · KHU VIP ESPORTS</strong>
+          </div>
+          <div style="border-bottom: 1px dashed #777; padding-bottom: 8px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700;">
+              <span>TÊN MÓN</span>
+              <span>SL</span>
+            </div>
+            <div style="margin-top: 4px;">
+              ● Mì tôm 2 trứng .............. x1<br>
+              <em style="color: #FF7B42;">-- Ghi chú: Trứng lòng đào, cay</em>
+            </div>
+            <div style="margin-top: 4px;">
+              ● Sting đỏ ướp lạnh ........... x1<br>
+              <em style="color: #38BDF8;">-- Ghi chú: Nhiều đá</em>
+            </div>
+            <div style="margin-top: 4px;">
+              ● Khoai tây chiên phô mai ..... x1<br>
+              <em style="color: #A3E635;">-- Ghi chú: Ít sốt</em>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 10px; color: #AAA;">
+            <span>Thời gian: 10:15:30 18/09/2026</span>
+            <span>Đã trừ tài khoản</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-kot-preview')">Đóng</button>
+        <button class="btn-fluent primary" onclick="showToast('✓ Lệnh in ESC/POS [GS V B 0] đã gửi tới máy in bếp LAN!')">Bắn Lệnh In Máy In Bếp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ĐỔI MÁY TRẠM CHO KHÁCH -->
+  <div class="modal-backdrop" id="modal-change-seat">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">🔄 CHUYỂN ĐỔI MÁY TRẠM (BẢO LƯU PHIÊN CHƠI)</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-change-seat')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 4px; font-size: 11.5px;">
+          <div><strong>Máy nguồn hiện tại:</strong> <span id="change-source-seat" style="color: #FFCC05; font-weight: 700;">VIP-05</span></div>
+          <div><strong>Hội viên:</strong> <span id="change-source-user">kehuydiet6789</span> · Số dư: <span id="change-source-bal" class="tabular-num">45.000 đ</span></div>
+          <div><strong>Thời gian còn:</strong> <span id="change-source-time" class="tabular-num" style="color: var(--status-online-green);">02:45:18</span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Chọn máy đích muốn chuyển sang (Chỉ máy trống):</label>
+          <select id="change-target-select" class="form-input">
+            <option value="VIP-06">VIP-06 (Khu VIP · 12k/h - Trống)</option>
+            <option value="VIP-10">VIP-10 (Khu VIP · 12k/h - Trống)</option>
+            <option value="ESP-08">ESP-08 (Sân Khấu Esports · 15k/h - Trống)</option>
+            <option value="STR-03">STR-03 (Phòng Đôi Stream · 18k/h - Trống)</option>
+            <option value="STD-05">STD-05 (Khu Thường · 8k/h - Trống)</option>
+            <option value="STD-08">STD-08 (Khu Thường · 8k/h - Trống)</option>
+          </select>
+        </div>
+        <div style="font-size: 11px; color: var(--text-secondary);">
+          Hệ thống sẽ tự động chuyển phiên chơi, số dư và quy đổi lại thời gian khả dụng theo biểu giá của máy mới (nếu khác khu vực).
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-change-seat')">Hủy</button>
+        <button class="btn-fluent primary" onclick="executeChangeSeat()">Xác Nhận Chuyển Máy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GỬI TIN NHẮN TỚI MÁY TRẠM -->
+  <div class="modal-backdrop" id="modal-send-message">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title">💬 GỬI THÔNG BÁO POP-UP TỚI MÁY TRẠM</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-send-message')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Gửi tới máy trạm:</label>
+          <input type="text" id="msg-target-seat" class="form-input" value="VIP-05" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mẫu tin nhắn nhanh:</label>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <button class="btn-fluent" style="text-align: left; font-size: 11px;" onclick="selectMessageTemplate('Ca trực thu ngân chúc bạn chơi game vui vẻ!')">1. Chúc chơi game vui vẻ</button>
+            <button class="btn-fluent" style="text-align: left; font-size: 11px;" onclick="selectMessageTemplate('Thông báo: Quán chuẩn bị đóng cửa lúc 22:00 theo NĐ 72/2013, quý khách lưu ý thời gian!')">2. Cảnh báo sắp đóng cửa 22h (NĐ 72)</button>
+            <button class="btn-fluent" style="text-align: left; font-size: 11px;" onclick="selectMessageTemplate('Món ăn/nước uống của bạn đang được nhân viên mang ra bàn!')">3. Báo đơn F&B đang mang ra</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nội dung tin nhắn tùy biến:</label>
+          <textarea id="custom-msg-input" class="form-input" style="height: 60px; resize: none; padding: 6px;" placeholder="Nhập nội dung thông báo..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-send-message')">Hủy</button>
+        <button class="btn-fluent primary" onclick="executeSendMessage()">Bắn Thông Báo LAN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ĐIỀU KHIỂN TẮT / REBOOT MÁY TỪ XA -->
+  <div class="modal-backdrop" id="modal-remote-action">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title" id="remote-action-title">⚡ ĐIỀU KHIỂN MÁY TRẠM TỪ XA</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-remote-action')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="padding: 10px; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #EF4444; font-size: 11.5px; color: #f87171;">
+          <strong id="remote-action-warning">Cảnh báo: Lệnh này sẽ can thiệp trực tiếp vào máy trạm qua giao thức Windows Service ting-update LAN!</strong>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Máy trạm tác động:</label>
+          <input type="text" id="remote-target-seat" class="form-input" value="VIP-05" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tùy chọn xử lý phiên chơi:</label>
+          <select id="remote-session-handling" class="form-input">
+            <option value="save">Bảo lưu số dư & đóng phiên bình thường</option>
+            <option value="keep">Giữ nguyên phiên chơi (Chỉ khởi động lại máy)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-remote-action')">Hủy</button>
+        <button class="btn-fluent primary" style="background: #c93b36; border-color: #ef4444;" onclick="executeRemoteAction()">Xác Nhận Thực Thi Lệnh</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: THANH LÝ HỢI VIÊN & PHIẾU CHI KẾ TOÁN HOÀN TIỀN -->
+  <div class="modal-backdrop" id="modal-member-refund">
+    <div class="modal-window" style="width: 500px;">
+      <div class="modal-header">
+        <span class="modal-title">📑 THANH LÝ HỘI VIÊN & LẬP PHIẾU CHI HOÀN TIỀN</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-member-refund')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 4px; font-size: 11.5px;">
+          <div><strong>Tên tài khoản:</strong> <span id="refund-user-name" style="color: var(--text-title); font-weight: 700;">kehuydiet6789</span></div>
+          <div><strong>Số dư trả trước chưa dùng:</strong> <span id="refund-user-bal" class="tabular-num" style="color: #FFCC05; font-size: 14px; font-weight: 800;">45.000 đ</span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lý do thanh lý hợp đồng dịch vụ:</label>
+          <select id="refund-reason-select" class="form-input">
+            <option>Khách hàng yêu cầu dừng dịch vụ và chuyển chỗ ở</option>
+            <option>Không còn nhu cầu sử dụng dịch vụ Internet phòng máy</option>
+            <option>Quyết toán số dư thừa cuối năm tài chính</option>
+            <option>Lý do khác</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hình thức hoàn tiền:</label>
+          <input type="text" class="form-input" value="Chi tiền mặt trực tiếp tại quầy thu ngân" readonly>
+        </div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">
+          * Theo Điều 23 Nghị định 52/2024/NĐ-CP: Mọi khoản hoàn phí dịch vụ trả trước bắt buộc có chứng từ phiếu chi nội bộ kèm chữ ký xác nhận của khách hàng.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-member-refund')">Hủy</button>
+        <button class="btn-fluent primary" onclick="executeRefund()">In Phiếu Chi & Thanh Lý</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ MỚI -->
+  <div class="modal-backdrop" id="modal-new-invoice">
+    <div class="modal-window" style="width: 520px;">
+      <div class="modal-header">
+        <span class="modal-title">🧾 PHÁT HÀNH HÓA ĐƠN ĐIỆN TỬ MÁY TÍNH TIỀN (POS)</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-new-invoice')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Đối tượng mua dịch vụ:</label>
+          <input type="text" id="inv-customer-input" class="form-input" value="Khách lẻ Máy VIP-05 (kehuydiet)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Loại hàng hóa / Dịch vụ:</label>
+          <select id="inv-service-type" class="form-input" onchange="updateInvoiceTaxRate(this.value)">
+            <option value="hours">Dịch vụ Internet / Giờ chơi máy trạm (Thuế suất 10%)</option>
+            <option value="food">Dịch vụ Canteen / Món ăn & Đồ uống (Thuế suất 8%)</option>
+            <option value="combo">Gói Combo Dịch Vụ Tổng Hợp (Thuế suất 10%)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tổng tiền thanh toán đã gồm thuế:</label>
+          <input type="text" id="inv-amount-input" class="form-input tabular-num" style="color: #FFCC05; font-size: 14px; font-weight: 700;" value="60.000">
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10B981; padding: 6px 10px; font-size: 11px;">
+          Ký hiệu hóa đơn: <strong>1C26TNG</strong> · Tự động truyền mã CQT máy tính tiền qua HSM tập trung theo NĐ 123/2020 & TT 78/2021.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-new-invoice')">Hủy</button>
+        <button class="btn-fluent primary" onclick="executeCreateInvoice()">Ký Số & Phát Hành HĐĐT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GỌI MÓN F&B TẠI QUẦY THU NGÂN -->
+  <div class="modal-backdrop" id="modal-new-order-pos">
+    <div class="modal-window" style="width: 480px;">
+      <div class="modal-header">
+        <span class="modal-title">🍔 TẠO ĐƠN GỌI MÓN F&B TẠI QUẦY THU NGÂN</span>
+        <button class="titlebar-btn" onclick="closeModal('modal-new-order-pos')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Giao tới máy trạm:</label>
+          <select id="pos-order-seat" class="form-input">
+            <option value="VIP-05">Máy VIP-05 (Đang chơi)</option>
+            <option value="ESP-02">Máy ESP-02 (Đang chơi)</option>
+            <option value="STR-01">Máy STR-01 (Đang chơi)</option>
+            <option value="STD-02">Máy STD-02 (Đang chơi)</option>
+            <option value="TAKEAWAY">Khách mua mang về tại quầy</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Chọn món ăn / đồ uống:</label>
+          <select id="pos-order-item" class="form-input">
+            <option value="Mì xào bò đặc biệt|40000">Mì xào bò đặc biệt - 40.000 đ</option>
+            <option value="Cơm sườn trứng ốp la|45000">Cơm sườn trứng ốp la - 45.000 đ</option>
+            <option value="Trà đào cam sả khổng lồ|25000">Trà đào cam sả khổng lồ - 25.000 đ</option>
+            <option value="Sting đỏ ướp lạnh|15000">Sting đỏ ướp lạnh - 15.000 đ</option>
+            <option value="Cà phê sữa đá pha phin|20000">Cà phê sữa đá pha phin - 20.000 đ</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số lượng & Ghi chú:</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="number" id="pos-order-qty" class="form-input" style="width: 70px;" value="1" min="1" max="10">
+            <input type="text" id="pos-order-note" class="form-input" style="flex: 1;" placeholder="Ghi chú: Ít ngọt, trứng đào...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Hình thức thanh toán:</label>
+          <div style="display: flex; gap: 8px;">
+            <label style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 3px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="pos_order_pay" value="cash" checked>
+              <span>Thu tiền mặt</span>
+            </label>
+            <label style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 3px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="pos_order_pay" value="prepaid">
+              <span>Trừ tài khoản máy</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-fluent" onclick="closeModal('modal-new-order-pos')">Hủy</button>
+        <button class="btn-fluent primary" onclick="executeCreateOrderPos()">Tạo Đơn & Bắn Phiếu Bếp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div class="app-toast" id="toast-box">
+    <span id="toast-msg">Thông báo</span>
+  </div>
+
+  <!-- ====================================================================
+       7. JAVASCRIPT LOGIC
+       ==================================================================== -->
+  <script>
+    const STATIONS = [
+      // Khu VIP (16 máy: VIP-01 -> VIP-16, rate 12k)
+      { id: 'VIP-01', zone: 'vip', name: 'VIP-01', user: 'kehuydiet6789', balance: 45000, time: 9918, status: 'active', game: 'LOL' },
+      { id: 'VIP-02', zone: 'vip', name: 'VIP-02', user: 'yasuo_gank_tem', balance: 18000, time: 5400, status: 'active', game: 'Valorant' },
+      { id: 'VIP-03', zone: 'vip', name: 'VIP-03', user: 'sontung_mtp', balance: 36000, time: 10800, status: 'active', game: 'CS:GO 2' },
+      { id: 'VIP-04', zone: 'vip', name: 'VIP-04', user: 'Khách Vãng Lai', balance: 12000, time: 780, status: 'warning', game: 'PUBG' },
+      { id: 'VIP-05', zone: 'vip', name: 'VIP-05', user: 'kehuydiet6789', balance: 45000, time: 9918, status: 'active', game: 'LOL' },
+      { id: 'VIP-06', zone: 'vip', name: 'VIP-06', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'VIP-07', zone: 'vip', name: 'VIP-07', user: 'faker_vietnam', balance: 60000, time: 18000, status: 'active', game: 'LOL' },
+      { id: 'VIP-08', zone: 'vip', name: 'VIP-08', user: 'leethan99', balance: 24000, time: 7200, status: 'active', game: 'Dota 2' },
+      { id: 'VIP-09', zone: 'vip', name: 'VIP-09', user: 'trum_fps', balance: 50000, time: 15000, status: 'active', game: 'Valorant' },
+      { id: 'VIP-10', zone: 'vip', name: 'VIP-10', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'VIP-11', zone: 'vip', name: 'VIP-11', user: 'van_ga_88', balance: 6000, time: 420, status: 'warning', game: 'FC Online' },
+      { id: 'VIP-12', zone: 'vip', name: 'VIP-12', user: 'ninja_lead', balance: 36000, time: 10800, status: 'active', game: 'GTA V' },
+      { id: 'VIP-13', zone: 'vip', name: 'VIP-13', user: 'hai_tac_mu_rom', balance: 80000, time: 24000, status: 'active', game: 'Naraka' },
+      { id: 'VIP-14', zone: 'vip', name: 'VIP-14', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'VIP-15', zone: 'vip', name: 'VIP-15', user: 'Bảo Trì Phím Cơ', balance: 0, time: 0, status: 'locked', game: '' },
+      { id: 'VIP-16', zone: 'vip', name: 'VIP-16', user: 'sofm_fan', balance: 48000, time: 14400, status: 'active', game: 'LOL' },
+
+      // Sân khấu Esports (10 máy: ESP-01 -> ESP-10, rate 15k)
+      { id: 'ESP-01', zone: 'esports', name: 'ESP-01', user: 'GAM_Kiaya', balance: 120000, time: 28800, status: 'active', game: 'LOL' },
+      { id: 'ESP-02', zone: 'esports', name: 'ESP-02', user: 'GAM_Levi', balance: 150000, time: 36000, status: 'active', game: 'LOL' },
+      { id: 'ESP-03', zone: 'esports', name: 'ESP-03', user: 'GAM_Emo', balance: 90000, time: 21600, status: 'active', game: 'LOL' },
+      { id: 'ESP-04', zone: 'esports', name: 'ESP-04', user: 'GAM_EasyLove', balance: 105000, time: 25200, status: 'active', game: 'LOL' },
+      { id: 'ESP-05', zone: 'esports', name: 'ESP-05', user: 'GAM_Elio', balance: 110000, time: 26400, status: 'active', game: 'LOL' },
+      { id: 'ESP-06', zone: 'esports', name: 'ESP-06', user: 'TS_Hasmed', balance: 75000, time: 18000, status: 'active', game: 'LOL' },
+      { id: 'ESP-07', zone: 'esports', name: 'ESP-07', user: 'TS_Hiro', balance: 90000, time: 21600, status: 'active', game: 'LOL' },
+      { id: 'ESP-08', zone: 'esports', name: 'ESP-08', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'ESP-09', zone: 'esports', name: 'ESP-09', user: 'TS_Eddie', balance: 85000, time: 20400, status: 'active', game: 'LOL' },
+      { id: 'ESP-10', zone: 'esports', name: 'ESP-10', user: 'TS_Taki', balance: 80000, time: 19200, status: 'active', game: 'LOL' },
+
+      // Phòng Đôi Stream (6 máy: STR-01 -> STR-06, rate 18k)
+      { id: 'STR-01', zone: 'stream', name: 'STR-01', user: 'mixigaming_fan', balance: 72000, time: 14400, status: 'active', game: 'GTA V RP' },
+      { id: 'STR-02', zone: 'stream', name: 'STR-02', user: 'linhngocdam_fan', balance: 72000, time: 14400, status: 'active', game: 'Valorant' },
+      { id: 'STR-03', zone: 'stream', name: 'STR-03', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'STR-04', zone: 'stream', name: 'STR-04', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'STR-05', zone: 'stream', name: 'STR-05', user: 'streamer_duo_1', balance: 90000, time: 18000, status: 'active', game: 'Apex' },
+      { id: 'STR-06', zone: 'stream', name: 'STR-06', user: 'streamer_duo_2', balance: 90000, time: 18000, status: 'active', game: 'Apex' },
+
+      // Khu Thường (16 máy: STD-01 -> STD-16, rate 8k)
+      { id: 'STD-01', zone: 'std', name: 'STD-01', user: 'hocsinh_tan_truong', balance: 16000, time: 7200, status: 'active', game: 'Roblox' },
+      { id: 'STD-02', zone: 'std', name: 'STD-02', user: 'aoe_la_nha', balance: 24000, time: 10800, status: 'active', game: 'AOE 1' },
+      { id: 'STD-03', zone: 'std', name: 'STD-03', user: 'cf_dotkich_pro', balance: 8000, time: 3600, status: 'active', game: 'Đột Kích' },
+      { id: 'STD-04', zone: 'std', name: 'STD-04', user: 'Khách Vãng Lai', balance: 4000, time: 540, status: 'warning', game: 'Web' },
+      { id: 'STD-05', zone: 'std', name: 'STD-05', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'STD-06', zone: 'std', name: 'STD-06', user: 'audition_dap_phim', balance: 32000, time: 14400, status: 'active', game: 'Audition' },
+      { id: 'STD-07', zone: 'std', name: 'STD-07', user: 'fifa_online_4', balance: 16000, time: 7200, status: 'active', game: 'FC Online' },
+      { id: 'STD-08', zone: 'std', name: 'STD-08', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'STD-09', zone: 'std', name: 'STD-09', user: 'Hỏng Màn Hình', balance: 0, time: 0, status: 'locked', game: '' },
+      { id: 'STD-10', zone: 'std', name: 'STD-10', user: 'lien_quan_pc', balance: 24000, time: 10800, status: 'active', game: 'NoxPlayer' },
+      { id: 'STD-11', zone: 'std', name: 'STD-11', user: '', balance: 0, time: 0, status: 'vacant', game: '' },
+      { id: 'STD-12', zone: 'std', name: 'STD-12', user: 'pubg_mobi_vng', balance: 16000, time: 7200, status: 'active', game: 'Gameloop' },
+      { id: 'STD-13', zone: 'std', name: 'STD-13', user: 'kiem_the_private', balance: 40000, time: 18000, status: 'active', game: 'Kiếm Thế' },
+      { id: 'STD-14', zone: 'std', name: 'STD-14', user: 'tlbb_vintage', balance: 24000, time: 10800, status: 'active', game: 'TLBB' },
+      { id: 'STD-15', zone: 'std', name: 'STD-15', user: 'volam_truyenky', balance: 32000, time: 14400, status: 'active', game: 'Võ Lâm' },
+      { id: 'STD-16', zone: 'std', name: 'STD-16', user: 'half_life_11', balance: 16000, time: 7200, status: 'active', game: 'Half-Life' }
+    ];
+
+    const KDS_ORDERS = [
+      {
+        id: 'TKT-1042',
+        seat: 'VIP-05',
+        time: '02:40',
+        payment: 'prepaid',
+        status: 'pending',
+        items: [
+          { name: 'Mì xào bò đặc biệt (2 trứng lòng đào)', qty: 1, price: 40000, note: 'Lòng đào, ăn cay nhiều' },
+          { name: 'Trà đào cam sả khổng lồ', qty: 1, price: 25000, note: 'Ít ngọt, nhiều đá' }
+        ],
+        total: 65000
+      },
+      {
+        id: 'TKT-1041',
+        seat: 'ESP-03',
+        time: '05:12',
+        payment: 'cash',
+        status: 'pending',
+        items: [
+          { name: 'Cơm rang dưa bò giòn', qty: 1, price: 45000, note: 'Xin thêm dưa chua' },
+          { name: 'Cà phê sữa đá pha phin', qty: 1, price: 20000, note: 'Đậm đặc' }
+        ],
+        total: 65000
+      },
+      {
+        id: 'TKT-1040',
+        seat: 'VIP-01',
+        time: '09:30',
+        payment: 'prepaid',
+        status: 'cooking',
+        items: [
+          { name: 'Bánh mì pate chả giò nướng', qty: 2, price: 50000, note: 'Nhiều tương ớt' }
+        ],
+        total: 50000
+      },
+      {
+        id: 'TKT-1039',
+        seat: 'STD-02',
+        time: '14:20',
+        payment: 'prepaid',
+        status: 'done',
+        items: [
+          { name: 'Mì tôm xúc xích bò húc', qty: 1, price: 35000, note: '' }
+        ],
+        total: 35000
+      }
+    ];
+
+    const MEMBERS = [
+      { user: 'kehuydiet6789', phone: '0912345678', cccd: '001095012345', tier: 'VIP Gold', balance: 45000, timeVIP: '03h 45m', lastSeen: 'Đang online VIP-05' },
+      { user: 'yasuo_gank_tem', phone: '0988776655', cccd: '034098054321', tier: 'Silver', balance: 18000, timeVIP: '01h 30m', lastSeen: 'Đang online VIP-02' },
+      { user: 'GAM_Levi', phone: '0903112233', cccd: '079097098765', tier: 'Diamond', balance: 150000, timeVIP: '12h 30m', lastSeen: 'Đang online ESP-02' },
+      { user: 'mixigaming_fan', phone: '0977889900', cccd: '025096011223', tier: 'VIP Gold', balance: 72000, timeVIP: '06h 00m', lastSeen: 'Đang online STR-01' },
+      { user: 'trum_aoe_viet', phone: '0933445566', cccd: '001092033445', tier: 'Normal', balance: 0, timeVIP: '00h 00m', lastSeen: 'Hôm qua 21:40' }
+    ];
+
+    let selectedStationId = 'VIP-05';
+    let currentFilterZone = 'all';
+
+    /* Render Workstations Grid */
+    function renderGrid() {
+      const container = document.getElementById('grid-stations');
+      if (!container) return;
+
+      const filtered = STATIONS.filter(s => currentFilterZone === 'all' || s.zone === currentFilterZone);
+
+      container.innerHTML = filtered.map(st => {
+        const hours = Math.floor(st.time / 3600);
+        const mins = Math.floor((st.time % 3600) / 60);
+        const secs = st.time % 60;
+        const timeStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        const isSel = st.id === selectedStationId;
+        const isWarn = st.status === 'warning';
+        const isVac = st.status === 'vacant';
+        const isLock = st.status === 'locked';
+
+        let zoneTagClass = 'std';
+        let zoneLabel = 'STD';
+        if (st.zone === 'vip') { zoneTagClass = 'vip'; zoneLabel = 'VIP'; }
+        else if (st.zone === 'esports') { zoneTagClass = 'esports'; zoneLabel = 'ESP'; }
+        else if (st.zone === 'stream') { zoneTagClass = 'stream'; zoneLabel = 'STR'; }
+
+        return `
+          <div class="seat-node ${st.status} ${isSel ? 'selected' : ''}" onclick="selectNode('${st.id}')">
+            <div class="seat-header">
+              <span class="seat-title">${st.name}</span>
+              <span class="seat-zone-badge ${zoneTagClass}">${zoneLabel}</span>
+            </div>
+            <div class="seat-body">
+              <div class="seat-user-row">
+                <span class="seat-username" style="${isVac ? 'color: var(--text-muted); font-style: italic;' : ''}">${isVac ? 'Máy Trống' : (isLock ? st.user : st.user)}</span>
+                ${st.game ? `<span class="seat-game-chip">${st.game}</span>` : ''}
+              </div>
+              <div class="seat-balance-row">
+                <span>${isVac ? 'Sẵn sàng mở' : `Số dư: <strong class="tabular-num">${st.balance.toLocaleString('vi-VN')} đ</strong>`}</span>
+                <span style="font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted);">${st.zone === 'vip' ? '12k' : (st.zone === 'esports' ? '15k' : (st.zone === 'stream' ? '18k' : '8k'))}/h</span>
+              </div>
+              <div class="seat-time-row">
+                <span class="seat-time-label">${isVac ? 'TRẠNG THÁI' : 'CÒN LẠI'}</span>
+                <span class="seat-countdown ${isWarn ? 'warning' : ''}">${isVac ? 'CHỜ KHÁCH' : (isLock ? 'TẠM KHÓA' : timeStr)}</span>
+              </div>
+              <div class="seat-progress-track">
+                <div class="seat-progress-fill ${isWarn ? 'warning' : ''}" style="width: ${isVac || isLock ? 0 : (isWarn ? 15 : 70)}%;"></div>
+              </div>
+            </div>
+            <div class="seat-actions-ribbon" onclick="event.stopPropagation()">
+              ${isVac ? `
+                <button class="btn-seat-action primary" onclick="quickOpen('${st.id}')">Mở Máy</button>
+                <button class="btn-seat-action" onclick="openTopupModalFor('${st.id}')">Nạp Giờ</button>
+              ` : (isLock ? `
+                <button class="btn-seat-action" onclick="unlockStation('${st.id}')">Mở Khóa</button>
+              ` : `
+                <button class="btn-seat-action primary" onclick="openTopupModalFor('${st.id}')">+ Nạp</button>
+                <button class="btn-seat-action" onclick="quickChange('${st.id}')">Đổi</button>
+                <button class="btn-seat-action" onclick="quickLock('${st.id}')">Khóa</button>
+              `)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderInspector() {
+      const st = STATIONS.find(s => s.id === selectedStationId) || STATIONS[0];
+      document.getElementById('inspect-title').textContent = st.name;
+      document.getElementById('inspect-user').textContent = st.user || (st.status === 'vacant' ? 'Máy Trống' : 'Khóa');
+      document.getElementById('inspect-bal').textContent = st.balance.toLocaleString('vi-VN') + ' đ';
+
+      const hours = Math.floor(st.time / 3600);
+      const mins = Math.floor((st.time % 3600) / 60);
+      const secs = st.time % 60;
+      document.getElementById('inspect-countdown').textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      document.getElementById('inspect-game').textContent = st.game || 'Chưa khởi chạy';
+
+      const zoneTag = document.getElementById('inspect-zone');
+      zoneTag.textContent = `${st.zone.toUpperCase()} · ${st.zone === 'vip' ? '12k' : (st.zone === 'esports' ? '15k' : (st.zone === 'stream' ? '18k' : '8k'))}/h`;
+    }
+
+    function renderKds() {
+      const pLane = document.getElementById('lane-p');
+      const cLane = document.getElementById('lane-c');
+      const dLane = document.getElementById('lane-d');
+
+      const p = KDS_ORDERS.filter(o => o.status === 'pending');
+      const c = KDS_ORDERS.filter(o => o.status === 'cooking');
+      const d = KDS_ORDERS.filter(o => o.status === 'done');
+
+      document.getElementById('kds-badge-p').textContent = p.length;
+      document.getElementById('kds-badge-c').textContent = c.length;
+      document.getElementById('kds-badge-d').textContent = d.length;
+      document.getElementById('sidebar-kds-badge').textContent = p.length;
+
+      const ticketHtml = (ord) => `
+        <div class="kds-order-ticket pending">
+          <div class="ticket-header">
+            <span class="ticket-seat">Máy ${ord.seat}</span>
+            <span class="ticket-time">⏱ Chờ: ${ord.time}</span>
+          </div>
+          <span class="ticket-paytag ${ord.payment === 'prepaid' ? 'prepaid' : 'cash'}">
+            ${ord.payment === 'prepaid' ? '✔ ĐÃ TRỪ TÀI KHOẢN MÁY' : '💵 THU TIỀN MẶT KHI GIAO'}
+          </span>
+          <ul class="ticket-item-list">
+            ${ord.items.map(i => `
+              <li class="ticket-item-row">
+                <div>
+                  <strong>${i.qty}x ${i.name}</strong>
+                  ${i.note ? `<div class="ticket-modifier">↳ Ghi chú: ${i.note}</div>` : ''}
+                </div>
+                <span class="tabular-num">${(i.price * i.qty).toLocaleString('vi-VN')} đ</span>
+              </li>
+            `).join('')}
+          </ul>
+          <div style="display: flex; justify-content: space-between; font-weight: 700; border-top: 1px solid var(--border-subtle); padding-top: 4px;">
+            <span style="color: var(--text-muted); font-size: 10.5px;">Tổng cộng:</span>
+            <span style="color: #FFCC05;" class="tabular-num">${ord.total.toLocaleString('vi-VN')} đ</span>
+          </div>
+          <div style="display: flex; gap: 4px; margin-top: 2px;">
+            ${ord.status === 'pending' ? `
+              <button class="btn-fluent primary" style="flex: 1; justify-content: center; font-size: 11px;" onclick="advanceKds('${ord.id}', 'cooking')">✔ Duyệt & In KOT Bếp</button>
+            ` : ''}
+            ${ord.status === 'cooking' ? `
+              <button class="btn-fluent" style="flex: 1; justify-content: center; font-size: 11px;" onclick="advanceKds('${ord.id}', 'done')">🚀 Bếp Xong - Mang Ra Bàn</button>
+            ` : ''}
+            ${ord.status === 'done' ? `
+              <span style="font-size: 10.5px; color: var(--status-online-green); font-weight: 700; width: 100%; text-align: center;">✓ ĐÃ GIAO KHÁCH HOÀN TẤT</span>
+            ` : ''}
+          </div>
+        </div>
+      `;
+
+      if (pLane) pLane.innerHTML = p.map(ticketHtml).join('');
+      if (cLane) cLane.innerHTML = c.map(ticketHtml).join('');
+      if (dLane) dLane.innerHTML = d.map(ticketHtml).join('');
+    }
+
+    function renderMembers() {
+      const tbody = document.getElementById('members-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = MEMBERS.map(m => `
+        <tr>
+          <td><strong style="color: var(--text-title);">${m.user}</strong></td>
+          <td class="tabular-num">${m.phone}</td>
+          <td><code style="font-family: var(--font-mono); color: var(--text-secondary);">${m.cccd}</code></td>
+          <td><span class="seat-zone-badge vip">${m.tier}</span></td>
+          <td class="tabular-num" style="color: #FFCC05; font-weight: 700;">${m.balance.toLocaleString('vi-VN')} đ</td>
+          <td class="tabular-num">${m.timeVIP}</td>
+          <td style="color: var(--text-muted); font-size: 11px;">${m.lastSeen}</td>
+          <td style="text-align: right;">
+            <button class="btn-fluent" style="display: inline-flex; height: 22px; padding: 0 6px; font-size: 10.5px;" onclick="openTopupModalFor('${m.user}')">Nạp Giờ</button>
+            <button class="btn-fluent" style="display: inline-flex; height: 22px; padding: 0 6px; font-size: 10.5px; color: #f87171;" onclick="terminateMember('${m.user}', ${m.balance})">Thanh Lý</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /* Actions */
+    function selectNode(id) {
+      selectedStationId = id;
+      renderGrid();
+      renderInspector();
+    }
+
+    function switchView(viewId, navEl) {
+      document.querySelectorAll('.view-panel').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.add('active');
+      if (navEl) navEl.classList.add('active');
+    }
+
+    function filterZone(z, btn) {
+      currentFilterZone = z;
+      document.querySelectorAll('.chip-btn').forEach(c => c.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderGrid();
+    }
+
+    function searchStations(q) {
+      const query = q.toLowerCase().trim();
+      document.querySelectorAll('.seat-node').forEach(node => {
+        const txt = node.textContent.toLowerCase();
+        node.style.display = (!query || txt.includes(query)) ? 'flex' : 'none';
+      });
+    }
+
+    function advanceKds(id, nextState) {
+      const ord = KDS_ORDERS.find(o => o.id === id);
+      if (ord) {
+        ord.status = nextState;
+        if (nextState === 'cooking') {
+          showToast(`✓ Đã duyệt đơn ${id} & Tự động in phiếu bếp KOT nhiệt 80mm!`);
+        } else if (nextState === 'done') {
+          showToast(`🚀 Đơn ${id} đã hoàn tất chế biến, nhân viên mang ra máy ${ord.seat}!`);
+        }
+        renderKds();
+      }
+    }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add('active');
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove('active');
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
+    }
+
+    let currentTopupAmount = 50000;
+    function setTopupPreset(amt) {
+      currentTopupAmount = amt;
+      showToast(`Đã chọn số tiền nạp: ${amt.toLocaleString('vi-VN')} đ`);
+    }
+
+    function savePricingRules() {
+      const vip = document.getElementById('cfg-rate-vip').value;
+      const esp = document.getElementById('cfg-rate-esp').value;
+      const str = document.getElementById('cfg-rate-str').value;
+      const std = document.getElementById('cfg-rate-std').value;
+      showToast(`✓ Đã lưu bảng giá mới (VIP: ${vip}, ESP: ${esp}, STD: ${std}) và đồng bộ toàn bộ 48 máy trạm!`);
+    }
+
+    function submitTopup() {
+      const target = document.getElementById('target-seat-input').value;
+      closeModal('modal-topup');
+      showToast(`✓ Đã nạp ${currentTopupAmount.toLocaleString('vi-VN')} đ cho ${target}! In hóa đơn máy tính tiền POS.`);
+    }
+
+    function submitNewMember() {
+      const user = document.getElementById('reg-user').value;
+      const phone = document.getElementById('reg-phone').value;
+      const cccd = document.getElementById('reg-cccd').value;
+      if (!user) {
+        showToast('Vui lòng nhập tên tài khoản');
+        return;
+      }
+      MEMBERS.unshift({
+        user,
+        phone: phone || '09xxxxxxxx',
+        cccd: cccd || '001098000000',
+        tier: 'Member',
+        balance: 50000,
+        timeVIP: '04h 10m',
+        lastSeen: 'Vừa tạo'
+      });
+      closeModal('modal-member');
+      renderMembers();
+      showToast(`✓ Đã tạo thành công hội viên [${user}], cộng 50.000 đ vào tài khoản trả trước!`);
+    }
+
+    function submitHandover() {
+      closeModal('modal-handover');
+      showToast('✓ Đã in biên bản bàn giao ca trực! Dữ liệu đã đồng bộ lên ting-api Cloud.');
+    }
+
+    function terminateMember(user, bal) {
+      openRefundModal(user, bal);
+    }
+
+    function openRefundModal(user, bal) {
+      document.getElementById('refund-user-name').textContent = user;
+      document.getElementById('refund-user-bal').textContent = (bal || 0).toLocaleString('vi-VN') + ' đ';
+      openModal('modal-member-refund');
+    }
+
+    function executeRefund() {
+      const user = document.getElementById('refund-user-name').textContent;
+      const mem = MEMBERS.find(m => m.user === user);
+      if (mem) {
+        const refundedAmt = mem.balance;
+        mem.balance = 0;
+        mem.timeVIP = '00h 00m';
+        mem.lastSeen = 'Đã thanh lý tại quầy';
+        closeModal('modal-member-refund');
+        renderMembers();
+        showToast(`✓ Đã in Phiếu Chi hoàn lại ${refundedAmt.toLocaleString('vi-VN')} đ cho hội viên [${user}]!`);
+      }
+    }
+
+    function quickOpen(seatId) {
+      showToast(`Đang mở máy ${seatId} cho khách vãng lai...`);
+      const st = STATIONS.find(s => s.id === seatId);
+      if (st) {
+        st.status = 'active';
+        st.user = 'Khách Vãng Lai';
+        st.time = 7200;
+        st.balance = 24000;
+        renderGrid();
+        renderInspector();
+      }
+    }
+
+    function quickLock(seatId) {
+      if (confirm(`Khóa trạm máy ${seatId}?`)) {
+        const st = STATIONS.find(s => s.id === seatId);
+        if (st) {
+          st.status = 'vacant';
+          st.user = '';
+          st.time = 0;
+          st.balance = 0;
+          st.game = '';
+          renderGrid();
+          renderInspector();
+          showToast(`Đã khóa máy ${seatId} và bảo lưu số dư tài khoản.`);
+        }
+      }
+    }
+
+    function unlockStation(seatId) {
+      const st = STATIONS.find(s => s.id === seatId);
+      if (st) {
+        st.status = 'vacant';
+        st.user = '';
+        renderGrid();
+        renderInspector();
+        showToast(`Trạm ${seatId} đã mở khóa.`);
+      }
+    }
+
+    function openTopupModalFor(id) {
+      document.getElementById('target-seat-input').value = id;
+      openModal('modal-topup');
+    }
+
+    function promptTopupSelected() {
+      openTopupModalFor(selectedStationId);
+    }
+
+    function promptLockStation() {
+      quickLock(selectedStationId);
+    }
+
+    function quickChange(seatId) {
+      const st = STATIONS.find(s => s.id === seatId);
+      if (!st) return;
+      document.getElementById('change-source-seat').textContent = st.name;
+      document.getElementById('change-source-user').textContent = st.user || 'Khách chơi';
+      document.getElementById('change-source-bal').textContent = st.balance.toLocaleString('vi-VN') + ' đ';
+
+      const hours = Math.floor(st.time / 3600);
+      const mins = Math.floor((st.time % 3600) / 60);
+      const secs = st.time % 60;
+      document.getElementById('change-source-time').textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      // Populate vacant seats
+      const select = document.getElementById('change-target-select');
+      const vacantSeats = STATIONS.filter(s => s.status === 'vacant' && s.id !== seatId);
+      if (select) {
+        if (vacantSeats.length === 0) {
+          select.innerHTML = '<option value="">-- Không có máy trống nào --</option>';
+        } else {
+          select.innerHTML = vacantSeats.map(v => `
+            <option value="${v.id}">${v.name} (${v.zone.toUpperCase()} · ${v.zone === 'vip' ? '12k' : (v.zone === 'esports' ? '15k' : (v.zone === 'stream' ? '18k' : '8k'))}/h)</option>
+          `).join('');
+        }
+      }
+      openModal('modal-change-seat');
+    }
+
+    function promptChangeSeat() {
+      quickChange(selectedStationId);
+    }
+
+    function executeChangeSeat() {
+      const srcId = document.getElementById('change-source-seat').textContent;
+      const select = document.getElementById('change-target-select');
+      const targetId = select ? select.value : '';
+
+      if (!targetId) {
+        showToast('Không có máy trống hợp lệ để chuyển');
+        return;
+      }
+
+      const src = STATIONS.find(s => s.id === srcId);
+      const tgt = STATIONS.find(s => s.id === targetId);
+
+      if (src && tgt) {
+        tgt.status = src.status;
+        tgt.user = src.user;
+        tgt.balance = src.balance;
+        tgt.time = src.time;
+        tgt.game = src.game;
+
+        src.status = 'vacant';
+        src.user = '';
+        src.balance = 0;
+        src.time = 0;
+        src.game = '';
+
+        selectedStationId = targetId;
+        closeModal('modal-change-seat');
+        renderGrid();
+        renderInspector();
+        showToast(`✓ Đã chuyển toàn bộ phiên chơi từ ${srcId} sang ${targetId} thành công!`);
+      }
+    }
+
+    function promptSendMessage() {
+      document.getElementById('msg-target-seat').value = selectedStationId;
+      document.getElementById('custom-msg-input').value = '';
+      openModal('modal-send-message');
+    }
+
+    function selectMessageTemplate(txt) {
+      document.getElementById('custom-msg-input').value = txt;
+    }
+
+    function executeSendMessage() {
+      const seat = document.getElementById('msg-target-seat').value;
+      const msg = document.getElementById('custom-msg-input').value.trim() || 'Ca trực thu ngân chúc bạn chơi game vui vẻ!';
+      closeModal('modal-send-message');
+      showToast(`✓ Đã bắn thông báo pop-up tới ${seat}: "${msg.slice(0, 30)}..."`);
+    }
+
+    let currentRemoteAction = 'reboot';
+    function promptRemoteAction(action) {
+      currentRemoteAction = action;
+      document.getElementById('remote-target-seat').value = selectedStationId;
+      const title = document.getElementById('remote-action-title');
+      const warn = document.getElementById('remote-action-warning');
+      if (action === 'shutdown') {
+        if (title) title.textContent = '⚡ TẮT NGUỒN MÁY TRẠM TỪ XA (SHUTDOWN LAN)';
+        if (warn) warn.textContent = `Cảnh báo: Lệnh này sẽ tắt nguồn hoàn toàn máy ${selectedStationId} qua LAN :3210!`;
+      } else {
+        if (title) title.textContent = '⚡ KHỞI ĐỘNG LẠI MÁY TRẠM TỪ XA (REBOOT LAN)';
+        if (warn) warn.textContent = `Cảnh báo: Lệnh này sẽ khởi động lại hệ điều hành Windows trên máy ${selectedStationId}!`;
+      }
+      openModal('modal-remote-action');
+    }
+
+    function executeRemoteAction() {
+      const seatId = document.getElementById('remote-target-seat').value;
+      const st = STATIONS.find(s => s.id === seatId);
+      if (st) {
+        if (currentRemoteAction === 'shutdown') {
+          st.status = 'vacant';
+          st.user = '';
+          st.time = 0;
+          st.balance = 0;
+          st.game = '';
+          showToast(`✓ Đã gửi tín hiệu Shutdown tới ${seatId}. Máy đang tắt nguồn...`);
+        } else {
+          showToast(`✓ Đã gửi tín hiệu Reboot tới ${seatId}. Máy đang khởi động lại...`);
+        }
+        closeModal('modal-remote-action');
+        renderGrid();
+        renderInspector();
+      }
+    }
+
+    function searchMembers(query) {
+      const q = query.toLowerCase().trim();
+      const tbody = document.getElementById('members-tbody');
+      if (!tbody) return;
+
+      const filtered = MEMBERS.filter(m => 
+        !q || m.user.toLowerCase().includes(q) || m.phone.includes(q) || m.cccd.includes(q)
+      );
+
+      tbody.innerHTML = filtered.map(m => `
+        <tr>
+          <td><strong style="color: var(--text-title);">${m.user}</strong></td>
+          <td class="tabular-num">${m.phone}</td>
+          <td><code style="font-family: var(--font-mono); color: var(--text-secondary);">${m.cccd}</code></td>
+          <td><span class="seat-zone-badge vip">${m.tier}</span></td>
+          <td class="tabular-num" style="color: #FFCC05; font-weight: 700;">${m.balance.toLocaleString('vi-VN')} đ</td>
+          <td class="tabular-num">${m.timeVIP}</td>
+          <td style="color: var(--text-muted); font-size: 11px;">${m.lastSeen}</td>
+          <td style="text-align: right;">
+            <button class="btn-fluent" style="display: inline-flex; height: 22px; padding: 0 6px; font-size: 10.5px;" onclick="openTopupModalFor('${m.user}')">Nạp Giờ</button>
+            <button class="btn-fluent" style="display: inline-flex; height: 22px; padding: 0 6px; font-size: 10.5px; color: #f87171;" onclick="terminateMember('${m.user}', ${m.balance})">Thanh Lý</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openNewInvoiceModal() {
+      openModal('modal-new-invoice');
+    }
+
+    function updateInvoiceTaxRate(val) {
+      const amtInput = document.getElementById('inv-amount-input');
+      if (val === 'food') amtInput.value = '45.000';
+      else amtInput.value = '60.000';
+    }
+
+    function executeCreateInvoice() {
+      const customer = document.getElementById('inv-customer-input').value;
+      const type = document.getElementById('inv-service-type').value;
+      const amtStr = document.getElementById('inv-amount-input').value;
+      const amt = parseInt(amtStr.replace(/\D/g, '')) || 60000;
+
+      const vatRate = type === 'food' ? 0.08 : 0.10;
+      const subtotal = Math.round(amt / (1 + vatRate));
+      const vat = amt - subtotal;
+
+      const randomNum = String(Math.floor(4202 + Math.random() * 50)).padStart(7, '0');
+      const timeStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' 18/09';
+
+      const tbody = document.getElementById('invoices-tbody');
+      if (tbody) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong style="color: var(--text-title);">${randomNum}</strong></td>
+          <td>${timeStr}</td>
+          <td>${customer}</td>
+          <td>Dịch vụ ${type === 'food' ? 'Canteen F&B' : 'Internet Giờ Chơi'}</td>
+          <td class="tabular-num">${subtotal.toLocaleString('vi-VN')} đ</td>
+          <td class="tabular-num">${vat.toLocaleString('vi-VN')} đ</td>
+          <td><strong class="tabular-num" style="color: #FFCC05;">${amt.toLocaleString('vi-VN')} đ</strong></td>
+          <td><span class="seat-zone-badge std" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">Hợp Lệ CQT</span></td>
+          <td style="text-align: right;">
+            <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="openModal('modal-invoice-detail')">Xem</button>
+            <button class="btn-fluent" style="padding: 2px 8px; font-size: 10.5px;" onclick="showToast('✓ Đang in lại hóa đơn nhiệt 80mm...')">In Lại</button>
+          </td>
+        `;
+        tbody.insertBefore(tr, tbody.firstChild);
+      }
+
+      closeModal('modal-new-invoice');
+      showToast(`✓ Đã ký số HSM & phát hành hóa đơn số ${randomNum}! Dữ liệu truyền CQT thành công.`);
+    }
+
+    function openNewOrderPosModal() {
+      openModal('modal-new-order-pos');
+    }
+
+    function executeCreateOrderPos() {
+      const seat = document.getElementById('pos-order-seat').value;
+      const itemVal = document.getElementById('pos-order-item').value;
+      const [name, priceStr] = itemVal.split('|');
+      const price = parseInt(priceStr) || 30000;
+      const qty = parseInt(document.getElementById('pos-order-qty').value) || 1;
+      const note = document.getElementById('pos-order-note').value;
+      const payRadio = document.querySelector('input[name="pos_order_pay"]:checked');
+      const payment = payRadio ? payRadio.value : 'cash';
+
+      const newId = 'TKT-' + (1043 + Math.floor(Math.random() * 20));
+
+      KDS_ORDERS.unshift({
+        id: newId,
+        seat: seat,
+        time: 'Vừa xong',
+        payment: payment,
+        status: 'pending',
+        items: [
+          { name: name, qty: qty, price: price, note: note }
+        ],
+        total: price * qty
+      });
+
+      closeModal('modal-new-order-pos');
+      renderKds();
+      showToast(`✓ Đã tạo đơn #${newId} cho ${seat}! In phiếu bếp KOT nhiệt 80mm.`);
+    }
+
+    function calculateShiftDifference(val) {
+      const cleanNum = parseInt(val.replace(/\D/g, '')) || 0;
+      const theoretical = 1450000;
+      const diff = cleanNum - theoretical;
+      const label = document.getElementById('shift-diff-label');
+      if (label) {
+        if (diff === 0) {
+          label.style.color = 'var(--status-online-green)';
+          label.textContent = '0 đ (Khớp 100%)';
+        } else if (diff > 0) {
+          label.style.color = '#38BDF8';
+          label.textContent = `+${diff.toLocaleString('vi-VN')} đ (Thừa két)`;
+        } else {
+          label.style.color = 'var(--status-missing-color)';
+          label.textContent = `${diff.toLocaleString('vi-VN')} đ (Thiếu két)`;
+        }
+      }
+    }
+
+    function toggleSidebar() {
+      const sb = document.getElementById('app-sidebar');
+      sb.classList.toggle('collapsed');
+      const btn = sb.querySelector('.sidebar-toggle-btn');
+      btn.textContent = sb.classList.contains('collapsed') ? '▶' : '◀';
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const cur = html.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      showToast(`Chuyển sang giao diện ${next === 'dark' ? 'Tối' : 'Sáng'}`);
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('toast-box');
+      const txt = document.getElementById('toast-msg');
+      if (!el || !txt) return;
+      txt.textContent = msg;
+      el.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    /* Key Shortcuts */
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F1') {
+        e.preventDefault();
+        openModal('modal-topup');
+      } else if (e.key === 'F2') {
+        e.preventDefault();
+        openModal('modal-member');
+      } else if (e.key === 'F3') {
+        e.preventDefault();
+        switchView('kds');
+      } else if (e.key === 'F4') {
+        e.preventDefault();
+        openModal('modal-handover');
+      } else if (e.key === 'Escape') {
+        closeAllModals();
+      }
+    });
+
+    /* Live Countdown Loop */
+    setInterval(() => {
+      STATIONS.forEach(s => {
+        if (s.time > 0 && s.status === 'active') {
+          s.time -= 1;
+          if (s.time < 900) s.status = 'warning';
+        }
+      });
+      const matrixTab = document.getElementById('view-matrix');
+      if (matrixTab && matrixTab.classList.contains('active')) {
+        renderGrid();
+        renderInspector();
+      }
+    }, 1000);
+
+    /* Init */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderGrid();
+      renderInspector();
+      renderKds();
+      renderMembers();
+    });
+  </script>
+</body>
+</html>
