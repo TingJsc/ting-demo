@@ -29,14 +29,13 @@
       --text-muted: #6B7280;
       --text-header: #89909E;
 
-      /* Gradient Thương hiệu TingSoft trích xuất từ SVG */
-      /* paint0 / paint6 / paint7 / paint8: stop 0% #FFCC05, 50% #E41865, 100% #721980 */
-      --brand-gradient: linear-gradient(135deg, #FFCC05 0%, #E41865 50%, #721980 100%);
-      --brand-gradient-h: linear-gradient(90deg, #FFCC05 0%, #E41865 48%, #721980 100%);
-      --brand-pink: #E41865;
-      --brand-purple: #721980;
-      --brand-yellow: #FFCC05;
-      --brand-glow: rgba(228, 24, 101, 0.4);
+      /* Gradient Thương hiệu Ting Launcher: Vàng kim hổ phách 3D */
+      --brand-gradient: linear-gradient(135deg, #FFE066 0%, #FFB700 50%, #D97706 100%);
+      --brand-gradient-h: linear-gradient(90deg, #FFE066 0%, #FFB700 48%, #D97706 100%);
+      --brand-amber: #FFB700;
+      --brand-yellow: #FFE066;
+      --brand-dark-gold: #D97706;
+      --brand-glow: rgba(255, 183, 0, 0.4);
 
       /* Accents & Badges */
       --accent-cyan: #38BDF8;
@@ -330,7 +329,7 @@
 
     .btn-login-gradient:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(228, 24, 101, 0.5);
+      box-shadow: 0 6px 16px rgba(255, 183, 0, 0.5);
     }
 
     .btn-register-dark {
@@ -1321,7 +1320,7 @@
     }
 
     /* DANH SÁCH GAME Section Header */
-    .catalog-section-header {
+    .game-list-section-header {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1330,7 +1329,7 @@
       margin-bottom: 2px;
     }
 
-    .catalog-main-title {
+    .game-list-main-title {
       font-size: 15px;
       font-weight: 800;
       color: #FFFFFF;
@@ -1338,15 +1337,15 @@
       text-transform: uppercase;
     }
 
-    /* Tabs Bar for Catalogs (All, Online Game, Offline Game, Tool Game) */
-    .catalog-tabs-bar {
+    /* Tabs Bar for game groups (All, Online Game, Offline Game, Tool Game) */
+    .game-list-tabs-bar {
       display: flex;
       align-items: center;
       gap: 24px;
       padding: 0 8px;
     }
 
-    .catalog-tab-link {
+    .game-list-tab-link {
       background: transparent;
       border: none;
       color: var(--text-muted);
@@ -1358,16 +1357,16 @@
       transition: all 0.15s ease;
     }
 
-    .catalog-tab-link:hover {
+    .game-list-tab-link:hover {
       color: var(--text-main);
     }
 
-    .catalog-tab-link.active {
+    .game-list-tab-link.active {
       color: var(--text-main);
       font-weight: 700;
     }
 
-    .catalog-tab-link.active::after {
+    .game-list-tab-link.active::after {
       content: "";
       position: absolute;
       bottom: -2px;
@@ -1379,8 +1378,8 @@
       box-shadow: 0 0 8px var(--brand-glow);
     }
 
-    /* Layout A: Bottom 12-column Catalog (Group 78: 923x184 rx=8) */
-    .catalog-12col-box {
+    /* Layout A: Bottom 12-column game list (Group 78: 923x184 rx=8) */
+    .game-list-12col-box {
       width: 100%;
       background: var(--panel-bg);
       border-radius: 8px;
@@ -1393,7 +1392,7 @@
       border: 1px solid var(--border-subtle);
     }
 
-    .catalog-12col-grid {
+    .game-list-12col-grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
       row-gap: 8px;
@@ -1456,14 +1455,14 @@
       color: var(--text-main);
     }
 
-    /* Layout B: 8-column Catalog + VTC Game Ad Poster (Group 102: 643px + 269px) */
+    /* Layout B: 8-column game list + VTC Game Ad Poster (Group 102: 643px + 269px) */
     .home-layout-b-container {
       display: none; /* Hiển thị khi ở Layout Group 102 */
       gap: 20px;
       width: 100%;
     }
 
-    .catalog-8col-box {
+    .game-list-8col-box {
       flex: 1;
       background: var(--panel-bg);
       border-radius: 8px;
@@ -1476,7 +1475,7 @@
       border: 1px solid var(--border-subtle);
     }
 
-    .catalog-8col-grid {
+    .game-list-8col-grid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
       row-gap: 8px;
@@ -2745,7 +2744,7 @@
           <img src="../logo-launcher.svg" alt="Ting Launcher Logo" class="brand-logo-img">
           <div class="brand-text-label">
             <span style="font-weight: 900; color: #FFFFFF; font-size: 26px; letter-spacing: -0.5px;">Ting</span>
-            <span id="brand-app-name" style="margin-left: 6px; font-weight: 800; font-size: 24px; background: linear-gradient(135deg, #FFCC05 0%, #E41865 60%, #9333EA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Launcher</span>
+            <span id="brand-app-name" style="margin-left: 6px; font-weight: 800; font-size: 24px; background: linear-gradient(135deg, #FFE066 0%, #FFB700 50%, #D97706 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Launcher</span>
           </div>
         </a>
       </div>
@@ -2766,8 +2765,8 @@
           <svg class="station-hanging-svg" viewBox="0 0 170 40" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="hanging-grad" x1="0" y1="0" x2="170" y2="25" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#E41865"/>
-                <stop offset="1" stop-color="#721980"/>
+                <stop stop-color="#FFB700"/>
+                <stop offset="1" stop-color="#D97706"/>
               </linearGradient>
             </defs>
             <path d="M0 0L6.67 20.2457C10.1 30.6594 19.09 38.0896 29.7 39.6814V40H33.98H136.02H140.3V39.6814C150.91 38.0896 159.9 30.6594 163.33 20.2457L170 0H140.3H29.7H0Z" fill="url(#hanging-grad)"/>
@@ -3006,19 +3005,19 @@
           </div>
 
           <!-- DANH SÁCH GAME Section Header -->
-          <div class="catalog-section-header">
-            <h2 class="catalog-main-title">DANH SÁCH GAME</h2>
-            <div class="catalog-tabs-bar">
-              <button class="catalog-tab-link active" onclick="filterCatalogCategory('all', this)">All</button>
-              <button class="catalog-tab-link" onclick="filterCatalogCategory('online', this)">Online Game</button>
-              <button class="catalog-tab-link" onclick="filterCatalogCategory('offline', this)">Offline Game</button>
-              <button class="catalog-tab-link" onclick="filterCatalogCategory('tool', this)">Tool Game</button>
+          <div class="game-list-section-header">
+            <h2 class="game-list-main-title">DANH SÁCH GAME</h2>
+            <div class="game-list-tabs-bar">
+              <button class="game-list-tab-link active" onclick="filterGameCategory('all', this)">All</button>
+              <button class="game-list-tab-link" onclick="filterGameCategory('online', this)">Online Game</button>
+              <button class="game-list-tab-link" onclick="filterGameCategory('offline', this)">Offline Game</button>
+              <button class="game-list-tab-link" onclick="filterGameCategory('tool', this)">Tool Game</button>
             </div>
           </div>
 
           <!-- LAYOUT A: FIGMA GROUP 78 (12-column Grid, fill=#1F2229) -->
-          <div class="catalog-12col-box" id="home-catalog-layout-a">
-            <div class="catalog-12col-grid" id="catalog-grid-row-1">
+          <div class="game-list-12col-box" id="home-game-list-layout-a">
+            <div class="game-list-12col-grid" id="game-list-grid-row-1">
               <!-- Hàng 1: 12 Game Icons -->
               <div class="game-icon-item" onclick="openGameModal('League of Legends')">
                 <div class="icon-square-frame"><img src="assets/icon_lol.png" class="game-icon-thumb" alt="LoL"></div>
@@ -3122,9 +3121,9 @@
           </div>
 
           <!-- LAYOUT B: FIGMA GROUP 102 (8-column Grid + VTC Game Poster 269x393) -->
-          <div class="home-layout-b-container" id="home-catalog-layout-b">
-            <div class="catalog-8col-box">
-              <div class="catalog-8col-grid">
+          <div class="home-layout-b-container" id="home-game-list-layout-b">
+            <div class="game-list-8col-box">
+              <div class="game-list-8col-grid">
                 <!-- Hàng 1: 8 Game Icons -->
                 <div class="game-icon-item" onclick="openGameModal('League of Legends')">
                   <div class="icon-square-frame"><img src="assets/icon_lol.png" class="game-icon-thumb" alt="LoL"></div>
@@ -3203,7 +3202,7 @@
         </div>
 
         <!-- ==================================================================
-             PAGE 2: GAME LIBRARY (Toàn bộ danh mục game, tìm kiếm & bộ lọc)
+             PAGE 2: GAME LIBRARY (Toàn bộ danh sách game, tìm kiếm & bộ lọc)
              ================================================================== -->
         <div class="view-page" id="view-game">
           <div class="game-library-toolbar">
@@ -3217,7 +3216,7 @@
                 <strong style="color: #34C759;">100% Sẵn sàng</strong>
               </div>
               <div class="metric-pill">
-                <span>Tốc độ LAN P2P:</span>
+                <span>Tốc độ P2P Internet:</span>
                 <strong style="color: #38BDF8;">1.250 MB/s (10Gbps)</strong>
               </div>
               <div class="metric-pill">
@@ -3226,7 +3225,7 @@
               </div>
             </div>
 
-            <!-- Danh mục lọc Game -->
+            <!-- Nhóm lọc Game -->
             <div class="category-pills-row">
               <button class="cat-pill-btn active" onclick="filterLibraryGenre('all', this)">Tất Cả (168)</button>
               <button class="cat-pill-btn" onclick="filterLibraryGenre('online', this)">Online & Esport (45)</button>
@@ -3433,9 +3432,9 @@
         <div class="view-page" id="view-update">
           <div class="update-stats-grid">
             <div class="update-stat-card">
-              <span style="font-size: 12px; color: var(--text-sub);">TingServer P2P LAN Seeder</span>
-              <strong style="font-size: 20px; color: #34C759;">Kết nối hoàn hảo :3211</strong>
-              <span style="font-size: 11px; color: var(--text-muted);">120 Client đang chia sẻ dữ liệu P2P</span>
+              <span style="font-size: 12px; color: var(--text-sub);">Swarm P2P Internet</span>
+              <strong style="font-size: 20px; color: #34C759;">Tracker public :443</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">120 peer đang chia sẻ dữ liệu P2P</span>
             </div>
             <div class="update-stat-card">
               <span style="font-size: 12px; color: var(--text-sub);">Dung Lượng Ổ Game D:\</span>
@@ -4446,8 +4445,8 @@
        LAYOUT TOGGLE: FIGMA GROUP 78 (12 Cột) vs GROUP 102 (8 Cột + Poster VTC)
        ========================================================================== */
     function toggleHomeLayout() {
-      const layoutA = document.getElementById('home-catalog-layout-a');
-      const layoutB = document.getElementById('home-catalog-layout-b');
+      const layoutA = document.getElementById('home-game-list-layout-a');
+      const layoutB = document.getElementById('home-game-list-layout-b');
       const heroBanner = document.getElementById('hero-banner-element');
       const label = document.getElementById('label-layout-mode');
 
@@ -4845,8 +4844,8 @@
 
     function setHomeLayout(layout) {
       appState.homeLayout = layout;
-      const layoutA = document.getElementById('home-catalog-layout-a');
-      const layoutB = document.getElementById('home-catalog-layout-b');
+      const layoutA = document.getElementById('home-game-list-layout-a');
+      const layoutB = document.getElementById('home-game-list-layout-b');
       const heroBanner = document.getElementById('hero-banner-element');
       const label = document.getElementById('label-layout-mode');
       if (layout === 'g102') {
@@ -5012,8 +5011,8 @@
       `).join('');
     }
 
-    function filterCatalogCategory(cat, tabElement) {
-      const tabs = document.querySelectorAll('.catalog-tab-link');
+    function filterGameCategory(cat, tabElement) {
+      const tabs = document.querySelectorAll('.game-list-tab-link');
       tabs.forEach(t => t.classList.remove('active'));
       if (tabElement) tabElement.classList.add('active');
 
