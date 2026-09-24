@@ -42,6 +42,20 @@ body{font-family:"Segoe UI",Arial,sans-serif}
 </head>
 <body class="text-slate-100">
 <div id="app" class="relative w-screen h-screen flex flex-col overflow-hidden bg-[#141433]">
+  <!-- TITLEBAR kiểu Win11: control box phải -->
+  <div id="titlebar" class="relative z-20 h-9 min-h-[36px] flex items-center pl-4 select-none" style="-webkit-app-region:drag">
+    <div class="flex items-center gap-2 text-xs text-slate-300">
+      <img src="icon.png" alt="" class="w-4 h-4 object-contain" onerror="this.style.display='none'">
+      <span class="font-semibold tracking-wide">Ting Menu</span>
+    </div>
+    <div class="ml-auto flex items-stretch h-full" style="-webkit-app-region:no-drag">
+      <button id="btnMin" title="Thu nhỏ" class="w-12 flex items-center justify-center text-slate-300 hover:bg-white/10 hover:text-white text-sm">—</button>
+      <button id="btnMax" title="Phóng to" class="w-12 flex items-center justify-center text-slate-300 hover:bg-white/10 hover:text-white text-xs">▢</button>
+      <button id="btnClose" title="Đóng" class="w-12 flex items-center justify-center text-slate-300 hover:bg-red-600 hover:text-white text-sm">✕</button>
+    </div>
+  </div>
+
+  <!-- SVG -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
     <linearGradient id="cardEdge" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#FFCC05"/><stop offset=".51" stop-color="#E41865"/><stop offset="1" stop-color="#873A93"/>
@@ -59,11 +73,11 @@ body{font-family:"Segoe UI",Arial,sans-serif}
   <div class="blob w-[690px] h-[380px] -left-[14%] -top-[16%] bg-fuchsia-900 opacity-40"></div>
 
   <!-- HEADER -->
-  <header class="relative z-10 min-h-[64px] px-4 flex flex-wrap items-center gap-x-4 gap-y-2 py-2">
+  <header class="relative z-10 min-h-[64px] px-10 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
     <div id="btnBrand" class="flex items-center cursor-pointer shrink-0" title="Về danh sách game">
       <img src="icon.png" alt="Ting" class="w-11 h-11 object-contain drop-shadow-[0_0_8px_rgba(244,63,94,.6)] hover:scale-110 transition-transform" onerror="this.style.display='none'">
     </div>
-    <div class="text-lg whitespace-nowrap shrink-0">Máy: <b class="font-extrabold">B-05</b></div>
+    <div class="bg-white/10 rounded-full px-5 py-2 text-lg whitespace-nowrap shrink-0">Máy: <b class="font-extrabold">B-05</b></div>
     <nav id="pills" class="flex items-center gap-1 bg-white/10 rounded-full p-1 shrink-0 overflow-x-auto max-w-full">
       <button class="pill px-4 sm:px-6 py-1.5 rounded-full text-sm text-slate-300 hover:text-white whitespace-nowrap" data-cat="all">All</button>
       <button class="pill px-4 sm:px-6 py-1.5 rounded-full text-sm text-slate-300 hover:text-white whitespace-nowrap" data-cat="online">Online</button>
@@ -74,19 +88,23 @@ body{font-family:"Segoe UI",Arial,sans-serif}
       <div class="h-[42px] flex items-center bg-white/10 rounded-full pl-5 pr-2 focus-within:bg-white/[.14]">
         <input id="srch" type="text" placeholder="Find your games......." aria-label="Tìm game"
           class="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-white/40">
-        <button id="srchBtn" title="Tìm kiếm" class="w-[30px] h-[30px] shrink-0 text-white text-lg">⌕</button>
+        <button id="srchBtn" title="Tìm kiếm" class="w-[30px] h-[30px] shrink-0 text-white flex items-center justify-center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
       </div>
     </div>
     <button id="btnBell" title="Thông báo" class="relative w-[42px] h-[42px] rounded-full bg-white/10 text-lg shrink-0 hover:bg-white/20">🔔<span class="dot absolute top-[10px] right-[11px] w-2 h-2 rounded-full bg-rose-500"></span></button>
-    <button id="btnFnb" class="hidden sm:flex items-center gap-2 h-[42px] px-4 bg-orange-500/10 border border-orange-500/40 rounded-full text-orange-400 text-sm font-semibold whitespace-nowrap hover:bg-orange-500/25 shrink-0">🍔<span>Order Đồ Ăn</span></button>
-    <div class="hidden md:flex gap-2 items-center text-slate-400 shrink-0">
-      <button id="btnMin" title="Thu nhỏ xuống Taskbar" class="text-xl px-1 hover:text-white">—</button>
-      <button id="btnMax" title="Phóng to / Khôi phục" class="text-lg px-1 hover:text-white">▢</button>
+    <!-- dropdown notifications -->
+    <div id="notifPanel" class="hidden absolute top-[104px] right-[210px] z-[900] w-[320px] max-w-[90vw] bg-[#0d1428]/95 border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-2.5 border-b border-white/10">
+        <span class="text-xs font-extrabold uppercase tracking-wider text-slate-300">Thông báo</span>
+        <button id="notifReadAll" class="text-[11px] text-amber-300 hover:text-amber-200 font-semibold">Đánh dấu đã đọc</button>
+      </div>
+      <div id="notifList" class="max-h-[300px] overflow-y-auto"></div>
     </div>
+    <button id="btnFnb" class="hidden sm:flex items-center gap-2 h-[42px] px-4 bg-orange-500/10 border border-orange-500/40 rounded-full text-orange-400 text-sm font-semibold whitespace-nowrap hover:bg-orange-500/25 shrink-0">🍔<span>Order Đồ Ăn</span></button>
   </header>
 
   <!-- TICKER -->
-  <div class="relative z-[9] h-[26px] mx-4 flex items-center justify-center overflow-hidden text-xs">
+  <div class="relative z-[9] h-[26px] mx-10 mt-3 flex items-center justify-center overflow-hidden text-xs">
     <span class="tick-msg flex gap-1">
       <span class="text-amber-400 font-extrabold mr-2 shrink-0">[HOT]</span>
       <span class="text-slate-200">Nạp Gio Vang 12h-14h Tang 100% Thoi Gian Choi &nbsp;•&nbsp; Giai Dau CS2 &amp; LoL Cyber Cup 2026 - Dang Ky Mien Phi Tai Quay &nbsp;•&nbsp; Black Myth Wukong &amp; Cyberpunk 2077 Vua Cap Nhat Ban Moi!</span>
@@ -94,11 +112,11 @@ body{font-family:"Segoe UI",Arial,sans-serif}
   </div>
 
   <!-- BODY -->
-  <div class="relative z-[1] flex-1 flex flex-col min-h-0 px-5 sm:px-4 pt-1.5 gap-2.5">
-    <section class="flex-1 min-h-0 bg-white/10 backdrop-blur-md border border-white/[.06] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,.35)] p-3 sm:p-4 overflow-hidden flex flex-col">
+  <div class="relative z-[1] flex-1 flex flex-col min-h-0 px-10 py-5 gap-5">
+    <section class="flex-1 min-h-200px bg-white/5 backdrop-blur-sm border border-white/[.06] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,.35)] p-5 mb-5 overflow-hidden flex flex-col">
       <div id="gamesGrid" class="flex-1 min-h-0 overflow-y-auto grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 2xl:grid-cols-14 qhd:grid-cols-16 uhd:grid-cols-20 gap-x-1.5 gap-y-2.5 content-start px-0.5 py-1 pe-3"></div>
     </section>
-    <section class="shrink-0 bg-white/10 backdrop-blur-md border border-white/[.06] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,.35)] px-3 sm:px-4 pt-2.5 pb-2">
+    <section class="shrink-0 bg-white/5 backdrop-blur-sm border border-white/[.06] rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,.35)] p-5 sm:p-5">
       <div id="posterStrip" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-9 gap-2 sm:gap-3"></div>
     </section>
   </div>
@@ -110,7 +128,7 @@ body{font-family:"Segoe UI",Arial,sans-serif}
       <span title="Kênh cộng đồng" class="w-[22px] h-[22px] inline-flex items-center justify-center border-[1.5px] border-slate-500 rounded-[5px] text-slate-400 text-xs font-extrabold cursor-pointer hover:text-white hover:border-white">f</span>
       <span title="Kênh video" class="w-[22px] h-[22px] inline-flex items-center justify-center border-[1.5px] border-slate-500 rounded-[5px] text-slate-400 text-[10px] font-extrabold cursor-pointer hover:text-white hover:border-white">▶</span>
     </div>
-    <div class="flex items-center gap-2 font-semibold text-slate-300"><span>Ting Menu V0.1.0</span><span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_#10B981]"></span></div>
+    <div class="flex items-center gap-2 font-semibold text-slate-300"><span>phiên bản 0.1.0</span><span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_#10B981]"></span></div>
   </footer>
 </div>
 
@@ -153,7 +171,7 @@ const GAMES=[
   {id:"cs2",name:"Counter-Strike 2",cat:"online",genre:"FPS",status:"ready",size:"35.2 GB",ver:"1.40.2",exe:"cs2.exe",path:"G:\\Online\\Counter-Strike 2\\cs2.exe",icon:"assets/source/game-counter-strike.png",poster:"assets/source/game-counter-strike.png"},
   {id:"hitman",name:"Hitman: World of Assassination",cat:"offline",genre:"Hành động",status:"ready",size:"75 GB",ver:"3.180",exe:"HITMAN3.exe",path:"G:\\Offline\\Hitman 3\\HITMAN3.exe",icon:"assets/source/game-hitman.png",poster:"assets/source/game-hitman.png"},
   {id:"hl",name:"Half Life 1.1",cat:"offline",genre:"FPS cổ điển",status:"reboot",size:"1.2 GB",ver:"1.1",exe:"hl.exe",path:"G:\\Offline\\Half Life\\hl.exe",icon:"assets/source/game-counter-strike.png",poster:"assets/source/poster-pubg.png"},
-  {id:"aoe",name:"Age of Empires",cat:"offline",genre:"Chiến thuật RTS",status:"waiting",size:"2.5 GB",ver:"1.0c",exe:"EMPIRESX.EXE",path:"G:\\Offline\\AOE\\EMPIRESX.EXE",icon:"assets/source/game-aoe.png",poster:"assets/source/game-aoe.png"},
+  {id:"aoe",name:"Age of Empires",cat:"offline",genre:"Chiến thuật RTS",status:"not_installed",size:"2.5 GB",ver:"1.0c",exe:"EMPIRESX.EXE",path:"G:\\Offline\\AOE\\EMPIRESX.EXE",icon:"assets/source/game-aoe.png",poster:"assets/source/game-aoe.png"},
   {id:"fc",name:"EA SPORTS FC Online",cat:"online",genre:"Bóng đá",status:"updating",size:"36.8 GB",ver:"2024.09",exe:"FC_Online.exe",path:"G:\\Online\\FC Online\\FC_Online.exe",icon:"assets/source/game-fo4.png",poster:"assets/source/game-fo4.png"},
   {id:"ntkt",name:"Nghịch Thiên Kiếm Thế",cat:"online",genre:"MMORPG",status:"ready",size:"14.5 GB",ver:"2.1",exe:"game.exe",path:"G:\\Online\\Nghịch Thiên\\game.exe",icon:"assets/source/game-nghich-thien.png",poster:"assets/source/game-nghich-thien.png"},
   {id:"dota2",name:"Dota 2",cat:"online",genre:"MOBA Esports",status:"ready",size:"58.6 GB",ver:"7.37",exe:"dota2.exe",path:"G:\\Online\\Dota 2\\dota2.exe",icon:"assets/source/game-lol.png",poster:"assets/source/poster-dota2.png"},
@@ -211,21 +229,21 @@ function renderPosters(){
   }).join("");
   ps.querySelectorAll(".pcw").forEach(c=>c.addEventListener("click",()=>{const g=GAMES.find(x=>x.id===c.dataset.id);if(g)openModal(g);}));
 }
-const TAGC={ready:["bg-emerald-500/10 border-emerald-500/40 text-emerald-400","Sẵn sàng"],reboot:["bg-amber-500/10 border-amber-500/40 text-amber-500","Cần khởi động lại"],updating:["bg-sky-500/10 border-sky-500/40 text-sky-400","Đang cập nhật"],waiting:["bg-white/10 border-white/10 text-slate-400","Chờ tải"]};
+const TAGC={ready:["bg-emerald-500/10 border-emerald-500/40 text-emerald-400","Sẵn sàng"],reboot:["bg-amber-500/10 border-amber-500/40 text-amber-500","Cần khởi động lại"],updating:["bg-sky-500/10 border-sky-500/40 text-sky-400","Đang cập nhật"],error:["bg-rose-500/10 border-rose-500/40 text-rose-400","Có lỗi"],not_installed:["bg-purple-500/10 border-purple-500/40 text-purple-300","Chưa cài đặt"]};
 function openModal(g){
   selGame=g;launching=false;tele("click",g.id,false);
   $("mhImg").src=g.poster||"";$("mhImg").onerror=function(){this.style.display="none";};$("mhImg").style.display="";
   $("mIco").src=g.icon;$("mIco").onerror=function(){this.src="icon.png";};
   $("mTit").textContent=g.name;$("mGen").textContent=g.genre;
-  const tc=TAGC[g.status]||TAGC.waiting,st=$("mSt");
+  const tc=TAGC[g.status]||TAGC.not_installed,st=$("mSt");
   st.textContent=tc[1];st.className="text-[10.5px] font-semibold px-2.5 py-[3px] rounded border "+tc[0];
   const bl=$("bLaunch"),bt=$("bLTxt");
   $("rba").classList.toggle("hidden",g.status!=="reboot");$("rba").classList.toggle("flex",g.status==="reboot");
   bl.classList.toggle("from-amber-400",g.status==="reboot");bl.classList.toggle("to-amber-700",g.status==="reboot");
-  bl.classList.toggle("from-[#FFCC05]",g.status!=="reboot");bl.classList.toggle("to-amber-600",g.status!=="reboot");
-  bl.classList.toggle("from-orange-400",g.status==="reboot");bl.classList.toggle("to-orange-700",g.status==="reboot");
-  bl.disabled=!launchable(g);
-  bt.textContent=g.status==="reboot"?"KHỞI ĐỘNG LẠI MÁY ĐỂ CHƠI":g.status==="updating"?"ĐANG TẢI...":g.status==="waiting"?"CHỜ TẢI":"CHƠI NGAY";
+  bl.classList.toggle("from-[#FFCC05]",g.status==="ready");bl.classList.toggle("to-amber-600",g.status==="ready");
+  bl.classList.toggle("from-purple-600",g.status==="not_installed");bl.classList.toggle("to-indigo-700",g.status==="not_installed");
+  bl.disabled=g.status!=="ready"&&g.status!=="not_installed";
+  bt.textContent=g.status==="reboot"?"KHỞI ĐỘNG LẠI MÁY ĐỂ CHƠI":g.status==="updating"?"ĐANG TẢI...":g.status==="not_installed"?"BÁO NHÂN VIÊN TẢI GAME":g.status==="error"?"LIÊN HỆ NHÂN VIÊN":"CHƠI NGAY";
   modal.classList.remove("modal-hidden");
 }
 function closeModal(){modal.classList.add("modal-hidden");selGame=null;launching=false;}
@@ -236,13 +254,20 @@ let st;$("srch").addEventListener("input",e=>{clearTimeout(st);st=setTimeout(()=
 $("srchBtn").addEventListener("click",()=>{searchQ=$("srch").value.trim().toLowerCase();renderGrid();});
 window.addEventListener("keydown",e=>{
   if((e.ctrlKey&&(e.key==="k"||e.key==="K"))||(e.key==="/"&&document.activeElement!==$("srch"))){e.preventDefault();$("srch").focus();$("srch").select();}
-  if(e.key==="Escape"&&!modal.classList.contains("modal-hidden"))closeModal();
+  if(e.key==="Escape"){if(!modal.classList.contains("modal-hidden"))closeModal();else toggleNotif(false);}
 });
 $("mClose").addEventListener("click",closeModal);
 modal.addEventListener("click",e=>{if(e.target===modal)closeModal();});
 $("bLaunch").addEventListener("click",()=>{
-  if(!selGame||launching||!launchable(selGame))return;
+  if(!selGame||launching)return;
   if(selGame.status==="reboot"){showToast("⚠️","Cần khởi động lại máy trước khi chơi "+selGame.name+".");return;}
+  if(selGame.status==="not_installed"){
+    tele("click",selGame.id,true);
+    showToast("🔔","Đã gửi yêu cầu tới quầy thu ngân. Vui lòng liên hệ nhân viên!");
+    closeModal();
+    return;
+  }
+  if(!launchable(selGame))return;
   launching=true;$("bLTxt").textContent="ĐANG MỞ...";$("bLaunch").disabled=true;
   setTimeout(()=>{
     tele("launch",selGame.id,true);
@@ -253,8 +278,42 @@ $("bLaunch").addEventListener("click",()=>{
 $("bFolder").addEventListener("click",()=>{if(selGame)showToast("📁","Mở thư mục: "+selGame.path);});
 $("btnBrand").addEventListener("click",()=>{searchQ="";$("srch").value="";setCat("all");});
 $("btnFnb").addEventListener("click",()=>showToast("🍔","Kích hoạt Ting Launcher - Gọi món & nạp tiền."));
-$("btnBell").addEventListener("click",e=>{e.currentTarget.querySelector(".dot").style.display="none";showToast("🔔","3 tin mới: Cyber Cup 2026, giờ vàng 12h-14h, bản cập nhật mới.");});
+$("btnBell").addEventListener("click",e=>{e.stopPropagation();toggleNotif();});
+function toggleNotif(force){
+  const p=$("notifPanel");
+  const show=force!==undefined?force:p.classList.contains("hidden");
+  p.classList.toggle("hidden",!show);
+  if(show)renderNotif();
+}
+document.addEventListener("click",e=>{
+  const p=$("notifPanel");
+  if(!p.classList.contains("hidden")&&!p.contains(e.target))p.classList.add("hidden");
+});
 $("btnMin").addEventListener("click",()=>showToast("—","Thu nhỏ cửa sổ xuống Taskbar."));
+const NOTIFS=[
+  {t:"Cyber Cup 2026 mở đăng ký",d:"Giải đấu CS2 & LoL, đăng ký miễn phí tại quầy.",time:"10 phút trước",unread:true},
+  {t:"Giờ vàng 12h-14h",d:"Nạp giờ vàng tặng 100% thời gian chơi.",time:"1 giờ trước",unread:true},
+  {t:"Bản cập nhật mới",d:"Black Myth Wukong & Cyberpunk 2077 vừa cập nhật bản mới.",time:"3 giờ trước",unread:true},
+  {t:"Đồng bộ thành công",d:"Danh sách game đã được cập nhật từ Ting Update.",time:"Hôm qua",unread:false}
+];
+function renderNotif(){
+  $("notifList").innerHTML=NOTIFS.map((n,i)=>'<button data-i="'+i+'" class="notif-item w-full flex gap-3 px-4 py-3 text-left hover:bg-white/5 border-b border-white/5 last:border-0">'
+    +'<span class="mt-1.5 w-2 h-2 rounded-full shrink-0 '+(n.unread?"bg-amber-400":"bg-transparent")+'"></span>'
+    +'<span class="min-w-0"><span class="block text-xs font-bold '+(n.unread?"text-white":"text-slate-400")+'">'+n.t+'</span>'
+    +'<span class="block text-[11px] text-slate-400 mt-0.5">'+n.d+'</span>'
+    +'<span class="block text-[10px] text-slate-600 mt-1">'+n.time+'</span></span></button>').join("");
+  $("notifList").querySelectorAll(".notif-item").forEach(b=>b.addEventListener("click",()=>{
+    NOTIFS[parseInt(b.dataset.i,10)].unread=false;renderNotif();syncBellDot();
+    showToast("🔔","Đã mở: "+NOTIFS[parseInt(b.dataset.i,10)].t);
+  }));
+  syncBellDot();
+}
+function syncBellDot(){
+  const any=NOTIFS.some(n=>n.unread);
+  document.querySelector("#btnBell .dot").style.display=any?"":"none";
+}
+$("notifReadAll").addEventListener("click",()=>{NOTIFS.forEach(n=>n.unread=false);renderNotif();});
+$("btnClose").addEventListener("click",()=>showToast("✕","Demo trên browser không thể đóng cửa sổ; app thật sẽ thoát về Taskbar."));
 $("btnMax").addEventListener("click",()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen().catch(()=>{});});
 setCat("all");renderPosters();
 const qp=new URLSearchParams(location.search).get("play")||new URLSearchParams(location.search).get("game");
