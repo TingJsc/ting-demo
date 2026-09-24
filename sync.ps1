@@ -1,10 +1,11 @@
 ﻿<#
 .SYNOPSIS
-    Đồng bộ dữ liệu thiết kế từ ..\ting\design sang ting-demo.
+    Đồng bộ dữ liệu thiết kế từ ..\ting\design sang ting-demo,
+    tự động commit và push lên Git master.
 
 .DESCRIPTION
     Sử dụng Windows Robocopy để đồng bộ nhanh, bảo toàn thư mục .git
-    và các file script điều khiển.
+    và tự động tạo git commit + push lên master khi có thay đổi.
 
 .PARAMETER Source
     Đường dẫn thư mục nguồn. Mặc định: "..\ting\design".
@@ -12,26 +13,35 @@
 .PARAMETER Destination
     Đường dẫn thư mục đích. Mặc định: thư mục chứa script này (ting-demo).
 
+.PARAMETER Message
+    Nội dung commit message. Mặc định: "feat: sync design from ting (yyyy-MM-dd HH:mm)".
+
+.PARAMETER Branch
+    Tên nhánh Git cần push. Mặc định: "master" (hoặc nhánh hiện tại).
+
 .PARAMETER DryRun
     Chạy thử nghiệm (xem trước các file sẽ được copy/xóa mà không thay đổi thực tế).
 
 .PARAMETER NoDelete
     Chỉ copy các file mới/thay đổi, không xóa các file thừa ở thư mục đích.
 
-.PARAMETER NoGitStatus
-    Không hiển thị trạng thái git status sau khi sync.
+.PARAMETER NoCommit
+    Chỉ đồng bộ file, không tạo commit và không push.
+
+.PARAMETER NoPush
+    Có commit nhưng không push lên remote.
 
 .EXAMPLE
     .\sync.ps1
-    # Đồng bộ toàn bộ (mirror)
+    # Đồng bộ, tự động commit và push lên master
 
 .EXAMPLE
     .\sync.ps1 -DryRun
     # Xem trước danh sách thay đổi
 
 .EXAMPLE
-    .\sync.ps1 -NoDelete
-    # Copy cập nhật, không xóa file cũ
+    .\sync.ps1 -Message "feat: update menu layout"
+    # Đồng bộ với commit message tùy chỉnh
 #>
 [CmdletBinding()]
 param(
@@ -42,16 +52,25 @@ param(
     [string]$Destination,
 
     [Parameter()]
+    [string]$Message,
+
+    [Parameter()]
+    [string]$Branch = "master",
+
+    [Parameter()]
     [switch]$DryRun,
 
     [Parameter()]
     [switch]$NoDelete,
 
     [Parameter()]
-    [switch]$NoGitStatus
+    [switch]$NoCommit,
+
+    [Parameter()]
+    [switch]$NoPush
 )
 
-# Đảm bảo UTF-8 cho tên file tiếng Việt
+# Đảm bảo UTF-8 cho tên file tiếng Việt và Git
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
@@ -131,32 +150,58 @@ if ($DryRun) {
 $exitCode = $LASTEXITCODE
 
 # Mã thoát của Robocopy:
-# 0: Không có file nào thay đổi
-# 1: Đã copy thành công các file mới/cập nhật
-# 2: Phát hiện file thừa (extras)
-# 3: Đã copy file mới và phát hiện file thừa
-# 4-7: Có file mismatch nhưng không có lỗi nghiêm trọng
+# 0-7: Thành công (0 = không thay đổi, 1 = có file mới/cập nhật, 2 = có file thừa,...)
 # >= 8: Thất bại / có lỗi copy
 if ($exitCode -ge 8) {
     Write-Host "`n[LỖI] Đồng bộ thất bại (Robocopy Exit Code: $exitCode)." -ForegroundColor Red
     exit $exitCode
 } else {
     if ($exitCode -eq 0) {
-        Write-Host "`n[HOÀN TẤT] Thư mục đã đồng bộ hoàn toàn (không có file thay đổi)." -ForegroundColor Green
+        Write-Host "`n[HOÀN TẤT] File đã đồng bộ hoàn toàn." -ForegroundColor Green
     } else {
-        Write-Host "`n[HOÀN TẤT] Đồng bộ thành công!" -ForegroundColor Green
+        Write-Host "`n[HOÀN TẤT] Đồng bộ file thành công!" -ForegroundColor Green
     }
 }
 
-# Hiển thị trạng thái git nếu có thay đổi
-if (-not $NoGitStatus -and -not $DryRun -and (Get-Command git -ErrorAction SilentlyContinue)) {
+# Tự động commit và push nếu có thay đổi và không chạy DryRun
+if (-not $DryRun -and -not $NoCommit -and (Get-Command git -ErrorAction SilentlyContinue)) {
     if (Test-Path -LiteralPath (Join-Path $destPath ".git")) {
-        $gitStatus = git -C $destPath status --short
-        Write-Host "`nTrạng thái Git sau khi đồng bộ:" -ForegroundColor Cyan
+        $gitStatus = git -C $destPath status --porcelain
         if ($gitStatus) {
-            $gitStatus | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+            Write-Host "`nTrạng thái Git phát hiện thay đổi:" -ForegroundColor Cyan
+            git -C $destPath status --short | ForEach-Object { Write-Host "  $_" -ForegroundColor Yellow }
+
+            # Lấy tên nhánh hiện tại
+            $currentBranch = (git -C $destPath branch --show-current).Trim()
+            if (-not $currentBranch) {
+                $currentBranch = $Branch
+            }
+
+            # Tạo commit message mặc định nếu chưa truyền
+            $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm")
+            $commitMsg = if ($Message) { $Message } else { "feat: sync design from ting ($timestamp)" }
+
+            Write-Host "`n>> Đang tạo commit: '$commitMsg'..." -ForegroundColor Cyan
+            git -C $destPath add -A
+            git -C $destPath commit -m $commitMsg
+
+            if ($LASTEXITCODE -eq 0) {
+                if (-not $NoPush) {
+                    Write-Host ">> Đang push lên origin/$currentBranch..." -ForegroundColor Cyan
+                    git -C $destPath push origin $currentBranch
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-Host "[THÀNH CÔNG] Đã commit và push lên origin/$currentBranch thành công!" -ForegroundColor Green
+                    } else {
+                        Write-Host "[CẢNH BÁO] Push lên origin thất bại (Exit Code: $LASTEXITCODE)." -ForegroundColor Red
+                    }
+                } else {
+                    Write-Host "[HOÀN TẤT] Đã commit cục bộ (bỏ qua push do -NoPush)." -ForegroundColor Green
+                }
+            } else {
+                Write-Host "[CẢNH BÁO] Không thể tạo commit Git." -ForegroundColor Yellow
+            }
         } else {
-            Write-Host "  (Không có thay đổi trong Git working tree)" -ForegroundColor DarkGray
+            Write-Host "`n[GIT] Working tree sạch sẽ, không có thay đổi nào để commit & push." -ForegroundColor DarkGray
         }
     }
 }
