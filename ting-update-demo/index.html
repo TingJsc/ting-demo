@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ting Update</title>
+  <title>Ting Update · Demo thiết kế</title>
   <style>
     :root {
       /* Windows 11 Dark Mode */
@@ -438,6 +438,32 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       font-family: Consolas, "Courier New", monospace;
+    }
+
+    .root-degraded-banner {
+      display: none;
+      min-height: 34px;
+      padding: 5px 10px;
+      align-items: center;
+      gap: 8px;
+      background: rgba(234, 179, 8, 0.12);
+      border-bottom: 1px solid rgba(234, 179, 8, 0.45);
+      color: var(--text-primary);
+      font-size: 11px;
+    }
+
+    .root-degraded-banner.visible {
+      display: flex;
+    }
+
+    .root-degraded-banner strong {
+      color: #eab308;
+      white-space: nowrap;
+    }
+
+    .root-degraded-message {
+      flex: 1;
+      min-width: 0;
     }
 
     .service-state-grid {
@@ -968,6 +994,30 @@
       color: var(--text-game-name);
     }
 
+    .local-tag,
+    .local-conflict-tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 10px;
+      font-weight: 700;
+      vertical-align: 1px;
+      white-space: nowrap;
+    }
+
+    .local-tag {
+      color: #7dd3fc;
+      background: rgba(14, 165, 233, 0.14);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+
+    .local-conflict-tag {
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(248, 113, 113, 0.4);
+    }
+
     .cell-version {
       font-family: monospace;
       color: var(--text-secondary);
@@ -1342,6 +1392,8 @@
       color: var(--text-secondary);
     }
 
+    [hidden] { display: none !important; }
+
     .settings-card {
       background-color: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -1585,6 +1637,33 @@
       display: block;
     }
 
+    .toast-pill.error {
+      background-color: #4a1f24;
+      border-color: #f87171;
+      color: #f87171;
+      font-size: 14px;
+      font-weight: 700;
+      max-width: min(520px, calc(100vw - 40px));
+      padding: 12px 16px;
+    }
+
+    .toast-pill.warn {
+      background-color: #493b16;
+      border-color: #eab308;
+      color: #facc15;
+    }
+
+    [data-theme="light"] .toast-pill.error {
+      background-color: #fee2e2;
+      border-color: #dc2626;
+      color: #991b1b;
+    }
+
+    [data-theme="light"] .toast-pill.warn {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
     @keyframes toastIn {
       from {
         opacity: 0;
@@ -1596,7 +1675,20 @@
         transform: translateY(0);
       }
     }
-  </style>
+
+/* Retain original desktop dialog, colors and controls. */
+#wizard-card{width:min(500px,calc(100vw - 32px));max-height:calc(100dvh - 32px)}
+#wizard-body{min-height:0;overflow:auto;max-height:calc(100dvh - 88px)}
+.license-native{max-width:500px;padding:16px 18px;font-size:12px}
+.license-tabs{display:flex;gap:8px;margin-bottom:12px}
+#wizard-step-1 form,.license-native form{display:grid;gap:10px}
+#wizard-step-1 label,.license-native label{display:grid;gap:5px}
+#wizard-step-1 input,.license-native input{width:100%;max-width:100%;box-sizing:border-box}
+.license-caption{font-size:11px;color:var(--text-muted);margin:8px 0;line-height:1.5}
+.license-order{padding:10px;margin:12px 0;border:1px solid var(--border-color);border-radius:4px;background:var(--bg-card-inner)}
+.license-order p{margin:6px 0;overflow-wrap:anywhere}.license-key{font-family:monospace;user-select:all}
+.license-error{color:var(--status-error-color,#ef4444);font-size:12px}
+</style>
 </head>
 
 <body>
@@ -1605,7 +1697,7 @@
   <header class="titlebar">
     <div class="titlebar-left">
       <div class="titlebar-logo">
-        <img src="../logo.svg" alt="Ting Logo" style="height: 22px; width: 22px; object-fit: contain;">
+        <img src="../logo-update.svg" alt="Ting Update" style="height: 22px; width: 22px; object-fit: contain;">
       </div>
       <span class="titlebar-title">Ting Update</span>
     </div>
@@ -1622,7 +1714,7 @@
       <div class="sidebar-top">
         <div class="sidebar-brand">
           <div class="brand-logo-wrap">
-            <img src="../logo.svg" alt="Ting Logo" class="brand-logo-img">
+            <img src="../logo-update.svg" alt="Ting Update" class="brand-logo-img">
             <span class="brand-tag">Update</span>
           </div>
           <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Thu nhỏ sidebar">
@@ -1719,7 +1811,7 @@
       <!-- Bottom: Update Client status and network -->
       <div class="sidebar-bottom">
         <div class="service-info-box" id="sidebar-service-box"
-          title="Cấu hình Ting Update:&#10;• Trạng thái: Service online (:3210)&#10;• Ổ chính: G:\ (410 GB trống)&#10;• Ổ phụ: I:\, J:\&#10;• Cổng P2P: 16882 (đang lắng nghe qua Internet; NAT chưa xác nhận)&#10;• IP Ting Update: 192.168.1.105 (Nhận diện cho Ting Menu)&#10;• Bản quyền: Ting Update (284 ngày)&#10;• Tiến trình: PID 3144 · v0.1.0">
+          title="Cấu hình Ting Update:&#10;• Trạng thái: Service đang chạy (:3210)&#10;• Ổ chính: G:\ (410 GB trống)&#10;• Ổ phụ: I:\, J:\&#10;• Cổng P2P: 16882 (đang lắng nghe qua Internet; NAT chưa xác nhận)&#10;• IP Ting Update: 192.168.1.105 (Nhận diện cho Ting Menu)&#10;• Bản quyền: xem mục Bản quyền&#10;• Tiến trình: PID 3144 · v0.1.0">
           <div class="service-status-line" id="service-status-toggle" title="Nhấp để chuyển Online / Offline">
             <div class="status-indicator-badge" id="service-status-badge">
               <span class="indicator-dot" id="service-indicator-dot"></span>
@@ -1743,7 +1835,7 @@
           </div>
           <div class="service-detail-line">
             <span class="detail-label">Bản quyền</span>
-            <span class="detail-val" style="color: var(--status-ready-color);">Ting Update (284 ngày)</span>
+            <span class="detail-val" style="color: var(--status-ready-color);"><span id="business-license-status">Xem trạng thái bản quyền</span></span>
           </div>
         </div>
 
@@ -1764,8 +1856,13 @@
         <strong>Service gặp lỗi</strong>
         <span class="service-error-message" id="service-error-message">Không thể khởi tạo cổng mạng P2P; hãy kiểm tra kết nối mạng hoặc tường lửa.</span>
         <button class="btn-action" onclick="refreshServiceState()">Thử lại</button>
-        <button class="btn-action primary" onclick="restartService()">Restart service</button>
+        <button class="btn-action primary" onclick="restartService()">Khởi động lại dịch vụ</button>
         <button class="btn-action" onclick="showToast('Đang mở thư mục Log của Ting Update...')">Mở Log</button>
+      </div>
+      <div class="root-degraded-banner" id="root-degraded-banner" role="status">
+        <strong>Ổ game chưa sẵn sàng</strong>
+        <span class="root-degraded-message">Tải/kiểm tra game server đang tạm dừng. Game local vẫn hiển thị, sửa/xóa được và vẫn chơi từ Ting Menu.</span>
+        <button class="btn-action" onclick="openModal('modal-root-gate')">Chọn ổ game</button>
       </div>
 
       <!-- ======================================================== -->
@@ -1780,9 +1877,9 @@
             <div class="toolbar-actions-list" id="toolbar-center-actions">
               <span class="selection-indicator" id="selection-count-badge" style="display: none;">Đã chọn: 0</span>
 
-              <!-- 1. Tải game: cùng một action cho lần tải đầu, retry và tải lại cùng version -->
+              <!-- 1. Tải game: enable cho game Chưa tải hoặc Lỗi (retry) -->
               <button class="btn-action" id="btn-download-game" disabled
-                title="Tải các game đã chọn từ swarm P2P">
+                title="Tải các game đã chọn về máy trạm">
                 <svg viewBox="0 0 16 16">
                   <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
                   <path
@@ -1802,7 +1899,7 @@
               </button>
 
               <!-- 3. Tiếp tục -->
-              <button class="btn-action" id="btn-resume-download" disabled title="Tiếp tục tải các game đã tạm dừng">
+              <button class="btn-action" id="btn-resume-download" disabled title="Tiếp tục các tác vụ đã tạm dừng hoặc đã dừng">
                 <svg viewBox="0 0 16 16"><path d="M6.79 5.093 10.5 7.25a.87.87 0 0 1 0 1.5l-3.71 2.157A.87.87 0 0 1 5.5 10.157V5.843a.87.87 0 0 1 1.29-.75z"/></svg>
                 <span>Tiếp tục</span>
               </button>
@@ -1815,7 +1912,7 @@
 
               <!-- 5. Kiểm tra Game: verify integrity ngầm qua libtorrent -->
               <button class="btn-action" id="btn-recheck" disabled
-                title="Kiểm tra tính toàn vẹn torrent và file local qua libtorrent ngầm">
+                title="Kiểm tra tính toàn vẹn torrent và file local qua P2P engine chạy nền">
                 <svg viewBox="0 0 16 16">
                   <path
                     d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
@@ -1823,14 +1920,14 @@
                 <span>Kiểm tra Game</span>
               </button>
 
-              <!-- 4. Set ưu tiên tải: mở modal chọn mức ưu tiên tải -->
+              <!-- 4. Đặt ưu tiên tải: mở modal chọn mức ưu tiên tải -->
               <button class="btn-action" id="btn-set-priority" disabled
-                title="Set mức ưu tiên tải cho các game đã chọn">
+                title="Đặt mức ưu tiên tải cho các game đã chọn">
                 <svg viewBox="0 0 16 16">
                   <path
                     d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm4.5 3a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3z" />
                 </svg>
-                <span>Set ưu tiên tải</span>
+                <span>Đặt ưu tiên tải</span>
               </button>
 
               <!-- 5. Xóa game: reset về Chưa tải, có thể chọn xóa cả folder source -->
@@ -1889,7 +1986,7 @@
 
             <!-- Cụm action bên phải -->
             <div class="toolbar-actions-right">
-              <button class="btn-action" id="btn-add-local-game" title="Thêm game từ ổ đĩa local" onclick="openLocalGameModal()">
+              <button class="btn-action" id="btn-add-local-game" title="Thêm game từ ổ đĩa local" onclick="if (requireMainGate()) openLocalGameModal()">
                 <span>Thêm game local</span>
               </button>
               <button class="btn-action" id="btn-refresh" title="Làm mới danh sách game từ cloud (F5)">
@@ -1953,7 +2050,7 @@
                   <div class="col-resizer"></div>
                 </th>
                 <th data-col="peers">
-                  <div class="th-inner"><span>Peers/Seeds</span><span class="sort-arrow"></span></div>
+                  <div class="th-inner"><span>Kết nối P2P</span><span class="sort-arrow"></span></div>
                   <div class="col-resizer"></div>
                 </th>
                 <th class="col-actions no-sort" style="width: 210px; text-align: center;">
@@ -1989,6 +2086,11 @@
               <span class="stat-value" style="color: #38bdf8;">38.4 MB/s</span>
               <span class="stat-subtext">Nhận từ 14 peers qua Internet</span>
             </div>
+            <div class="stat-card" id="admin-upload-speed" hidden>
+              <span class="stat-label">Tốc độ Upload P2P</span>
+              <span class="stat-value" style="color: #38bdf8;">2.4 MB/s</span>
+              <span class="stat-subtext">Gửi cho peer qua Internet</span>
+            </div>
             <div class="stat-card">
               <span class="stat-label">IP Ting Update</span>
               <span class="stat-value" style="font-size: 15px; color: #38bdf8;">192.168.1.105</span>
@@ -1996,10 +2098,10 @@
             </div>
           </div>
 
-          <div style="font-size: 11px; line-height: 1.45; color: var(--text-muted);">
-            NAT: Chưa xác nhận<br>
-            Cần peer ngoài mạng để xác nhận kết quả.<br>
-            Phương thức: Automatic<br>
+          <div id="nat-summary" style="font-size: 11px; line-height: 1.45; color: var(--text-muted);">
+            NAT: Chưa xác nhận kết nối vào<br>
+            Ting Update vẫn tự kết nối ra Internet và chia sẻ piece đã tải hợp lệ.<br>
+            Phương thức: Tự động<br>
             Port: 16882<br>
             Kiểm tra lúc: 2026-09-09T19:12:05.450+07:00<br><br>
             GUI không hiển thị hash, magnet, tracker thô, peer debug hoặc rqbit WebUI.
@@ -2065,46 +2167,7 @@
       <!-- VIEW 4: BẢN QUYỀN (Chỉ Ting Update có)                   -->
       <!-- ======================================================== -->
       <div class="view-panel" id="view-license">
-        <div class="subview-container">
-          <div class="subview-header">
-            <h2 class="subview-title">Bản Quyền Ting Update</h2>
-            <p class="subview-desc">Quản lý thông tin giấy phép bản quyền Ting Update</p>
-          </div>
-
-          <div class="settings-card">
-            <div class="form-group">
-              <label class="form-label">Gói bản quyền đang áp dụng</label>
-              <div style="font-size: 14px; font-weight: 700; color: var(--status-ready-color);">
-                ✓ Bản quyền Ting Update (Còn lại: 284 ngày)
-              </div>
-              <div class="form-row" style="justify-content: space-between;">
-                <div style="font-size: 11.5px; color: var(--text-muted);">
-                  Ting ID phòng máy: <strong>TING-PC-8F2C19A4</strong>
-                </div>
-                <button class="btn-action" onclick="showToast('Đã sao chép Ting ID: TING-PC-8F2C19A4')">Sao
-                  chép</button>
-              </div>
-              <div style="font-size: 11px; line-height: 1.45; color: var(--text-muted);">
-                Ting ID: TING-PC-8F2C19A4<br>
-                Trạng thái: Hợp lệ<br>
-                Thời gian còn lại: 284 ngày<br>
-                Thời hạn: 2027-06-20T23:59:59+07:00 &nbsp; License được xác minh và lưu bởi service; GUI không lưu
-                token.
-              </div>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid var(--border-color);">
-
-            <div class="form-group">
-              <label class="form-label">Nạp Token / Gia hạn Bản quyền</label>
-              <div class="form-row">
-                <input type="password" class="form-input" placeholder="Dán mã khóa bản quyền Ting Update..."
-                  style="width: 340px;">
-                <button class="btn-action primary" onclick="openModal('modal-activation')">Kích hoạt mới</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- Màn hình bản quyền/mua key được nạp từ demo dùng chung cuối file. -->
       </div>
 
       <!-- ======================================================== -->
@@ -2171,7 +2234,7 @@
         <div class="subview-container">
           <div class="subview-header">
             <h2 class="subview-title">Thiết lập Ting Update</h2>
-            <p class="subview-desc">Quản lý service, ổ game chính/phụ và tùy chọn hệ thống</p>
+            <p class="subview-desc">Quản lý dịch vụ, ổ game chính/phụ và tùy chọn hệ thống</p>
           </div>
 
           <div class="settings-card">
@@ -2206,6 +2269,19 @@
 
           <div class="settings-card">
             <div class="form-group">
+              <div class="form-row"><span>Chế độ Admin</span><button id="admin-toggle" class="btn-action" onclick="toggleAdmin()">Bật Admin</button></div>
+              <label class="form-label">Debug mode</label>
+              <div class="form-row">
+                <label class="switch"><input type="checkbox" id="settings-debug-mode" checked><span class="slider"></span></label>
+                <span class="form-hint">Ghi chi tiết tải/cập nhật và reason file vào status-detail.log</span>
+                <button class="btn-action primary" onclick="saveDebugMode()">Áp dụng</button>
+              </div>
+              <span class="form-hint">Áp dụng ngay, không cần restart Ting Update Service.</span>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="form-group">
               <label class="form-label">Ổ game chính</label>
               <div class="form-row">
                 <input type="text" class="form-input" value="G:\" readonly style="width: 260px;">
@@ -2226,34 +2302,59 @@
             </div>
 
             <div class="form-group">
+              <label class="form-label">Số game xử lý file đồng thời</label>
+              <div class="form-row">
+                <select class="adv-search-select" id="file-processing-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option></select>
+                <input class="form-input" id="file-processing-limit" type="text" value="1" disabled style="width:90px" placeholder="1-32">
+                <button class="btn-action primary" onclick="saveFileProcessing()">Lưu</button>
+                <span id="file-processing-summary" class="form-hint"></span>
+              </div>
+              <span class="form-hint">• Kiểm tra file và sửa cấu trúc game.<br>• Sau tải: tạo thư mục/file rỗng, dọn file thừa.<br>• Tự động theo CPU, RAM và ổ đĩa; Thủ công nhập 1–32.<br>• Giảm giới hạn không ngắt việc đang chạy.</span>
+              <div id="file-processing-error" class="field-error" style="font-size:11px;color:var(--status-error-color)"></div>
+            </div>
+<div class="form-group">
               <label class="form-label">Số game tải xuống đồng thời</label>
               <div class="form-row">
                 <select class="adv-search-select" id="settings-concurrency-mode" style="width: 150px;">
                   <option value="auto" selected>Tự động</option>
                   <option value="manual">Thủ công</option>
+                  <option value="unlimited">Không giới hạn</option>
                 </select>
-                <input type="text" class="form-input" id="settings-concurrency-limit" value="2" placeholder="1-32" style="width: 90px;">
+                <input type="text" class="form-input" id="settings-concurrency-limit" value="1" placeholder="1-32" style="width: 90px;">
                 <button class="btn-action primary" onclick="saveConcurrencySetting()">Lưu</button>
-                <span class="form-hint" id="settings-concurrency-summary">Tự động</span>
+                <span class="form-hint" id="settings-concurrency-summary">Limit hiện tại: 1 game</span>
               </div>
-              <span class="form-hint">Tự động gợi ý theo CPU, RAM và dung lượng trống; chế độ thủ công nhận từ 1 đến 32 game.</span>
+              <span class="form-hint">• Số game tải dữ liệu qua mạng cùng lúc.<br>• Kiểm tra và hoàn tất file dùng giới hạn xử lý file riêng.<br>• Tự động theo CPU và bộ nhớ còn lại; Thủ công nhập 1–32.<br>• Mọi chế độ đều chờ khi máy thiếu bộ nhớ.</span>
               <div id="settings-concurrency-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
             </div>
 
             <hr style="border: 0; border-top: 1px solid var(--border-color);">
 
+            <div class="form-group" id="seed-concurrency-settings" hidden>
+              <label class="form-label">Số game seed đồng thời</label>
+              <div class="form-row">
+                <select class="adv-search-select" id="seed-concurrency-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option><option value="unlimited">Không giới hạn</option></select>
+                <input class="form-input" id="seed-concurrency-limit" type="text" value="1" disabled style="width:90px" placeholder="1-32">
+                <button class="btn-action primary" onclick="saveSeedConcurrency()">Lưu</button>
+                <span id="seed-concurrency-summary" class="form-hint"></span>
+              </div>
+              <span class="form-hint">• Số game gửi dữ liệu cho máy khác cùng lúc.<br>• Game không có máy khác tải không chiếm chỗ.<br>• Tự động theo CPU/RAM; Thủ công nhập 1–32.<br>• Không giới hạn: không hạn chế số game gửi cùng lúc.</span>
+              <div id="seed-concurrency-error" class="field-error" style="font-size:11px;color:var(--status-error-color)"></div>
+            </div>
             <div class="form-group">
               <label class="form-label">Giới hạn băng thông P2P</label>
               <div class="form-row">
                 <span style="font-size: 11px; color: var(--text-secondary);">Download</span>
                 <input type="text" class="form-input" id="settings-download-rate" value="40" placeholder="40" style="width: 75px;">
                 <span style="font-size: 11px; color: var(--text-secondary);">MiB/s</span>
+                <span id="admin-upload-settings" hidden>
                 <span style="font-size: 11px; color: var(--text-secondary);">Upload</span>
                 <input type="text" class="form-input" id="settings-upload-rate" value="40" placeholder="40" style="width: 75px;">
                 <span style="font-size: 11px; color: var(--text-secondary);">MiB/s</span>
+                </span>
                 <button class="btn-action primary" onclick="saveTransferRates()">Lưu</button>
               </div>
-              <span class="form-hint">Nhập số MiB/s hoặc unlimited. Mặc định 40 MiB/s cho mỗi chiều.</span>
+              <span class="form-hint">Nhập số MiB/s hoặc unlimited. Mặc định 40 MiB/s.</span>
               <div id="settings-transfer-rate-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
             </div>
 
@@ -2283,8 +2384,19 @@
                   IP</button>
                 <button class="btn-action primary" title="Cập nhật settings.ini cho Ting Menu; file nằm trong ignore.paths nên P2P không ghi đè" onclick="reconfigureMenuSettings()">Cập nhật IP Server cho Ting Menu</button>
               </div>
-              <span class="form-hint">Địa chỉ IP nội bộ của máy trạm chạy Ting Update để Ting Menu tự động nhận diện
-                kết nối dịch vụ (:3210). settings.ini nằm trong ignore.paths nên P2P không ghi đè.</span>
+              <span class="form-hint">Địa chỉ IP nội bộ của máy chủ chạy Ting Update để Ting Menu tự động nhận diện
+                kết nối Service (:3210). settings.ini nằm trong ignore.paths nên P2P không ghi đè.</span>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color);">
+
+            <div class="form-group">
+              <label class="form-label">Đường dẫn Ting Launcher cho Ting Menu</label>
+              <div class="form-row">
+                <input type="text" class="form-input" id="settings-launcher-path" value="C:\Program Files\Ting Billing\ting-launcher.exe" placeholder="C:\Program Files\Ting Billing\ting-launcher.exe" style="width: 320px;">
+                <button class="btn-action primary" title="Cập nhật đường dẫn Ting Launcher vào settings.ini cho Ting Menu" onclick="saveLauncherPath()">Lưu cấu hình Ting Menu</button>
+              </div>
+              <span class="form-hint">Đường dẫn tới file thực thi TingLauncher.exe trên máy trạm để Ting Menu gọi món, nạp tiền và tải game.</span>
             </div>
 
             <hr style="border: 0; border-top: 1px solid var(--border-color);">
@@ -2336,56 +2448,61 @@
   <!-- ======================================================== -->
   <!-- CONTEXT MENU (Fix hiển thị đúng row đang click chuột phải) -->
   <!-- ======================================================== -->
-  <div class="context-menu" id="context-menu">
+  <div class="context-menu" id="context-menu" role="menu">
     <!-- 1. Tải (enable nếu chưa tải hoặc paused) -->
-    <div class="context-item" id="ctx-download">
+    <div class="context-item" id="ctx-download" role="menuitem" tabindex="0">
       <span>Tải game</span>
     </div>
     <!-- 2. Tạm dừng -->
-    <div class="context-item" id="ctx-pause">
+    <div class="context-item" id="ctx-pause" role="menuitem" tabindex="0">
       <span>Tạm dừng</span>
     </div>
     <!-- 4. Tiếp tục -->
-    <div class="context-item" id="ctx-resume">
+    <div class="context-item" id="ctx-resume" role="menuitem" tabindex="0">
       <span id="ctx-resume-label">Tiếp tục</span>
     </div>
     <!-- 5. Stop -->
-    <div class="context-item" id="ctx-stop">
+    <div class="context-item" id="ctx-stop" role="menuitem" tabindex="0">
       <span>Dừng</span>
     </div>
     <!-- 6. Kiểm tra game -->
-    <div class="context-item" id="ctx-recheck">
+    <div class="context-item" id="ctx-recheck" role="menuitem" tabindex="0">
       <span>Kiểm tra Game</span>
     </div>
-    <div class="context-divider"></div>
-    <!-- 5. Set ưu tiên tải -->
-    <div class="context-item" id="ctx-priority">
-      <span>Set ưu tiên tải...</span>
+    <div class="context-item" id="ctx-repair-structure" role="menuitem" tabindex="0"><span>Sửa cấu trúc</span></div>
+    <div class="context-divider" id="ctx-transfer-divider"></div>
+    <!-- 5. Đặt ưu tiên tải -->
+    <div class="context-item" id="ctx-priority" role="menuitem" tabindex="0">
+      <span>Đặt ưu tiên tải...</span>
     </div>
     <!-- 6. Mở thư mục -->
-    <div class="context-item" id="ctx-open-folder">
+    <div class="context-item" id="ctx-open-folder" role="menuitem" tabindex="0">
       <span>Mở thư mục chứa Game</span>
     </div>
     <!-- 8. Tải game chưa cài về ổ phụ -->
-    <div class="context-item" id="ctx-download-secondary">
+    <div class="context-item" id="ctx-download-secondary" role="menuitem" tabindex="0">
       <span>Tải về ổ đĩa phụ...</span>
     </div>
     <!-- 9. Di chuyển giữa ổ chính và ổ phụ -->
-    <div class="context-item" id="ctx-move-drive">
+    <div class="context-item" id="ctx-move-drive" role="menuitem" tabindex="0">
       <span>Di chuyển game...</span>
     </div>
     <!-- 9. Thông tin game chi tiết -->
-    <div class="context-item" id="ctx-properties">
+    <div class="context-item" id="ctx-properties" role="menuitem" tabindex="0">
       <span>Thông tin game chi tiết...</span>
     </div>
-    <div class="context-divider"></div>
+    <!-- LocalGame chỉ được Sửa/Xóa/Xem chi tiết; không có thao tác folder/torrent -->
+    <div class="context-item" id="ctx-edit-local" role="menuitem" tabindex="0">
+      <span>Sửa Game local...</span>
+    </div>
+    <div class="context-divider" id="ctx-delete-divider"></div>
     <!-- 9. Xóa game -->
-    <div class="context-item danger" id="ctx-delete">
+    <div class="context-item danger" id="ctx-delete" role="menuitem" tabindex="0">
       <span>Xóa dữ liệu game...</span>
     </div>
   </div>
 
-  <div class="context-menu" id="column-menu" aria-label="Chọn cột hiển thị"></div>
+  <div class="context-menu" id="column-menu" role="menu" aria-label="Chọn cột hiển thị"></div>
 
   <!-- Action Toast Notice -->
   <div class="toast-pill" id="toast-pill"></div>
@@ -2394,11 +2511,23 @@
   <!-- MODALS / DIALOGS                                         -->
   <!-- ======================================================== -->
 
-  <!-- Modal 1: Set Ưu Tiên Tải -->
+  <!-- Modal 1: Đặt ưu tiên tải -->
+  <div class="modal-overlay" id="modal-repair-structure">
+    <div class="modal" style="width:540px;">
+      <div class="modal-header"><span class="modal-title">Sửa cấu trúc game</span><button class="modal-close" onclick="closeRepairStructure()">×</button></div>
+      <div class="modal-body">
+        <strong id="repair-game-name"></strong><p id="repair-game-path"></p>
+        <p>Tạo lại thư mục và file rỗng, sửa metadata, xóa file/thư mục thừa. File bỏ qua được giữ nguyên. Không tải lại hoặc kiểm tra hash.</p>
+        <p style="color:var(--status-error-color)">File bị xóa không thể hoàn tác. Nếu nội dung game đã thay đổi, cần Kiểm tra Game trước.</p>
+      </div>
+      <div class="modal-footer"><button class="btn" id="repair-cancel" onclick="closeRepairStructure()">Hủy</button><button class="btn btn-danger" onclick="confirmRepairStructure()">Sửa cấu trúc</button></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modal-priority">
     <div class="modal-card" style="max-width: 440px;">
       <div class="modal-header">
-        <span class="modal-title">Set Ưu Tiên Tải</span>
+        <span class="modal-title">Đặt ưu tiên tải</span>
         <button class="modal-close-btn" onclick="closeModal('modal-priority')">✕</button>
       </div>
       <div class="modal-body">
@@ -2435,7 +2564,7 @@
   <div class="modal-overlay" id="modal-delete-confirm">
     <div class="modal-card" style="max-width: 480px;">
       <div class="modal-header">
-        <span class="modal-title" style="color: var(--status-error-color);">Xác nhận xóa dữ liệu Game</span>
+        <span class="modal-title" id="delete-modal-title" style="color: var(--status-error-color);">Xác nhận xóa dữ liệu Game</span>
         <button class="modal-close-btn" onclick="closeModal('modal-delete-confirm')">✕</button>
       </div>
       <div class="modal-body">
@@ -2447,10 +2576,10 @@
           <label
             style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; color: var(--status-error-color); font-weight: 600;">
             <input type="checkbox" id="chk-delete-downloaded-files" class="native-checkbox" style="margin-top: 2px;" onchange="updateDeleteHint()">
-            <span>Xóa cả folder source</span>
+            <span>Đồng thời xóa thư mục game</span>
           </label>
         </div>
-        <div id="delete-hint" style="font-size: 11px; color: var(--text-muted);">Folder source được giữ nguyên.</div>
+        <div id="delete-hint" style="font-size: 11px; color: var(--text-muted);">Thư mục game được giữ nguyên.</div>
         <div id="delete-dialog-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
       </div>
       <div class="modal-footer">
@@ -2527,11 +2656,12 @@
             <option value="E:\">Ổ E:\ (SSD Tốc độ cao - 180 GB trống / 500 GB)</option>
           </select>
         </div>
+        <div style="font-size: 11px; color: var(--text-muted);">Xác nhận ổ đang dùng để bật tải/kiểm tra game server. Game local vẫn hoạt động nếu chưa xác nhận.</div>
         <div id="root-drive-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
       </div>
       <div class="modal-footer">
         <button class="btn-action" onclick="closeModal('modal-root-gate')">Hủy</button>
-        <button class="btn-action primary" onclick="submitRootGate()">Áp dụng</button>
+        <button class="btn-action primary" id="root-gate-submit" onclick="submitRootGate()">Áp dụng</button>
       </div>
     </div>
   </div>
@@ -2552,7 +2682,7 @@
           </div>
           <span class="badge-mini success" id="prop-game-status">Sẵn sàng</span>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; margin-top: 4px;">
+        <div id="prop-api-details" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; margin-top: 4px;">
           <div><strong style="color: var(--text-muted);">Phiên bản:</strong> <span id="prop-game-ver">2026.09.05</span>
           </div>
           <div><strong style="color: var(--text-muted);">Ưu tiên tải:</strong> <span id="prop-game-prio">Cao</span>
@@ -2566,6 +2696,16 @@
           <div><strong style="color: var(--text-muted);">Cập nhật thành công:</strong> <span id="prop-game-updated">—</span></div>
           <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">IP Ting Update:</strong>
             192.168.1.105:3210 (Nhận diện cho Ting Menu)</div>
+        </div>
+        <div id="prop-local-details" style="display: none; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 11.5px; margin-top: 10px;">
+          <div><strong style="color: var(--text-muted);">Phân loại:</strong> <span id="prop-local-category">—</span></div>
+          <div><strong style="color: var(--text-muted);">Dung lượng:</strong> <span id="prop-local-size">—</span></div>
+          <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">Cập nhật thành công:</strong> <span id="prop-local-updated">—</span></div>
+          <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">Folder game:</strong> <span id="prop-local-path" style="font-family: monospace;">—</span></div>
+          <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">File chạy:</strong> <span id="prop-local-exe" style="font-family: monospace;">—</span></div>
+          <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">Icon:</strong> <span id="prop-local-icon" style="font-family: monospace;">—</span></div>
+          <div style="grid-column: 1 / -1;"><strong style="color: var(--text-muted);">Thumbnail:</strong> <span id="prop-local-thumbnail" style="font-family: monospace;">—</span></div>
+          <div style="grid-column: 1 / -1; color: var(--text-muted);">Game local chỉ có thể Sửa, Xóa dữ liệu hoặc xem chi tiết trong Ting Update.</div>
         </div>
       </div>
       <div class="modal-footer">
@@ -2593,11 +2733,11 @@
     </div>
   </div>
 
-  <!-- Modal 9: Thêm game từ ổ đĩa local (Ready-only) -->
+  <!-- Modal 9: Thêm hoặc sửa Game local (Ready-only) -->
   <div class="modal-overlay" id="modal-local-game">
     <div class="modal-card" style="max-width: 660px;">
       <div class="modal-header">
-        <span class="modal-title">Thêm game từ ổ đĩa local</span>
+        <span class="modal-title" id="local-game-modal-title">Thêm game từ ổ đĩa local</span>
         <button class="modal-close-btn" onclick="closeModal('modal-local-game')">✕</button>
       </div>
       <div class="modal-body">
@@ -2611,9 +2751,10 @@
         <div class="form-group">
           <label class="form-label">Thư mục game</label>
           <div class="form-row">
-            <input type="text" class="form-input" id="local-game-folder" placeholder="D:\Games\My Game" style="flex: 1;">
+            <input type="text" class="form-input" id="local-game-folder" placeholder="D:\Games\My Game" style="flex: 1;" oninput="hideFieldError('local-game-folder-error')">
             <button class="btn-action" onclick="showToast('Mở browser Windows để chọn thư mục game local...')">Chọn...</button>
           </div>
+          <div id="local-game-folder-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
         </div>
         <div class="form-group">
           <label class="form-label">Tên game</label>
@@ -2635,65 +2776,32 @@
           <label class="form-label">Thumbnail</label>
           <input type="text" class="form-input" id="local-game-thumbnail" placeholder="Tự nhận diện từ thư mục game" style="width: 100%;">
         </div>
-        <div style="font-size: 11px; color: var(--text-muted);">Game local chỉ hiển thị và chạy từ Ting Menu; Ting Update không tải hoặc cập nhật game này. Game local ở trạng thái Sẵn sàng và chỉ xem, mở thư mục hoặc gỡ khỏi danh sách.</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Game local chỉ hiển thị và chạy từ Ting Menu; Ting Update không tải hoặc tự cập nhật game này. Game local luôn ở trạng thái Sẵn sàng. Trong màn này chỉ được Sửa, Xóa dữ liệu game local hoặc xem chi tiết.</div>
         <div id="local-game-dialog-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
       </div>
       <div class="modal-footer">
         <button class="btn-action" onclick="closeModal('modal-local-game')">Hủy</button>
-        <button class="btn-action primary" onclick="submitLocalGame()">Thêm game</button>
+        <button class="btn-action primary" id="local-game-submit" onclick="submitLocalGame()">Thêm game</button>
       </div>
     </div>
   </div>
 
-  <!-- Wizard gate theo screen-state: 0 chờ kết nối -> 1 Bản quyền -> 2 Ổ đĩa -> 3 Danh sách -->
+  <!-- Hard gate chỉ gồm kết nối và license; ổ game được sửa từ màn chính. -->
   <div class="modal-overlay" id="wizard-gate">
     <div class="modal-card" id="wizard-card" style="max-width: 500px;">
       <div class="modal-header">
-        <span class="modal-title" id="wizard-title">Kích hoạt Bản Quyền Ting Update</span>
+        <img src="../logo-update.svg" alt="" width="20" height="22" style="object-fit:contain;margin-right:8px"><span class="modal-title" id="wizard-title">Kích hoạt Bản Quyền Ting Update</span>
       </div>
       <div class="modal-body" id="wizard-body">
         <!-- Màn 0: chờ kết nối service -->
         <div id="wizard-step-0" style="display: none; flex-direction: column; gap: 12px;">
           <div style="font-size: 12px; color: var(--text-muted);">Đang kết nối Ting Update Service...</div>
           <button class="btn-action primary" onclick="retryWizardConnection()">Thử lại</button>
-          <div style="font-size: 11px; color: var(--text-muted);">Xem trước gate: <a href="?screen=0" style="color: #38bdf8;">M0 Chờ kết nối</a> · <a href="?screen=1" style="color: #38bdf8;">M1 Bản quyền</a> · <a href="?screen=2" style="color: #38bdf8;">M2 Ổ đĩa</a> · <a href="?screen=3" style="color: #38bdf8;">M3 Danh sách</a></div>
+          <div style="font-size: 11px; color: var(--text-muted);">Xem trước: <a href="?screen=0" style="color: #38bdf8;">M0 Chờ kết nối</a> · <a href="?screen=1" style="color: #38bdf8;">M1 Bản quyền</a> · <a href="?screen=2" style="color: #38bdf8;">Màn chính · ổ lỗi</a> · <a href="?screen=3" style="color: #38bdf8;">Màn chính</a></div>
         </div>
         <!-- Màn 1: Bản quyền -->
         <div id="wizard-step-1" style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="font-size: 11.5px; color: var(--text-muted);">Nhập mã token bản quyền được cấp bởi Ting để kích hoạt tính năng P2P.</div>
-          <div class="form-row" style="justify-content: space-between;">
-            <span style="font-size: 12px; color: var(--text-muted);" id="wizard-ting-id">Ting ID: TING-PC-8F2C19A4</span>
-            <button class="btn-action" onclick="copyWizardTingId()">Sao chép mã</button>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Mã kỹ thuật viên (bắt buộc, tối đa 64 ký tự)</label>
-            <input type="text" class="form-input" id="wizard-technician" placeholder="TECH-HCM-01" style="width: 100%;">
-            <button class="btn-action" onclick="submitWizardTrial()">Dùng thử 1 ngày</button>
-          </div>
-          <hr style="border: 0; border-top: 1px solid var(--border-color);">
-          <div class="form-group">
-            <label class="form-label">Mã Token bản quyền</label>
-            <input type="password" class="form-input" id="wizard-token" placeholder="TING-UPDATE-XXXX-YYYY-ZZZZ" style="width: 100%;">
-            <button class="btn-action primary" onclick="submitWizardToken()">Kích hoạt bằng token</button>
-          </div>
-          <div id="wizard-dialog-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
-          <div style="font-size: 11px; color: var(--text-muted);">Xem trước gate: <a href="?screen=1" style="color: #38bdf8;">M1 Bản quyền</a> · <a href="?screen=2" style="color: #38bdf8;">M2 Ổ đĩa</a> · <a href="?screen=3" style="color: #38bdf8;">M3 Danh sách</a></div>
-        </div>
-        <!-- Màn 2: Ổ đĩa -->
-        <div id="wizard-step-2" style="display: none; flex-direction: column; gap: 12px;">
-          <div style="font-size: 12px; color: var(--text-muted);">License hợp lệ. Service cần xác nhận ổ game trước khi mở nghiệp vụ.</div>
-          <div style="font-size: 13px; font-weight: 700; color: #38bdf8;" id="wizard-current-drive">Ổ đang dùng: G:\</div>
-          <div class="form-row">
-            <select class="adv-search-select" id="wizard-drive-select" style="flex: 1;">
-              <option value="G:\" selected>G:\</option>
-              <option value="D:\">D:\</option>
-              <option value="E:\">E:\</option>
-            </select>
-            <button class="btn-action" onclick="saveWizardDrive()">Lưu</button>
-          </div>
-          <div id="wizard-restart-warn" style="display: none; font-size: 11.5px; color: #d49a2e;">Cần restart Ting Update Service trước khi xác nhận ổ mới.</div>
-          <button class="btn-action primary" id="wizard-confirm-drive" onclick="confirmWizardDrive()" disabled>Xác nhận ổ này và tiếp tục</button>
-          <div id="wizard-step2-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
+          <!-- Trial/mua key mới được nạp từ demo dùng chung cuối file. -->
         </div>
       </div>
     </div>
@@ -2735,6 +2843,7 @@
         updatedAt: "—",
         statusType: "downloading",
         statusText: "12% · Đang tải",
+        waitingForMemory: new URLSearchParams(location.search).get("memory") === "low",
         priority: "Bình thường",
         speed: "↓ 13.9 MB/s",
         eta: "1h 48m",
@@ -2742,6 +2851,7 @@
       },
       {
         id: "lol",
+        payloadOrigin: "downloaded",
         category: "Online",
         name: "League of Legends VN",
         version: "v82",
@@ -2837,6 +2947,7 @@
         updatedAt: "—",
         statusType: "not_downloaded",
         statusText: "Chưa tải",
+        existingFolderWarning: true,
         priority: "Bình thường",
         speed: "-",
         eta: "-",
@@ -2875,14 +2986,62 @@
         speed: "-",
         eta: "-",
         peers: "-"
+      },
+      {
+        id: "csgo",
+        category: "Online",
+        name: "CSGO",
+        version: "v2",
+        size: "69.1 GB",
+        sizeBytes: 74200000000,
+        path: "G:\\Tools\\AnyDesk\\CSGO",
+        rootDrive: "G:\\",
+        updatedAt: "2026-09-24 09:01",
+        statusType: "ready",
+        statusText: "Không thể tải vì thư mục đang được Game local AnyDesk portable sử dụng. Hãy sửa hoặc xóa Game local trước.",
+        priority: "—",
+        speed: "-",
+        eta: "-",
+        peers: "-",
+        blockedByLocal: true,
+        blockedByLocalId: "local-anydesk",
+        forceDownload: true,
+        conflictMessage: "Không thể tải vì thư mục đang được Game local AnyDesk portable sử dụng. Hãy sửa hoặc xóa Game local trước."
+      },
+      {
+        id: "local-anydesk",
+        category: "Tools",
+        name: "AnyDesk portable",
+        version: "Local",
+        size: "3.5 MB",
+        sizeBytes: 3670016,
+        path: "G:\\Tools\\AnyDesk",
+        rootDrive: "G:\\",
+        exe: "G:\\Tools\\AnyDesk\\AnyDesk.exe",
+        icon: "G:\\Tools\\AnyDesk\\AnyDesk.ico",
+        thumbnail: "",
+        updatedAt: "2026-09-21 10:53",
+        statusType: "ready",
+        statusText: "Sẵn sàng",
+        priority: "—",
+        speed: "-",
+        eta: "-",
+        peers: "-",
+        local: true,
+        localConflict: true,
+        conflictGameId: "csgo",
+        conflictMessage: "Thư mục Game local đang trùng với game CSGO trong danh sách."
       }
     ];
 
     // State Variables
     let selectedIds = new Set();
     let currentContextGameId = null;
+    let editingLocalId = null;
     let lastClickedIndex = -1;
-    let sortColumn = "name";
+    // Giữ thứ tự API khi mở màn hình; LocalGame mới luôn được append ở cuối.
+    // Chỉ sort sau khi KTV bấm tiêu đề cột.
+    let sortColumn = null;
     let sortAsc = true;
 
     // Demo store: settings + logs + progress timers (state JS + render lại, toast chỉ notify)
@@ -2890,15 +3049,21 @@
       rootDrive: "G:\\",
       concurrencyMode: "auto",
       concurrencyLimit: 2,
+      concurrencyAutoLimit: 1,
       downloadRate: "40",
       uploadRate: "40",
       eventInterval: 1000,
+      debugMode: true,
       folderPolicy: "observe",
       menuIp: "192.168.1.105"
     };
     const demoLogs = [];
     let logFilter = "all";
     const progressTimers = {};
+
+    function isLocalLike(game) {
+      return !!(game && (game.local || game.blockedByLocal));
+    }
 
     // DOM References
     const gridBody = document.getElementById("grid-body");
@@ -2934,11 +3099,21 @@
     const btnDeleteGame = document.getElementById("btn-delete-game");
 
     let toastTimer;
-    function showToast(msg) {
+    function toastLevel(msg) {
+      const lower = String(msg).toLowerCase();
+      if (/(lỗi|không hợp lệ|phải từ|phải có dạng|không được trùng|chưa có tài khoản|chưa có mật khẩu|thất bại|không thể|không gửi|không thành công|không khả dụng|không có game|chưa hoàn tất|chưa sẵn sàng|chỉ gửi được|cần kích hoạt|mất kết nối|offline|error)/.test(lower)) return "ERROR";
+      if (/(cảnh báo|warn|cần restart|chưa xác nhận)/.test(lower)) return "WARN";
+      if (/^(đã gửi|đã nhận)/.test(lower)) return "INFO";
+      if (/^đã/.test(lower) || lower.includes("thành công")) return "SUCCESS";
+      return "INFO";
+    }
+
+    function showToast(msg, level) {
       clearTimeout(toastTimer);
-      toastPill.textContent = msg;
-      toastPill.classList.add("show");
-      toastTimer = setTimeout(() => toastPill.classList.remove("show"), 2400);
+      const resolvedLevel = level || toastLevel(msg);
+      toastPill.textContent = resolvedLevel === "SUCCESS" ? "Thành công" : msg;
+      toastPill.className = `toast-pill show ${resolvedLevel.toLowerCase()}`;
+      toastTimer = setTimeout(() => toastPill.classList.remove("show"), resolvedLevel === "ERROR" || resolvedLevel === "WARN" ? 5000 : 2400);
     }
 
     function fullLogTimestamp(date = new Date()) {
@@ -2985,21 +3160,38 @@
       box.scrollTop = box.scrollHeight;
     }
     function natRecheck() {
-      if (!requireMainGate()) return;
-      appendLog("info", "Đang kiểm tra lại NAT/P2P");
-      appendP2pLog("Đang kiểm tra lại NAT/P2P...");
-      showToast("Đang kiểm tra lại NAT/P2P");
+      if (!requireTransferGate()) return;
+      appendLog("info", "Đã nhận lệnh kiểm tra lại kết nối");
+      appendP2pLog("Đã nhận lệnh kiểm tra lại kết nối");
+      showToast("Đã nhận lệnh kiểm tra lại kết nối");
+      renderNatSummary(false, false);
       setTimeout(() => {
-        appendLog("warn", "NAT: Chưa xác nhận — cần peer ngoài mạng để xác nhận");
-        appendP2pLog("NAT: Chưa xác nhận — cần peer ngoài mạng để xác nhận.");
-        showToast("NAT chưa xác nhận; cần peer ngoài mạng");
+        appendLog("info", "Chưa xác nhận kết nối vào. Ting Update vẫn tự kết nối ra Internet và chia sẻ piece đã tải hợp lệ.");
+        appendP2pLog("Chưa xác nhận kết nối vào. Ting Update vẫn tự kết nối ra Internet và chia sẻ piece đã tải hợp lệ.");
       }, 800);
     }
 
-    // Gate: khóa tương tác chính khi chưa qua wizard (screen-state 3 mới mở màn chính)
+    // Demo accepts the same evidence combinations as the Service snapshot.
+    function renderNatSummary(incoming, mapped) {
+      const status = incoming ? "Đã nhận kết nối từ Internet" : mapped ? "Chờ xác nhận từ Internet" : "Chưa xác nhận kết nối vào";
+      const detail = incoming ? "Đã ghi nhận peer Internet kết nối vào trong 10 phút gần đây." : mapped
+        ? "Router đã mở cổng tự động. Chưa ghi nhận kết nối vào từ peer Internet; tải và chia sẻ vẫn tiếp tục."
+        : "Ting Update vẫn tự kết nối ra Internet và chia sẻ piece đã tải hợp lệ.";
+      document.getElementById("nat-summary").innerText = `NAT: ${status}\n${detail}\nPhương thức: ${mapped ? "UPnP" : "Tự động"}\nPort: 16882\nKiểm tra lúc: ${new Date().toISOString()}\n\nGUI không hiển thị hash, magnet, tracker thô, peer debug hoặc rqbit WebUI.`;
+    }
+
+    // License mở màn chính; root/P2P chỉ khóa các transfer action.
     function requireMainGate() {
-      if (typeof screenState !== "undefined" && screenState !== 3) {
-        showToast("Hoàn tất wizard (xác nhận ổ game) để mở màn chính");
+      if (typeof screenState !== "undefined" && screenState < 2) {
+        showToast("Kích hoạt license trước khi dùng Ting Update");
+        return false;
+      }
+      return true;
+    }
+    function requireTransferGate() {
+      if (!requireMainGate()) return false;
+      if (typeof rootReady !== "undefined" && !rootReady) {
+        showToast("Ổ game chưa sẵn sàng; Game local vẫn dùng được");
         return false;
       }
       return true;
@@ -3072,9 +3264,8 @@
       }, 300);
     }
     function startDownloadOne(g) {
-      if (g.local || ["downloading", "checking", "paused"].includes(g.statusType)) return false;
-      if (!["paused", "stopped"].includes(g.statusType) || typeof g.progress !== "number") g.progress = 0;
-      if (g.statusType === "error") g.progress = 0;
+      if (isLocalLike(g) || !["not_downloaded", "error"].includes(g.statusType)) return false;
+      g.progress = 0;
       g.statusType = "downloading";
       g.statusText = `${Math.floor(g.progress)}% · Đang tải`;
       g.speed = "↓ 18.2 MB/s"; g.eta = "12m 40s"; g.peers = "10 / 1";
@@ -3083,36 +3274,71 @@
       return true;
     }
     function pauseOne(g) {
-      if (g.local || g.statusType !== "downloading") return false;
+      if (isLocalLike(g) || !["downloading", "checking", "ready", "seeding"].includes(g.statusType)) return false;
       stopProgressTick(g.id);
-      g.statusType = "paused";
-      g.statusText = `${Math.floor(typeof g.progress === "number" ? g.progress : 0)}% · Tạm dừng`;
+      if (g.statusType === "checking") {
+        g.checkPaused = true;
+        g.statusType = "ready";
+        g.statusText = `Sẵn sàng · Kiểm tra đã tạm dừng ${Math.floor(typeof g.progress === "number" ? g.progress : 0)}%`;
+      } else if (["ready", "seeding"].includes(g.statusType)) {
+        g._resumeMode = "seed";
+        g.statusType = "stopped";
+        g.statusText = "Đã dừng";
+      } else {
+        g._resumeMode = "download";
+        g.statusType = "paused";
+        g.statusText = `${Math.floor(typeof g.progress === "number" ? g.progress : 0)}% · Tạm dừng`;
+      }
       g.speed = "-"; g.eta = "-"; g.peers = "-";
       appendLog("info", `Đã gửi lệnh tạm dừng '${g.name}'; trạng thái cập nhật qua SSE.`);
       return true;
     }
     function resumeOne(g) {
-      if (g.local || !["paused", "stopped"].includes(g.statusType)) return false;
+      if (isLocalLike(g) || (!g.checkPaused && !["paused", "stopped"].includes(g.statusType))) return false;
       if (typeof g.progress !== "number") g.progress = 0;
-      g.statusType = "downloading";
-      g.statusText = `${Math.floor(g.progress)}% · Đang tải`;
-      g.speed = "↓ 18.2 MB/s";
-      startProgressTick(g.id);
+      if (g.checkPaused || g._resumeMode === "recheck") {
+        if (g._resumeMode === "recheck") g.progress = 0;
+        g.checkPaused = false;
+        delete g._resumeMode;
+        g.statusType = "checking";
+        g.statusText = `${Math.floor(g.progress)}% · Đang kiểm tra`;
+        startCheckingTick(g.id);
+      } else if (g._resumeMode === "seed") {
+        delete g._resumeMode;
+        g.progress = 100;
+        g.statusType = "ready";
+        g.statusText = "Sẵn sàng";
+      } else {
+        delete g._resumeMode;
+        g.statusType = "downloading";
+        g.statusText = `${Math.floor(g.progress)}% · Đang tải`;
+        g.speed = "↓ 18.2 MB/s";
+        startProgressTick(g.id);
+      }
       appendLog("info", `Đã gửi lệnh tiếp tục '${g.name}'; trạng thái cập nhật qua SSE.`);
       return true;
     }
     function stopOne(g) {
-      if (g.local || !["downloading", "checking"].includes(g.statusType)) return false;
+      if (isLocalLike(g) || !["downloading", "checking", "ready", "seeding", "paused"].includes(g.statusType)) return false;
       stopProgressTick(g.id);
       if (typeof g.progress !== "number") g.progress = 0;
+      if (g.statusType === "checking" || g.checkPaused) {
+        g._resumeMode = "recheck";
+        g.checkPaused = false;
+        g.progress = 0;
+      } else if (["ready", "seeding"].includes(g.statusType)) {
+        g._resumeMode = "seed";
+      } else {
+        g._resumeMode = "download";
+      }
       g.statusType = "stopped";
       g.statusText = "Đã dừng";
       g.speed = "-"; g.eta = "-"; g.peers = "-";
-      appendLog("warn", `Đã gửi lệnh dừng '${g.name}'; payload được giữ, trạng thái cập nhật qua SSE.`);
+      appendLog("warn", `Đã gửi lệnh dừng '${g.name}'; phần dữ liệu đã tải được giữ, trạng thái cập nhật qua SSE.`);
       return true;
     }
     function recheckOne(g) {
-      if (g.local || g.statusType === "checking") return false;
+      if (isLocalLike(g) || g.statusType === "checking") return false;
       stopProgressTick(g.id);
       g._preCheck = { statusType: g.statusType, statusText: g.statusText, progress: typeof g.progress === "number" ? g.progress : 0 };
       g.statusType = "checking";
@@ -3148,7 +3374,36 @@
       let badgeClass = "badge-paused";
       let barColor = "#6b7280";
 
-      if (type === "downloading") {
+      if (game.blockedByLocal) {
+        progress = 0;
+        badgeClass = "badge-error";
+        barColor = "#ef4444";
+        text = game.conflictMessage || text || "Không thể tải";
+      } else if (game.existingFolderWarning && type === "not_downloaded") {
+        progress = 0;
+        badgeClass = "badge-error";
+        barColor = "#ef4444";
+        text = "Thư mục đã có sẵn ở local game, tải game sẽ cài đè";
+      } else if (game.waitingForMemory && (type === "downloading" || type === "checking") && !["move_game", "delete_local", "remove_game"].includes(game.progressStage)) {
+        badgeClass = "badge-downloading";
+        text = "Đang chờ đủ bộ nhớ để tải";
+      // Resume dữ liệu đã xác minh giữ Ready; service chỉ gửi Checking khi cần xử lý lại.
+      } else if (game.progressStage === "download_queued" && ["downloading", "checking"].includes(type)) {
+        badgeClass = "badge-downloading";
+        text = `${Math.floor(progress)}% · Chờ lượt xử lý`;
+      } else if (game.progressStage === "piece_check" && ["downloading", "checking"].includes(type)) {
+        badgeClass = "badge-checking";
+        text = `${Math.floor(progress)}% · Đang kiểm tra phần đã có`;
+      } else if (game.progressStage === "payload_verification" && ["downloading", "checking"].includes(type)) {
+        badgeClass = "badge-checking";
+        text = `${Math.floor(progress)}% · Đang kiểm tra dữ liệu`;
+      } else if (game.progressStage === "tree_materialization" && ["downloading", "checking"].includes(type)) {
+        badgeClass = "badge-checking";
+        text = `${Math.floor(progress)}% · ${progress < 25 ? "Đang chuẩn bị cấu trúc" : "Hoàn tất cấu trúc"}`;
+      } else if (game.progressStage === "seed_initialization" && type === "checking") {
+        badgeClass = "badge-downloading";
+        text = "Đang chuẩn bị seed";
+      } else if (type === "downloading") {
         badgeClass = "badge-downloading";
         barColor = "#0078d4";
         const pctStr = progress % 1 !== 0 ? (progress.toString().includes(".") && progress.toString().split(".")[1].length > 2 ? progress.toString() : progress.toFixed(2)) : progress;
@@ -3161,7 +3416,7 @@
         progress = 100;
         badgeClass = "badge-ready";
         barColor = "#34c759";
-        text = "Sẵn sàng";
+        text = game.checkPaused ? game.statusText : "Sẵn sàng";
       } else if (type === "seeding") {
         progress = 100;
         badgeClass = "badge-ready";
@@ -3217,6 +3472,8 @@
         return true;
       });
 
+      if (!sortColumn) return list;
+
       list.sort((a, b) => {
         let va = a[sortColumn];
         let vb = b[sortColumn];
@@ -3256,51 +3513,71 @@
         if (game.priority === "Cao") prioClass = "cao";
         else if (game.priority === "Bình thường") prioClass = "binh-thuong";
 
+        const isLocal = !!game.local;
+        const isLocalConflict = isLocal && !!(game.localConflict || game.local_conflict);
+        const blockedByLocal = !isLocal && !!game.blockedByLocal;
+        const transferBlocked = isLocal || blockedByLocal;
+        const localBadge = isLocal
+          ? (isLocalConflict
+            ? `<span class="local-conflict-tag" title="${escapeHtml(game.conflictMessage || "Trùng thư mục với game trong danh sách")}">[Trùng local]</span>`
+            : '<span class="local-tag">[Local]</span>')
+          : "";
+
         tr.innerHTML = `
           <td class="col-cb">
             <input type="checkbox" class="native-checkbox row-cb" data-id="${game.id}" ${isSelected ? "checked" : ""}>
           </td>
           <td class="cell-category">${escapeHtml(game.category)}</td>
-          <td class="cell-name">${escapeHtml(game.name)}</td>
+          <td class="cell-name">${escapeHtml(game.name)}${localBadge}</td>
           <td class="cell-version">${escapeHtml(game.version)}</td>
           <td style="font-variant-numeric: tabular-nums; color: var(--text-secondary);">${escapeHtml(game.updatedAt || "—")}</td>
-          <td><span class="priority-badge ${prioClass}">${escapeHtml(game.priority)}</span></td>
+          <td>${transferBlocked ? "—" : `<span class="priority-badge ${prioClass}">${escapeHtml(game.priority)}</span>`}</td>
           <td class="cell-size">${escapeHtml(game.size)}</td>
           <td class="cell-path" title="${escapeHtml(game.path)}">${escapeHtml(game.path)}</td>
           <td style="text-align: center; vertical-align: middle;">${formatStatusBadge(game)}</td>
-          <td style="color: #38bdf8; font-variant-numeric: tabular-nums;">${escapeHtml(game.speed)}</td>
-          <td style="color: var(--text-muted);">${escapeHtml(game.eta)}</td>
-          <td>${escapeHtml(game.peers)}</td>
+          <td style="color: #38bdf8; font-variant-numeric: tabular-nums;">${transferBlocked ? "—" : escapeHtml(game.speed)}</td>
+          <td style="color: var(--text-muted);">${transferBlocked ? "—" : escapeHtml(game.eta)}</td>
+          <td>${transferBlocked ? "—" : escapeHtml(game.peers)}</td>
           <td class="col-actions">
             <div class="row-actions-group">
-              <!-- 1. Tải: enable nếu không đang downloading -->
-              <button class="row-btn-icon" data-action="download_game" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${(game.local || ['downloading', 'checking', 'paused'].includes(game.statusType)) ? 'display:none;' : ''}" title="Tải game về máy trạm">
+              <!-- 1. Tải hoặc Retry theo quyền thao tác của Service -->
+              <button class="row-btn-icon" data-action="${game.statusType === 'error' ? 'retry' : 'download_game'}" data-id="${game.id}" ${!isSrvOnline || !rootReady ? 'disabled' : ''} style="${(transferBlocked || !['not_downloaded', 'error'].includes(game.statusType)) ? 'display:none;' : ''}" title="${game.statusType === 'error' ? 'Thử lại' : 'Tải game về máy trạm'}">
                 <svg viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
               </button>
 
               <!-- 2. Tạm dừng -->
-              <button class="row-btn-icon" data-action="pause" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${(game.local || game.statusType !== 'downloading') ? 'display:none;' : ''}" title="Tạm dừng">
+              <button class="row-btn-icon" data-action="pause" data-id="${game.id}" ${!isSrvOnline || !rootReady || !['downloading', 'checking', 'ready', 'seeding'].includes(game.statusType) ? 'disabled' : ''} style="${transferBlocked ? 'display:none;' : ''}" title="Tạm dừng">
                 <svg viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
               </button>
 
-              <!-- 3. Tiếp tục / Chia sẻ game khi Đã dừng -->
-              <button class="row-btn-icon" data-action="resume" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${(game.local || !['paused', 'stopped'].includes(game.statusType)) ? 'display:none;' : ''}" title="${game.statusType === 'stopped' ? 'Chia sẻ game' : 'Tiếp tục'}">
+              <!-- 3. Tiếp tục tác vụ đã tạm dừng hoặc dừng -->
+              <button class="row-btn-icon" data-action="resume" data-id="${game.id}" ${!isSrvOnline || !rootReady || (!game.checkPaused && !['paused', 'stopped'].includes(game.statusType)) ? 'disabled' : ''} style="${transferBlocked ? 'display:none;' : ''}" title="Tiếp tục; nếu có bản mới, kiểm tra phần đã có trước khi tải">
                 <svg viewBox="0 0 16 16"><path d="M6.79 5.093 10.5 7.25a.87.87 0 0 1 0 1.5l-3.71 2.157A.87.87 0 0 1 5.5 10.157V5.843a.87.87 0 0 1 1.29-.75z"/></svg>
               </button>
 
               <!-- 4. Stop -->
-              <button class="row-btn-icon" data-action="stop" data-id="${game.id}" ${!isSrvOnline ? 'disabled' : ''} style="${(game.local || !['downloading', 'checking'].includes(game.statusType)) ? 'display:none;' : ''}" title="Dừng tác vụ P2P/hash/check">
+              <button class="row-btn-icon" data-action="stop" data-id="${game.id}" ${!isSrvOnline || !rootReady || !['downloading', 'checking', 'ready', 'seeding', 'paused'].includes(game.statusType) ? 'disabled' : ''} style="${transferBlocked ? 'display:none;' : ''}" title="Dừng tác vụ P2P/hash/check">
                 <svg viewBox="0 0 16 16"><path d="M4 4h8v8H4z"/></svg>
               </button>
 
-              <!-- 5. Mở Explorer -->
-              <button class="row-btn-icon" data-action="explorer" data-id="${game.id}" title="Mở thư mục game">
+              <!-- 5. Mở Explorer luôn giữ vị trí với game API; quyền thao tác quyết định nút có được bật hay không -->
+              <button class="row-btn-icon" data-action="explorer" data-id="${game.id}" ${!isSrvOnline || !rootReady || transferBlocked ? 'disabled' : ''} title="Mở thư mục game">
                 <svg viewBox="0 0 16 16"><path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31zM2.19 4a1 1 0 0 0-.996 1.09l.637 7a1 1 0 0 0 .995.91h10.348a1 1 0 0 0 .995-.91l.637-7A1 1 0 0 0 13.81 4H2.19zm4.69-1.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139C1.72 3.042 1.95 3 2.19 3h4.69z"/></svg>
               </button>
 
-              <!-- 6. Chi tiết Game -->
+              <!-- 6. Sửa Game local -->
+              <button class="row-btn-icon" data-action="edit_local" data-id="${game.id}" style="${isLocal ? '' : 'display:none;'}" title="Sửa Game local">
+                <svg viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-8.5 8.5a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.233l8.5-8.5zM11.5 2.207 3.98 9.727l-.64 2.56 2.56-.64 7.52-7.52-1.92-1.92z"/></svg>
+              </button>
+
+              <!-- 7. Chi tiết Game -->
               <button class="row-btn-icon" data-action="properties" data-id="${game.id}" title="Thông tin game chi tiết...">
                 <svg viewBox="0 0 16 16"><path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8z"/></svg>
+              </button>
+
+              <!-- 8. Xóa luôn giữ vị trí; Local xóa registry, API reset dữ liệu tải -->
+              <button class="row-btn-icon" data-action="delete_game" data-id="${game.id}" style="${blockedByLocal ? 'display:none;' : ''}" title="Xóa game">
+                <svg viewBox="0 0 16 16"><path d="M5.5 5.5v6h1v-6h-1zm4 0v6h1v-6h-1z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2H6l.5-1h3l.5 1h3.5a1 1 0 0 1 1 1zM4 4v9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4H4z"/></svg>
               </button>
 
               <!-- 7. Tùy chọn khác (...) -->
@@ -3310,17 +3587,37 @@
         `;
 
         tr.addEventListener("click", (e) => {
-          // Xử lý các quick action button trên từng row: tải, dừng, mở explorer, chi tiết
+          // Xử lý các quick action button trên từng row: tải, dừng, sửa Local, chi tiết
           const actionBtn = e.target.closest(".row-btn-icon");
           if (actionBtn) {
             e.stopPropagation();
             const act = actionBtn.dataset.action;
-            if (game.local && ["download_game", "pause", "resume", "stop"].includes(act)) {
-              showToast(`Game local ở trạng thái Sẵn sàng; chỉ xem, mở thư mục hoặc gỡ khỏi danh sách.`);
+            if (transferBlocked && ["download_game", "retry", "pause", "resume", "stop", "explorer"].includes(act)) {
+              showToast(game.local
+                ? "Game local chỉ cho phép Sửa, Xóa dữ liệu hoặc xem chi tiết."
+                : "Game đang trùng thư mục với Game local; hãy xử lý Game local trước.");
               return;
             }
-            if (!requireMainGate() || !requireOnline()) return;
-            if (act === "download_game") {
+            if (act === "edit_local") {
+              if (!requireMainGate()) return;
+              openLocalGameModal(game.id);
+              return;
+            }
+            if (act === "properties") {
+              if (!requireMainGate()) return;
+              openGameProperties(game.id);
+              return;
+            }
+            if (act === "delete_game") {
+              if (!requireMainGate() || blockedByLocal) return;
+              selectedIds.clear();
+              selectedIds.add(game.id);
+              syncSelection();
+              openDeleteConfirmModal();
+              return;
+            }
+            if (!requireTransferGate() || !requireOnline()) return;
+            if (act === "download_game" || act === "retry") {
               startDownloadOne(game);
               renderGrid();
               showToast(`Đã gửi lệnh tải '${game.name}'; tiến độ cập nhật qua SSE.`);
@@ -3338,8 +3635,6 @@
               showToast(`Đã gửi lệnh dừng '${game.name}'; trạng thái cập nhật qua SSE.`);
             } else if (act === "explorer") {
               showToast(`Đang mở thư mục cài đặt: ${game.path}`);
-            } else if (act === "properties") {
-              openGameProperties(game.id);
             }
             return;
           }
@@ -3423,6 +3718,9 @@
       configurableColumns.forEach(column => {
         const item = document.createElement("div");
         item.className = "context-item";
+        item.setAttribute("role", "menuitemcheckbox");
+        item.tabIndex = 0;
+        item.setAttribute("aria-checked", String(!hiddenColumns.has(column.key)));
         item.textContent = `${hiddenColumns.has(column.key) ? "   " : "✓ "}${column.label}`;
         item.addEventListener("click", () => {
           if (hiddenColumns.has(column.key)) hiddenColumns.delete(column.key);
@@ -3440,6 +3738,26 @@
     }
 
     columnHeaders.forEach(header => header.addEventListener("contextmenu", openColumnMenu));
+
+    function activateFocusedMenuItem(e) {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      if (!(e.target instanceof Element)) return;
+      const item = e.target.closest('[role="menuitem"], [role="menuitemcheckbox"]');
+      if (!(item instanceof HTMLElement) || item.getAttribute("aria-disabled") === "true") return;
+      e.preventDefault();
+      e.stopPropagation();
+      item.click();
+    }
+
+    contextMenu.addEventListener("keydown", activateFocusedMenuItem);
+    columnMenu.addEventListener("keydown", activateFocusedMenuItem);
+    contextMenu.addEventListener("click", (e) => {
+      if (!(e.target instanceof Element)) return;
+      const item = e.target.closest('[role="menuitem"]');
+      if (!(item instanceof HTMLElement) || item.getAttribute("aria-disabled") !== "true") return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }, true);
 
     function syncSelection() {
       const filtered = getFilteredList();
@@ -3485,7 +3803,7 @@
       const selectedGames = games.filter(g => selectedIds.has(g.id));
       const count = selectedGames.length;
 
-      if (!isSrvOnline || screenState !== 3 || count === 0) {
+      if (!isSrvOnline || screenState < 2 || count === 0) {
         btnDownloadGame.disabled = true;
         btnStopDownload.disabled = true;
         btnResumeDownload.disabled = true;
@@ -3496,30 +3814,33 @@
         return;
       }
 
-      // Game local ở trạng thái Sẵn sàng nên không tham gia các tác vụ P2P hàng loạt.
-      const transferGames = selectedGames.filter(g => !g.local);
+      // Game local và row trùng Local không tham gia các tác vụ P2P hàng loạt.
+      const transferGames = selectedGames.filter(g => !g.local && !g.blockedByLocal);
+      const transferAllowed = rootReady;
 
-      // 1. Tải game: chỉ disable khi một game đang có tác vụ tải/check.
-      btnDownloadGame.disabled = transferGames.length === 0 || transferGames.some(g => ["downloading", "checking", "paused"].includes(g.statusType));
+      // 1. Tải game: chỉ enable khi mọi game P2P đã chọn là Chưa tải hoặc Lỗi (retry).
+      btnDownloadGame.disabled = !transferAllowed || selectedGames.length === 0 || selectedGames.some(g => g.local || g.blockedByLocal || !["not_downloaded", "error"].includes(g.statusType));
 
-      // 2. Tạm dừng: CHỈ enable khi TẤT CẢ game đã chọn đều đang tải.
-      const allDownloading = transferGames.length > 0 && transferGames.every(g => g.statusType === "downloading");
-      btnStopDownload.disabled = !allDownloading;
+      // 2. Tạm dừng: download, check hoặc Ready/seeding đều là service-owned intent.
+      const allPausable = transferGames.length > 0 && transferGames.every(g => ["downloading", "checking", "ready", "seeding"].includes(g.statusType));
+      btnStopDownload.disabled = !transferAllowed || !allPausable;
 
-      // 3. Tiếp tục / Chia sẻ game: enable khi tất cả game đã tạm dừng hoặc đã dừng.
-      btnResumeDownload.disabled = !(transferGames.length > 0 && transferGames.every(g => ["paused", "stopped"].includes(g.statusType)));
+      // 3. Tiếp tục: gồm cả Check đang pause nhưng lifecycle vẫn Ready.
+      btnResumeDownload.disabled = !transferAllowed || !(transferGames.length > 0 && transferGames.every(g => g.checkPaused || ["paused", "stopped"].includes(g.statusType)));
 
-      // 4. Stop: P2P/hash/check đang chạy.
-      btnHardStopDownload.disabled = !(transferGames.length > 0 && transferGames.every(g => ["downloading", "checking"].includes(g.statusType)));
+      // 4. Stop: dừng download, seed, hash/check hoặc tác vụ đang pause.
+      btnHardStopDownload.disabled = !transferAllowed || !(transferGames.length > 0 && transferGames.every(g => ["downloading", "checking", "ready", "seeding", "paused"].includes(g.statusType)));
 
       // 3. Kiểm tra Game: enable khi có game P2P được chọn
-      btnRecheck.disabled = transferGames.length === 0;
+      btnRecheck.disabled = !transferAllowed || transferGames.length === 0;
 
-      // 4. Set ưu tiên tải: enable khi có game P2P được chọn
-      btnSetPriority.disabled = transferGames.length === 0;
+      // 4. Đặt ưu tiên tải: enable khi có game P2P được chọn
+      btnSetPriority.disabled = !transferAllowed || transferGames.length === 0;
 
-      // 5. Xóa dữ liệu game: enable khi có game được chọn (kể cả game local để gỡ)
-      btnDeleteGame.disabled = false;
+      // 5. Xóa dữ liệu game: Local được gỡ; row trùng Local không được xóa nhầm game API.
+      btnDeleteGame.disabled = selectedGames.length === 0
+        || selectedGames.some(g => g.blockedByLocal)
+        || (selectedGames.some(g => g.local) && selectedGames.length !== 1);
     }
 
     // ========================================================
@@ -3539,35 +3860,56 @@
       const itemResume = document.getElementById("ctx-resume");
       const itemStop = document.getElementById("ctx-stop");
       const itemRecheck = document.getElementById("ctx-recheck");
+      const itemRepair = document.getElementById("ctx-repair-structure");
       const itemDownloadSecondary = document.getElementById("ctx-download-secondary");
       const itemMoveDrive = document.getElementById("ctx-move-drive");
+      const itemOpenFolder = document.getElementById("ctx-open-folder");
+      const itemEditLocal = document.getElementById("ctx-edit-local");
 
-      // 1. Tải game: lần đầu, retry, sau Stop hoặc tải lại cùng version đều dùng chung action.
-      // Game local ở trạng thái Sẵn sàng: chỉ xem, mở thư mục hoặc gỡ.
+      // 1. Tải game hoặc Retry lỗi dùng chung vị trí; action vẫn tách riêng.
       const isLocal = !!game.local;
+      const blockedByLocal = !isLocal && !!game.blockedByLocal;
+      const transferBlocked = isLocal || blockedByLocal;
       const gateOpen = screenState === 3;
-      setContextItemState(itemDl, gateOpen && isSrvOnline && !isLocal && !["downloading", "checking", "paused"].includes(game.statusType));
+      const canStartOrRetry = ["not_downloaded", "error"].includes(game.statusType);
+      setContextItemState(itemDl, gateOpen && isSrvOnline && !transferBlocked && canStartOrRetry);
+      const downloadLabel = itemDl.querySelector("span");
+      if (downloadLabel) downloadLabel.textContent = game.statusType === "error" ? "Thử lại" : "Tải game";
 
-      // 3. Tạm dừng / Tiếp tục / Chia sẻ game (Đã dừng thì hiện Chia sẻ game).
-      setContextItemState(itemPause, gateOpen && isSrvOnline && !isLocal && game.statusType === "downloading");
+      // 3. Tạm dừng / Tiếp tục giữ nguyên tên action theo service contract.
+      setContextItemState(itemPause, gateOpen && isSrvOnline && !transferBlocked && ["downloading", "checking", "ready", "seeding"].includes(game.statusType));
       const resumeLabel = document.getElementById("ctx-resume-label");
-      if (resumeLabel) resumeLabel.textContent = game.statusType === "stopped" ? "Chia sẻ game" : "Tiếp tục";
-      setContextItemState(itemResume, gateOpen && isSrvOnline && !isLocal && ["paused", "stopped"].includes(game.statusType));
-      setContextItemState(itemStop, gateOpen && isSrvOnline && !isLocal && ["downloading", "checking"].includes(game.statusType));
+      if (resumeLabel) resumeLabel.textContent = "Tiếp tục";
+      setContextItemState(itemResume, gateOpen && isSrvOnline && !transferBlocked && (game.checkPaused || ["paused", "stopped"].includes(game.statusType)));
+      setContextItemState(itemStop, gateOpen && isSrvOnline && !transferBlocked && ["downloading", "checking", "ready", "seeding", "paused"].includes(game.statusType));
 
       // 4. Kiểm tra game: enable
-      setContextItemState(itemRecheck, gateOpen && isSrvOnline && !isLocal);
-      setContextItemState(itemDownloadSecondary, gateOpen && isSrvOnline && !isLocal && secondaryDrives.length > 0 && game.statusType === "not_downloaded");
-      setContextItemState(itemMoveDrive, gateOpen && isSrvOnline && !isLocal && secondaryDrives.length > 0 && !["not_downloaded", "downloading", "checking"].includes(game.statusType));
-      ["ctx-priority", "ctx-delete"].forEach(id => {
-        setContextItemState(document.getElementById(id), gateOpen && isSrvOnline);
+      setContextItemState(itemRecheck, gateOpen && isSrvOnline && !transferBlocked);
+      setContextItemState(itemRepair, gateOpen && isSrvOnline && !transferBlocked && game.payloadOrigin === "downloaded" && !["not_downloaded", "downloading", "checking"].includes(game.statusType));
+      setContextItemState(itemDownloadSecondary, gateOpen && isSrvOnline && !transferBlocked && secondaryDrives.length > 0 && game.statusType === "not_downloaded");
+      setContextItemState(itemMoveDrive, gateOpen && isSrvOnline && !transferBlocked && secondaryDrives.length > 0 && !["not_downloaded", "downloading", "checking"].includes(game.statusType));
+      setContextItemState(document.getElementById("ctx-priority"), gateOpen && isSrvOnline && !transferBlocked);
+      setContextItemState(document.getElementById("ctx-delete"), gateOpen && isSrvOnline && !blockedByLocal);
+      setContextItemState(itemEditLocal, gateOpen && isSrvOnline && isLocal);
+      // Local giữ Sửa/Xóa/Chi tiết; API conflict chỉ giữ Chi tiết.
+      [itemDl, itemPause, itemResume, itemStop, itemRecheck, itemRepair, itemDownloadSecondary, itemMoveDrive,
+        document.getElementById("ctx-priority")].forEach(item => {
+        if (item) item.style.display = transferBlocked ? "none" : "";
       });
+      if (itemOpenFolder) itemOpenFolder.style.display = transferBlocked ? "none" : "";
+      const transferDivider = document.getElementById("ctx-transfer-divider");
+      if (transferDivider) transferDivider.style.display = transferBlocked ? "none" : "";
+      if (itemEditLocal) itemEditLocal.style.display = isLocal ? "" : "none";
+      const itemDelete = document.getElementById("ctx-delete");
+      if (itemDelete) itemDelete.style.display = blockedByLocal ? "none" : "";
+      const deleteDivider = document.getElementById("ctx-delete-divider");
+      if (deleteDivider) deleteDivider.style.display = blockedByLocal ? "none" : "";
 
       contextMenu.style.display = "block";
       let x = e.clientX;
       let y = e.clientY;
       const mw = 220;
-      const mh = 308;
+      const mh = 340;
 
       if (x + mw > window.innerWidth) x = window.innerWidth - mw - 8;
       if (y + mh > window.innerHeight) y = window.innerHeight - mh - 8;
@@ -3578,6 +3920,7 @@
 
     function setContextItemState(el, isEnabled) {
       if (!el) return;
+      el.setAttribute("aria-disabled", String(!isEnabled));
       if (isEnabled) el.classList.remove("disabled");
       else el.classList.add("disabled");
     }
@@ -3641,6 +3984,29 @@
       triggerHardStopDownload();
     });
 
+    let repairGameId = null;
+    function closeRepairStructure() {
+      document.getElementById("modal-repair-structure").classList.remove("open");
+      repairGameId = null;
+    }
+    function confirmRepairStructure() {
+      const game = games.find(g => g.id === repairGameId);
+      if (!game || game.payloadOrigin !== "downloaded" || !isSrvOnline || screenState !== 3) return;
+      closeRepairStructure();
+      showToast(`Đã gửi lệnh sửa cấu trúc: ${game.name}`);
+    }
+    document.getElementById("ctx-repair-structure").addEventListener("click", () => {
+      if (document.getElementById("ctx-repair-structure").classList.contains("disabled")) return;
+      const game = games.find(g => g.id === currentContextGameId);
+      if (!game) return;
+      closeContextMenu();
+      repairGameId = game.id;
+      document.getElementById("repair-game-name").textContent = game.name;
+      document.getElementById("repair-game-path").textContent = game.path;
+      document.getElementById("modal-repair-structure").classList.add("open");
+      document.getElementById("repair-cancel").focus();
+    });
+
     document.getElementById("ctx-recheck").addEventListener("click", () => {
       if (document.getElementById("ctx-recheck").classList.contains("disabled")) return;
       closeContextMenu();
@@ -3648,11 +4014,13 @@
     });
 
     document.getElementById("ctx-priority").addEventListener("click", () => {
+      if (document.getElementById("ctx-priority").classList.contains("disabled")) return;
       closeContextMenu();
       openPriorityModal();
     });
 
     document.getElementById("ctx-open-folder").addEventListener("click", () => {
+      if (document.getElementById("ctx-open-folder").classList.contains("disabled")) return;
       closeContextMenu();
       const g = games.find(x => x.id === currentContextGameId);
       showToast(`Đang mở thư mục: ${g ? g.path : "G:\\"}...`);
@@ -3675,7 +4043,14 @@
       openGameProperties(currentContextGameId);
     });
 
+    document.getElementById("ctx-edit-local").addEventListener("click", () => {
+      if (document.getElementById("ctx-edit-local").classList.contains("disabled")) return;
+      closeContextMenu();
+      openLocalGameModal(currentContextGameId);
+    });
+
     document.getElementById("ctx-delete").addEventListener("click", () => {
+      if (document.getElementById("ctx-delete").classList.contains("disabled")) return;
       closeContextMenu();
       openDeleteConfirmModal();
     });
@@ -3734,7 +4109,7 @@
 
     function triggerRecheck() {
       if (!requireMainGate() || !requireOnline()) return;
-      const targetGames = games.filter(g => selectedIds.has(g.id) && !g.local);
+      const targetGames = games.filter(g => selectedIds.has(g.id) && !isLocalLike(g));
       if (targetGames.length === 0) return;
       targetGames.forEach(g => recheckOne(g));
       renderGrid();
@@ -3785,7 +4160,10 @@
 
     function openModal(id) {
       const m = document.getElementById(id);
-      if (m) m.classList.add("open");
+      if (m) {
+        if (id === "modal-root-gate") renderRootGateAction();
+        m.classList.add("open");
+      }
     }
 
     function closeModal(id) {
@@ -3817,7 +4195,7 @@
       const num = Number(value);
       if (!/^\d+$/.test(value) || num < 250 || num > 10000) {
         showFieldError("settings-event-interval-error", "Nhập số từ 250 đến 10000 mili giây.");
-        showToast("Tần suất SSE phải từ 250 đến 10000 ms");
+        showToast("Tần suất Kênh trạng thái phải từ 250 đến 10000 ms");
         return;
       }
       hideFieldError("settings-event-interval-error");
@@ -3825,6 +4203,29 @@
       appendLog("info", `Đã lưu tần suất SSE: ${num} ms`);
       showToast(`Đã lưu tần suất SSE: ${num} ms`);
     }
+    function saveDebugMode() {
+      demoSettings.debugMode = document.getElementById("settings-debug-mode").checked;
+      appendLog("info", `Đã ${demoSettings.debugMode ? "bật" : "tắt"} debug mode; log chi tiết ghi vào status-detail.log`);
+      showToast(`Đã ${demoSettings.debugMode ? "bật" : "tắt"} debug mode`);
+    }
+    let concurrencyDraftDirty = false;
+    function refreshConcurrencySetting(settings) {
+      demoSettings.concurrencyAutoLimit = settings.concurrencyAutoLimit;
+      document.getElementById("settings-concurrency-summary").textContent =
+        settings.concurrencyMode === "unlimited" ? "Không giới hạn" : `Limit hiện tại: ${settings.concurrencyMode === "auto" ? settings.concurrencyAutoLimit : settings.concurrencyLimit} game`;
+      if (concurrencyDraftDirty) {
+        if (document.getElementById("settings-concurrency-mode").value === "auto") {
+          document.getElementById("settings-concurrency-limit").value = String(settings.concurrencyAutoLimit);
+        }
+        return;
+      }
+      document.getElementById("settings-concurrency-mode").value = settings.concurrencyMode;
+      const input = document.getElementById("settings-concurrency-limit");
+      input.hidden = settings.concurrencyMode === "unlimited";
+      input.disabled = settings.concurrencyMode !== "manual";
+      input.value = settings.concurrencyMode === "unlimited" ? "" : String(settings.concurrencyMode === "auto" ? settings.concurrencyAutoLimit : settings.concurrencyLimit);
+    }
+    document.getElementById("settings-concurrency-limit").addEventListener("input", () => { concurrencyDraftDirty = true; });
     function saveConcurrencySetting() {
       const mode = document.getElementById("settings-concurrency-mode").value;
       const limitText = document.getElementById("settings-concurrency-limit").value.trim();
@@ -3838,11 +4239,19 @@
       hideFieldError("settings-concurrency-error");
       demoSettings.concurrencyMode = mode;
       if (mode === "manual") demoSettings.concurrencyLimit = Number(limitText);
-      document.getElementById("settings-concurrency-summary").textContent =
-        mode === "auto" ? "Tự động" : `Thủ công: ${demoSettings.concurrencyLimit} game`;
-      appendLog("info", `Đã lưu số game tải xuống đồng thời: ${mode === "auto" ? "Tự động" : demoSettings.concurrencyLimit + " game"}`);
+      concurrencyDraftDirty = false;
+      refreshConcurrencySetting(demoSettings);
+      appendLog("info", `Đã lưu số game tải xuống đồng thời: ${mode === "auto" ? "Tự động" : mode === "unlimited" ? "Không giới hạn" : demoSettings.concurrencyLimit + " game"}`);
       showToast("Đã lưu số game tải xuống đồng thời");
     }
+    document.getElementById("settings-concurrency-mode").addEventListener("change", (event) => {
+      concurrencyDraftDirty = true;
+      const input = document.getElementById("settings-concurrency-limit");
+      input.disabled = event.target.value !== "manual";
+      input.hidden = event.target.value === "unlimited";
+      input.value = input.hidden ? "" : String(demoSettings.concurrencyAutoLimit);
+    });
+    document.getElementById("settings-concurrency-limit").disabled = true;
     function parseRateLimitDemo(text) {
       const value = text.trim();
       if (value.toLowerCase() === "unlimited") return { ok: true, unlimited: true };
@@ -3853,7 +4262,7 @@
     }
     function saveTransferRates() {
       const download = document.getElementById("settings-download-rate").value;
-      const upload = document.getElementById("settings-upload-rate").value;
+      const upload = adminEnabled ? document.getElementById("settings-upload-rate").value : demoSettings.uploadRate;
       if (!parseRateLimitDemo(download).ok) {
         showFieldError("settings-transfer-rate-error", "Download phải là số MiB/s hoặc unlimited.");
         return;
@@ -3876,6 +4285,7 @@
       }
       hideFieldError("activation-dialog-error");
       closeModal("modal-activation");
+      if (!rootReady) openModal("modal-root-gate");
       appendLog("info", "Đã nhận yêu cầu kích hoạt bằng token");
       showToast("Đã nhận yêu cầu kích hoạt bằng token");
     }
@@ -3886,74 +4296,133 @@
         return;
       }
       hideFieldError("root-drive-error");
+      if (!rootReady && value === demoSettings.rootDrive) {
+        rootReady = true;
+        closeModal("modal-root-gate");
+        document.getElementById("root-degraded-banner").classList.remove("visible");
+        appendLog("ok", `Đã xác nhận ổ game ${value}; bật lại tải/kiểm tra game server`);
+        showToast("Đã xác nhận ổ game");
+        renderGrid();
+        return;
+      }
+      const changed = value !== demoSettings.rootDrive;
       closeModal("modal-root-gate");
       demoSettings.rootDrive = value;
+      if (changed) rootReady = false;
       const restartWarn = document.getElementById("settings-root-restart-warn");
-      if (restartWarn) restartWarn.style.display = value !== "G:\\" ? "block" : "none";
-      appendLog("info", `Đã lưu ổ game chính: ${value}${value !== "G:\\" ? " (cần restart service)" : ""}`);
+      if (restartWarn) restartWarn.style.display = changed ? "block" : "none";
+      document.getElementById("root-degraded-banner").classList.toggle("visible", !rootReady);
+      appendLog("info", `Đã lưu ổ game chính: ${value}${changed ? " (cần restart service rồi xác nhận)" : ""}`);
       showToast("Đã nhận yêu cầu lưu ổ game chính");
     }
+    function renderRootGateAction() {
+      const select = document.getElementById("root-gate-select");
+      const submit = document.getElementById("root-gate-submit");
+      if (!select || !submit) return;
+      submit.textContent = !rootReady && select.value === demoSettings.rootDrive
+        ? "Xác nhận ổ này và tiếp tục"
+        : "Áp dụng";
+    }
+    document.getElementById("root-gate-select").addEventListener("change", renderRootGateAction);
     function reconfigureMenuSettings() {
-      appendLog("info", `Đã cập nhật IP Server (${demoSettings.menuIp}) cho Ting Menu tại settings.ini`);
+      const launcherPath = document.getElementById("settings-launcher-path")?.value || "C:\\Ting\\TingLauncher.exe";
+      appendLog("info", `Đã cập nhật IP Server (${demoSettings.menuIp}) và Launcher (${launcherPath}) cho Ting Menu tại settings.ini`);
       showToast("Đã cập nhật IP Server (192.168.1.105) cho Ting Menu tại settings.ini");
     }
-    function openLocalGameModal() {
-      document.getElementById("local-game-executable").value = "";
-      document.getElementById("local-game-folder").value = "";
-      document.getElementById("local-game-name").value = "";
-      document.getElementById("local-game-category").value = "1";
-      document.getElementById("local-game-icon").value = "";
-      document.getElementById("local-game-thumbnail").value = "";
+    function saveLauncherPath() {
+      const launcherPath = document.getElementById("settings-launcher-path")?.value || "C:\\Ting\\TingLauncher.exe";
+      appendLog("info", `Đã lưu đường dẫn Ting Launcher (${launcherPath}) cho Ting Menu tại settings.ini`);
+      showToast(`Đã lưu đường dẫn Ting Launcher (${launcherPath}) vào settings.ini`);
+    }
+    function openLocalGameModal(localId = null) {
+      if (!requireMainGate()) return;
+      const existing = localId ? games.find(g => g.id === localId && g.local) : null;
+      editingLocalId = existing ? existing.id : null;
+      document.getElementById("local-game-modal-title").textContent = existing ? "Sửa Game local" : "Thêm game từ ổ đĩa local";
+      document.getElementById("local-game-submit").textContent = existing ? "Lưu thay đổi" : "Thêm game";
+      document.getElementById("local-game-executable").value = existing?.exe || "";
+      document.getElementById("local-game-folder").value = existing?.path || "";
+      document.getElementById("local-game-name").value = existing?.name || "";
+      document.getElementById("local-game-category").value = existing?.category === "Online" ? "0" : existing?.category === "Tools" ? "2" : "1";
+      document.getElementById("local-game-icon").value = existing?.icon || "";
+      document.getElementById("local-game-thumbnail").value = existing?.thumbnail || "";
+      hideFieldError("local-game-folder-error");
       hideFieldError("local-game-dialog-error");
       openModal("modal-local-game");
     }
+
+    function gamePathsOverlap(a, b) {
+      const normalize = value => String(value || "").trim().replace(/[\\/]+$/, "").toLowerCase();
+      const left = normalize(a);
+      const right = normalize(b);
+      return !!left && !!right && (left === right || left.startsWith(right + "\\") || right.startsWith(left + "\\"));
+    }
+
     function submitLocalGame() {
-      const name = document.getElementById("local-game-name").value.trim();
+      if (!requireMainGate()) return;
       const folder = document.getElementById("local-game-folder").value.trim();
       const executable = document.getElementById("local-game-executable").value.trim();
-      if (!name || !folder || !executable) {
-        showFieldError("local-game-dialog-error", "Điền đủ tên, thư mục và file chạy.");
+      const nameInput = document.getElementById("local-game-name").value.trim();
+      const inferredName = executable.split(/[\\/]/).pop()?.replace(/\.(exe|bat|cmd|com)$/i, "").trim() || "Game local";
+      const name = nameInput || inferredName;
+      if (!folder || !executable) {
+        showFieldError("local-game-dialog-error", "Chọn file chạy và thư mục game.");
         return;
       }
+      const overlap = games.find(g => g.id !== editingLocalId && gamePathsOverlap(g.path, folder));
+      if (overlap) {
+        showFieldError("local-game-folder-error", `Trùng thư mục game với game ${overlap.name} trong danh sách.`);
+        showFieldError("local-game-dialog-error", editingLocalId
+          ? "Không thể lưu Game local vì trùng thư mục Game với danh sách game."
+          : "Không thể thêm Game local vì trùng thư mục Game với danh sách game.");
+        return;
+      }
+      hideFieldError("local-game-folder-error");
       hideFieldError("local-game-dialog-error");
       const categoryIndex = document.getElementById("local-game-category").value;
       const category = categoryIndex === "0" ? "Online" : categoryIndex === "2" ? "Tools" : "Offline";
-      const id = "local-" + Date.now().toString(36);
-      games.push({
-        id,
-        category,
-        name,
-        exe: executable,
-        version: "v1",
-        size: "—",
-        sizeBytes: 0,
-        path: folder,
-        rootDrive: folder.substring(0, 3).toUpperCase(),
-        updatedAt: "—",
-        statusType: "ready",
-        statusText: "Sẵn sàng",
-        progress: 100,
-        priority: "Bình thường",
-        speed: "-",
-        eta: "-",
-        peers: "-",
-        local: true
-      });
-      closeModal("modal-local-game");
-      appendLog("ok", `Đã thêm game local: ${name} (${folder})`);
-      showToast(`Đã thêm game local: ${name}`);
-      renderGrid();
+      const icon = document.getElementById("local-game-icon").value.trim();
+      const thumbnail = document.getElementById("local-game-thumbnail").value.trim();
+      const existing = editingLocalId ? games.find(g => g.id === editingLocalId && g.local) : null;
+      const submit = document.getElementById("local-game-submit");
+      submit.disabled = true;
+      submit.textContent = "Đang lưu...";
+      // HTTP 202 chỉ xác nhận đã nhận lệnh. Demo chỉ đóng popup sau terminal
+      // event, giống UI thật.
+      setTimeout(() => {
+        const now = fullLogTimestamp().slice(0, 16);
+        if (existing) {
+          Object.assign(existing, { category, name, exe: executable, icon, thumbnail, path: folder,
+            rootDrive: folder.substring(0, 3).toUpperCase(), updatedAt: now, statusType: "ready",
+            statusText: "Sẵn sàng", progress: 100 });
+        } else {
+          const id = "local-" + Date.now().toString(36);
+          games.push({
+            id, category, name, exe: executable, icon, thumbnail, version: "Local", size: "—", sizeBytes: 0,
+            path: folder, rootDrive: folder.substring(0, 3).toUpperCase(), updatedAt: now,
+            statusType: "ready", statusText: "Sẵn sàng", progress: 100, priority: "—",
+            speed: "-", eta: "-", peers: "-", local: true
+          });
+        }
+        closeModal("modal-local-game");
+        appendLog("ok", `${existing ? "Đã sửa" : "Đã thêm"} game local: ${name} (${folder})`);
+        showToast(`${existing ? "Đã lưu thay đổi" : "Đã thêm game local"}: ${name}`);
+        editingLocalId = null;
+        submit.disabled = false;
+        submit.textContent = "Thêm game";
+        renderGrid();
+      }, 450);
     }
-    // Wizard gate: screen-state 0 chờ kết nối -> 1 Bản quyền -> 2 Ổ đĩa -> 3 Danh sách
+    // Hard gate: 0 chờ service, 1 license, 3 màn chính. `screen=2` chỉ mô
+    // phỏng root/P2P degraded trên màn chính, không chặn LocalGame.
     const wizardScreenParam = new URLSearchParams(window.location.search).get("screen");
-    let screenState = wizardScreenParam === "0" ? 0 : wizardScreenParam === "2" ? 2 : wizardScreenParam === "3" ? 3 : 1;
-    let wizardDriveDirty = false;
-    let wizardRestartRequired = false;
+    let screenState = wizardScreenParam === "0" ? 0 : wizardScreenParam === "1" || !wizardScreenParam ? 1 : 3;
+    // License hợp lệ mở được màn hình và LocalGame; root chỉ là gate của transfer.
+    let rootReady = wizardScreenParam !== "2";
     function renderWizard() {
       const gate = document.getElementById("wizard-gate");
       const step0 = document.getElementById("wizard-step-0");
       const step1 = document.getElementById("wizard-step-1");
-      const step2 = document.getElementById("wizard-step-2");
       const title = document.getElementById("wizard-title");
       if (screenState === 3) {
         gate.classList.remove("open");
@@ -3962,18 +4431,12 @@
       gate.classList.add("open");
       step0.style.display = "none";
       step1.style.display = "none";
-      step2.style.display = "none";
       if (screenState === 0) {
         title.textContent = "Đang kết nối Ting Update Service";
         step0.style.display = "flex";
       } else if (screenState === 1) {
         title.textContent = "Kích hoạt Bản Quyền Ting Update";
         step1.style.display = "flex";
-      } else {
-        title.textContent = "Chọn Ổ Lưu Trữ Game Mặc Định";
-        step2.style.display = "flex";
-        document.getElementById("wizard-restart-warn").style.display = wizardRestartRequired ? "block" : "none";
-        document.getElementById("wizard-confirm-drive").disabled = wizardDriveDirty || wizardRestartRequired;
       }
     }
     function retryWizardConnection() {
@@ -3984,57 +4447,7 @@
     function copyWizardTingId() {
       showToast("Đã sao chép Ting ID");
     }
-    function submitWizardTrial() {
-      const tech = document.getElementById("wizard-technician").value.trim();
-      if (!tech || tech.length > 64) {
-        showFieldError("wizard-dialog-error", "Mã kỹ thuật viên là bắt buộc và không được quá 64 ký tự");
-        return;
-      }
-      hideFieldError("wizard-dialog-error");
-      appendLog("info", "Đang kích hoạt bản dùng thử");
-      showToast("Đang kích hoạt bản dùng thử");
-      screenState = 2;
-      renderWizard();
-    }
-    function submitWizardToken() {
-      const token = document.getElementById("wizard-token").value.trim();
-      if (!token) {
-        showFieldError("wizard-dialog-error", "Nhập mã token trước khi xác nhận");
-        return;
-      }
-      hideFieldError("wizard-dialog-error");
-      appendLog("info", "Đã nhận yêu cầu kích hoạt bằng token");
-      showToast("Đã nhận yêu cầu kích hoạt bằng token");
-      screenState = 2;
-      renderWizard();
-    }
-    function saveWizardDrive() {
-      const value = document.getElementById("wizard-drive-select").value;
-      document.getElementById("wizard-current-drive").textContent = "Ổ đang dùng: " + value;
-      demoSettings.rootDrive = value;
-      wizardDriveDirty = false;
-      wizardRestartRequired = value !== "G:\\";
-      appendLog("info", `Đã lưu ổ game: ${value}${wizardRestartRequired ? " (cần restart service)" : ""}`);
-      renderWizard();
-      showToast(wizardRestartRequired ? "Đã lưu ổ game; cần restart service để áp dụng" : "Đã lưu ổ game");
-    }
-    function confirmWizardDrive() {
-      if (wizardDriveDirty || wizardRestartRequired) return;
-      hideFieldError("wizard-step2-error");
-      screenState = 3;
-      renderWizard();
-      appendLog("ok", `Đã xác nhận ổ game ${demoSettings.rootDrive}; mở màn chính`);
-      showToast("Đã xác nhận ổ game");
-      renderGrid();
-    }
-    document.getElementById("wizard-drive-select").addEventListener("change", (e) => {
-      const current = document.getElementById("wizard-current-drive").textContent.replace("Ổ đang dùng: ", "").trim();
-      wizardDriveDirty = e.target.value !== current;
-      hideFieldError("wizard-step2-error");
-      renderWizard();
-    });
-
-    // Set Ưu Tiên Tải Modal
+    // Đặt ưu tiên tải Modal
     function openPriorityModal() {
       const count = selectedIds.size || 1;
       document.getElementById("priority-modal-desc").textContent = `Chọn mức ưu tiên tải cho ${count} game đã chọn:`;
@@ -4126,14 +4539,24 @@
       const hint = document.getElementById("delete-hint");
       if (hint) {
         hint.textContent = deleteFiles
-          ? "Toàn bộ file và folder source sẽ bị xóa khỏi ổ đĩa."
-          : "Folder source được giữ nguyên.";
+          ? "Toàn bộ file trong thư mục game sẽ bị xóa khỏi ổ đĩa."
+          : "Thư mục game được giữ nguyên.";
         hint.style.color = deleteFiles ? "var(--status-error-color)" : "var(--text-muted)";
       }
     }
     function openDeleteConfirmModal() {
+      if (!requireMainGate()) return;
       const count = selectedIds.size || 1;
-      document.getElementById("delete-confirm-text").textContent = `Reset ${count} game đã chọn về Chưa tải. Game vẫn được giữ trong danh sách.`;
+      const selectedGames = games.filter(g => selectedIds.has(g.id));
+      const localTargets = selectedGames.filter(g => g.local);
+      const localOnly = selectedGames.length > 0 && localTargets.length === selectedGames.length;
+      document.getElementById("delete-modal-title").textContent = localOnly ? "Xóa dữ liệu game local" : "Xác nhận xóa dữ liệu Game";
+      const singleName = selectedGames.length === 1 ? selectedGames[0].name : "";
+      document.getElementById("delete-confirm-text").textContent = localOnly
+        ? `Game: ${localTargets.map(g => g.name).join(", ")}\nXóa game local khỏi danh sách game.`
+        : selectedGames.length === 1
+          ? `Game: ${singleName}\nReset game về Chưa tải. Game vẫn được giữ trong danh sách.`
+          : `Reset ${count} game đã chọn về Chưa tải. Game vẫn được giữ trong danh sách.`;
       document.getElementById("chk-delete-downloaded-files").checked = false;
       updateDeleteHint();
       hideFieldError("delete-dialog-error");
@@ -4144,8 +4567,9 @@
       const deleteFiles = document.getElementById("chk-delete-downloaded-files").checked;
       const targets = games.filter(g => selectedIds.has(g.id));
       const localIds = targets.filter(g => g.local).map(g => g.id);
+      const localOnly = targets.length > 0 && localIds.length === targets.length;
       targets.forEach(g => {
-        if (g.local) return;
+        if (g.local || g.blockedByLocal) return;
         stopProgressTick(g.id);
         g.statusType = "not_downloaded";
         g.statusText = "Chưa tải";
@@ -4160,9 +4584,22 @@
         if (g) appendLog("warn", `Đã gỡ game local '${g.name}' khỏi danh sách`);
       });
       if (localIds.length > 0) games = games.filter(g => !localIds.includes(g.id));
+      games.forEach(g => {
+        if (!g.local && localIds.includes(g.blockedByLocalId)) {
+          g.blockedByLocal = false;
+          g.blockedByLocalId = null;
+          g.conflictMessage = "";
+          g.statusType = g.forceDownload ? "downloading" : "not_downloaded";
+          g.statusText = g.forceDownload ? "0% · Đang tải" : "Chưa tải";
+          g.progress = 0;
+          if (g.forceDownload) startProgressTick(g.id);
+        }
+      });
       selectedIds.clear();
       closeModal("modal-delete-confirm");
-      showToast(deleteFiles ? "Đã nhận yêu cầu xóa folder source và reset về Chưa tải" : "Đã nhận yêu cầu reset game về Chưa tải");
+      showToast(localOnly
+        ? (deleteFiles ? "Đã gỡ Game local và xóa folder game" : "Đã gỡ Game local khỏi danh sách")
+        : (deleteFiles ? "Đã nhận yêu cầu xóa folder source và reset về Chưa tải" : "Đã nhận yêu cầu reset game về Chưa tải"));
       renderGrid();
     }
 
@@ -4223,13 +4660,28 @@
       if (!g) return;
       document.getElementById("prop-game-name").textContent = g.name;
       document.getElementById("prop-game-id").textContent = `ID: ${g.id} • ${g.category}`;
-      document.getElementById("prop-game-status").textContent = g.statusText;
+      const statusBadge = document.getElementById("prop-game-status");
+      statusBadge.textContent = g.blockedByLocal ? (g.conflictMessage || g.statusText || "Không thể tải") : (g.local ? "Sẵn sàng" : (g.waitingForMemory && ["downloading", "checking"].includes(g.statusType) && !["move_game", "delete_local", "remove_game"].includes(g.progressStage) ? "Đang chờ đủ bộ nhớ để tải" : g.statusText));
+      statusBadge.className = `badge-mini${g.blockedByLocal ? " offline" : " success"}`;
       document.getElementById("prop-game-ver").textContent = g.version;
       document.getElementById("prop-game-prio").textContent = g.priority;
       document.getElementById("prop-game-size").textContent = g.size;
       document.getElementById("prop-game-path").textContent = g.path;
       document.getElementById("prop-game-root").textContent = g.rootDrive || "G:\\";
       document.getElementById("prop-game-updated").textContent = g.updatedAt || "—";
+      const isLocal = !!g.local;
+      document.getElementById("prop-api-details").style.display = isLocal ? "none" : "grid";
+      document.getElementById("prop-local-details").style.display = isLocal ? "grid" : "none";
+      if (isLocal) {
+        document.getElementById("prop-game-id").textContent = `ID: ${g.id} • Game local`;
+        document.getElementById("prop-local-category").textContent = g.category || "—";
+        document.getElementById("prop-local-size").textContent = g.size || "—";
+        document.getElementById("prop-local-updated").textContent = g.updatedAt || "—";
+        document.getElementById("prop-local-path").textContent = g.path || "—";
+        document.getElementById("prop-local-exe").textContent = g.exe || "—";
+        document.getElementById("prop-local-icon").textContent = g.icon || "—";
+        document.getElementById("prop-local-thumbnail").textContent = g.thumbnail || "—";
+      }
       openModal("modal-properties");
     }
 
@@ -4377,7 +4829,7 @@
         settingsStatus.textContent = "Running · Healthy";
         settingsProcess.textContent = "PID 3144 · v0.1.0";
         if (p2pVal) p2pVal.innerHTML = '<span class="badge-mini success">Port 16882</span> qua Internet · NAT chưa xác nhận';
-        appendLog("ok", "Service online :3210 — health check thành công");
+        appendLog("ok", "Service đang chạy :3210 — kiểm tra tình trạng thành công");
       } else {
         const latest = errorMessage || "Không thể khởi tạo cổng mạng P2P; hãy kiểm tra kết nối mạng hoặc tường lửa.";
         text.textContent = "Service error";
@@ -4386,7 +4838,7 @@
         settingsProcess.textContent = "Không có tiến trình";
         errorText.textContent = latest;
         settingsErrorText.textContent = latest;
-        appendLog("err", `Service lỗi: ${latest}`);
+        appendLog("err", `Service gặp lỗi: ${latest}`);
         if (p2pVal) p2pVal.innerHTML = '<span class="badge-mini offline">Tắt</span>';
       }
       renderGrid();
@@ -4395,27 +4847,27 @@
 
     function refreshServiceState() {
       applyServiceState(isSrvOnline);
-      showToast(isSrvOnline ? "Service đang Running và health check thành công" : "Service vẫn lỗi; xem lỗi gần nhất hoặc Restart service");
+      showToast(isSrvOnline ? "Service đang chạy và kiểm tra tình trạng thành công" : "Service vẫn gặp lỗi; xem lỗi gần nhất hoặc restart service");
     }
 
     function restartService() {
       const button = document.getElementById("btn-restart-service");
-      if (button) { button.disabled = true; button.textContent = "Đang restart..."; }
+      if (button) { button.disabled = true; button.textContent = "Đang khởi động lại..."; }
       document.getElementById("settings-service-status").textContent = "Restarting...";
       appendLog("info", "Đang yêu cầu restart Ting Update Service...");
       showToast("Đang yêu cầu restart Ting Update Service...");
       setTimeout(() => {
         applyServiceState(true);
-        if (button) { button.disabled = false; button.textContent = "Restart service"; }
+        if (button) { button.disabled = false; button.textContent = "Khởi động lại dịch vụ"; }
         showToast("Đã khởi động lại Ting Update Service");
       }, 900);
     }
 
-    // Service state demo: click status simulates a recoverable service error.
+    // Demo trạng thái dịch vụ: bấm vào trạng thái để mô phỏng lỗi có thể khôi phục.
     let isSrvOnline = true;
     document.getElementById("service-status-toggle").addEventListener("click", () => {
       applyServiceState(!isSrvOnline);
-      showToast(isSrvOnline ? "Service online :3210" : "Service lỗi — lỗi gần nhất đã hiển thị tại màn hình hiện tại");
+      showToast(isSrvOnline ? "Service đang chạy :3210" : "Service gặp lỗi — lỗi gần nhất đã hiển thị tại màn hình hiện tại");
     });
 
     // Chuyển Tab Sidebar
@@ -4447,7 +4899,7 @@
       document.querySelector(`.nav-item[data-tab="${previewView}"]`).click();
     }
 
-    // Initial render: wizard gate theo screen-state rồi mới tới danh sách
+    // Initial render: license gate only; storage is a non-blocking transfer gate.
     const logFilterSelect = document.getElementById("log-filter-select");
     if (logFilterSelect) {
       logFilterSelect.addEventListener("change", () => {
@@ -4456,6 +4908,7 @@
       });
     }
     appendLog("info", "Ting Update demo sẵn sàng — state JS + render lại, toast chỉ notify");
+    document.getElementById("root-degraded-banner").classList.toggle("visible", !rootReady);
     renderGrid();
     renderWizard();
     const previewModal = previewParams.get("modal");
@@ -4464,7 +4917,7 @@
     else if (previewModal === "priority") openPriorityModal();
     else if (previewModal === "delete") openDeleteConfirmModal();
     else if (previewModal === "location") openDriveLocationModal(games[0]?.id, "move");
-    else if (previewModal === "activation") openModal("modal-activation");
+    else if (previewModal === "activation") { screenState = 1; renderWizard(); }
     else if (previewModal === "root") openModal("modal-root-gate");
     else if (previewModal === "folder-policy") {
       document.getElementById("update-folder-policy").value = "exclusive";
@@ -4472,6 +4925,150 @@
       openUpdateFolderPolicy();
     }
   </script>
-</body>
 
-</html>
+  <dialog id="admin-dialog" style="background:var(--bg-panel);color:var(--text-primary);border:1px solid var(--border-color);border-radius:8px;padding:20px;">
+    <form id="admin-form">
+      <h3>Chế độ Admin</h3><p>Nhập mật khẩu để mở cài đặt Admin.</p>
+      <p>Demo: dùng mật khẩu <code>demo-admin</code>, không dùng cho bản cài đặt.</p>
+      <input id="admin-password" class="form-input" type="password" placeholder="Mật khẩu" autocomplete="off">
+      <p id="admin-error" style="color:var(--status-error-color)"></p>
+      <button type="button" class="btn-action" onclick="closeAdminDialog()" autofocus>Hủy</button>
+      <button class="btn-action primary" type="submit">Xác nhận</button>
+    </form>
+  </dialog>
+  <script>
+    let adminEnabled = false;
+    function closeAdminDialog() {
+      document.getElementById('admin-password').value = '';
+      document.getElementById('admin-error').textContent = '';
+      document.getElementById('admin-dialog').close();
+    }
+    function setAdminEnabled(enabled) {
+      adminEnabled = enabled;
+      if (!enabled) hideFieldError("settings-transfer-rate-error");
+      document.getElementById('admin-upload-settings').hidden = !enabled;
+      document.getElementById('seed-concurrency-settings').hidden = !enabled;
+      document.getElementById('admin-upload-speed').hidden = !enabled;
+      document.getElementById('admin-toggle').textContent = enabled ? 'Tắt Admin' : 'Bật Admin';
+    }
+    function toggleAdmin() {
+      if (adminEnabled) setAdminEnabled(false);
+      else document.getElementById('admin-dialog').showModal();
+    }
+    document.getElementById('admin-dialog').addEventListener('cancel', closeAdminDialog);
+    document.getElementById('admin-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const accepted = document.getElementById('admin-password').value === 'demo-admin';
+      document.getElementById('admin-password').value = '';
+      if (accepted) { setAdminEnabled(true); closeAdminDialog(); }
+      else document.getElementById('admin-error').textContent = 'Mật khẩu không đúng.';
+    });
+  </script>
+<script>
+    const fileProcessingSettings = {mode: "auto", manual: 2, suggested: 1};
+    let fileProcessingDirty = false;
+    function refreshFileProcessing(settings) {
+      Object.assign(fileProcessingSettings, settings);
+      const mode = document.getElementById("file-processing-mode");
+      const value = document.getElementById("file-processing-limit");
+      if (!fileProcessingDirty) { mode.value = settings.mode; value.value = settings.mode === "auto" ? settings.suggested : settings.manual; }
+      else if (mode.value === "auto") value.value = settings.suggested;
+      value.disabled = mode.value === "auto";
+      document.getElementById("file-processing-summary").textContent = `Limit hiện tại: ${settings.mode === "auto" ? settings.suggested : settings.manual} game`;
+    }
+    function saveFileProcessing() {
+      const mode = document.getElementById("file-processing-mode").value;
+      const raw = document.getElementById("file-processing-limit").value.trim();
+      if (!/^\d+$/.test(raw) || Number(raw) < 1 || Number(raw) > 32) { document.getElementById("file-processing-error").textContent = "Nhập số game từ 1 đến 32."; return; }
+      document.getElementById("file-processing-error").textContent = "";
+      fileProcessingDirty = false;
+      refreshFileProcessing({...fileProcessingSettings, mode, manual: Number(raw)});
+      showToast("Đã lưu số game xử lý file");
+    }
+    document.getElementById("file-processing-mode").addEventListener("change", event => {
+      fileProcessingDirty = true;
+      const input = document.getElementById("file-processing-limit");
+      input.disabled = event.target.value === "auto";
+      input.value = fileProcessingSettings.suggested;
+    });
+    document.getElementById("file-processing-limit").addEventListener("input", () => {fileProcessingDirty = true;});
+    refreshFileProcessing(fileProcessingSettings);
+</script>
+
+  <script>
+    const seedConcurrencySettings = {mode:"auto", manual:2, suggested:1};
+    let seedConcurrencyDirty = false;
+    function refreshSeedConcurrency(settings) {
+      Object.assign(seedConcurrencySettings, settings);
+      const mode = document.getElementById("seed-concurrency-mode");
+      const input = document.getElementById("seed-concurrency-limit");
+      if (!seedConcurrencyDirty) {
+        mode.value = settings.mode;
+        input.value = settings.mode === "unlimited" ? "" : settings.mode === "auto" ? settings.suggested : settings.manual;
+      } else if (mode.value === "auto") input.value = settings.suggested;
+      input.disabled = mode.value !== "manual";
+      input.hidden = mode.value === "unlimited";
+      document.getElementById("seed-concurrency-summary").textContent = settings.mode === "unlimited" ? "Không giới hạn" : `Limit hiện tại: ${settings.mode === "auto" ? settings.suggested : settings.manual} game`;
+    }
+    function saveSeedConcurrency() {
+      if (!adminEnabled) return;
+      const mode = document.getElementById("seed-concurrency-mode").value;
+      const raw = document.getElementById("seed-concurrency-limit").value.trim();
+      if (mode === "manual" && (!/^\d+$/.test(raw) || Number(raw) < 1 || Number(raw) > 32)) {
+        document.getElementById("seed-concurrency-error").textContent = "Nhập số game từ 1 đến 32.";
+        return;
+      }
+      document.getElementById("seed-concurrency-error").textContent = "";
+      seedConcurrencyDirty = false;
+      refreshSeedConcurrency({...seedConcurrencySettings, mode, manual:mode === "manual" ? Number(raw) : seedConcurrencySettings.manual});
+      showToast("Đã lưu cài đặt");
+    }
+    document.getElementById("seed-concurrency-mode").addEventListener("change", event => {
+      seedConcurrencyDirty = true;
+      const input = document.getElementById("seed-concurrency-limit");
+      input.disabled = event.target.value !== "manual";
+      input.hidden = event.target.value === "unlimited";
+      input.value = event.target.value === "unlimited" ? "" : seedConcurrencySettings.suggested;
+    });
+    document.getElementById("seed-concurrency-limit").addEventListener("input", () => {seedConcurrencyDirty = true;});
+    refreshSeedConcurrency(seedConcurrencySettings);
+  </script>
+  <script id="license-demo">
+
+const licenseStore='ting-business-demo-v1',licenseNow=new Date('2026-10-07T10:00:00+07:00');
+let licensePane='key';
+function readLicenseDemo(){try{const d=JSON.parse(localStorage.getItem(licenseStore));if(d?.version===1)return d;}catch{}return ({version:1,seq:20,settings:{price:500000,pack:10,company:'Công ty Phần mềm Mẫu',tax:'MST-DEMO',address:'Địa chỉ minh họa',bank:'Ngân hàng mẫu',account:'DEMO-000000',beneficiary:'CONG TY MAU',phone:'Số hỗ trợ mẫu',instructions:'Chuyển đúng số tiền và nội dung của đơn. Đây là dữ liệu demo, không chuyển tiền thật.'},profiles:{ktv:{name:'Minh',phone:'0900000001',email:'ktv@example.invalid',billing:''},owner:{name:'Lan',phone:'0900000002',email:'owner@example.invalid',billing:''}},rooms:[{id:'R01',name:'Cyber Bình Minh',owner:'ktv',type:'paid',until:'2027-10-01T00:00:00+07:00',seen:'07/10/2026 09:30',pcs:60},{id:'R02',name:'Phòng máy Lan',owner:'owner',type:'trial',until:'2026-11-16T00:00:00+07:00',seen:'07/10/2026 09:20',pcs:30},{id:'R03',name:'Cyber Sao Mai',owner:'ktv',type:'expired',until:'2026-10-01T00:00:00+07:00',seen:'06/10/2026 15:30',pcs:45}],keys:[{id:'K01',text:'DEMO1-AAAAA-BBBBB-CCCCC-DDDDD',owner:'ktv',state:'active',room:'R01',order:'DH001'},{id:'K02',text:'DEMO2-AAAAA-BBBBB-CCCCC-DDDDD',owner:'ktv',state:'unused',room:null,order:'DH001'},{id:'K03',text:'DEMO3-AAAAA-BBBBB-CCCCC-DDDDD',owner:'ktv',state:'active',room:'R03',order:'DH001'}],orders:[{id:'DH001',owner:'ktv',kind:'buy',quantity:3,total:1500000,state:'paid',invoice:'issued',company:'Công ty Phần mềm Mẫu',bank:'Ngân hàng mẫu',account:'DEMO-000000',beneficiary:'CONG TY MAU',price:500000,pack:10,terms:'demo-v1',created:licenseNow.toISOString()},{id:'DH002',owner:'owner',kind:'buy',quantity:1,total:500000,state:'waiting',invoice:'none',company:'Công ty Phần mềm Mẫu',bank:'Ngân hàng mẫu',account:'DEMO-000000',beneficiary:'CONG TY MAU',price:500000,pack:10,terms:'demo-v1',created:licenseNow.toISOString()}],bonuses:[{id:'UD01',owner:'ktv',room:'R01',days:15,evidence:'Ảnh hạn dùng phần mềm cũ · dữ liệu mẫu',state:'pending'}],refunds:[],accounts:[{id:'ktv',name:'Minh',role:'KTV',active:true},{id:'owner',name:'Lan',role:'Chủ phòng',active:true},{id:'accountant',name:'Hà',role:'Kế toán',active:true}],games:[{id:'G1',name:'Liên Minh Huyền Thoại',version:'26.19',hot:true,promoted:false},{id:'G2',name:'Valorant',version:'11.07',hot:false,promoted:true},{id:'G3',name:'Dota 2',version:'7.40',hot:false,promoted:false}],logs:[],menu:{title:'Phòng máy của tôi',message:'Chúc bạn chơi game vui vẻ'},update:{room:'R02',scenario:'trial',order:'DH002',online:true}});}
+function saveLicenseDemo(d){localStorage.setItem(licenseStore,JSON.stringify(d));}
+function le(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function licenseError(t){document.querySelectorAll('.license-error').forEach(n=>n.textContent=t);}
+function renderLicenseDemo(){
+const d=readLicenseDemo(),u=d.update,r=d.rooms.find(r=>r.id===u.room),paid=r.type==='paid'&&new Date(r.until)>licenseNow&&u.scenario!=='paid-expired',trial=u.scenario==='trial'&&!paid,offline=u.scenario==='offline',o=d.orders.find(o=>o.id===u.order&&o.owner==='owner'&&o.state!=='cancelled');
+const money=n=>Number(n).toLocaleString('vi-VN')+'đ',field=(t,n,v='',type='text')=>'<label>'+t+'<input class="settings-input" name="'+n+'" type="'+type+'" value="'+le(v)+'" required></label>';
+let b='<p class="license-caption">'+(offline?'Kết nối mạng để kiểm tra bản quyền.':paid?'Hạn dùng: '+new Date(r.until).toLocaleDateString('vi-VN'):trial?'Dùng thử đến hết 15/11/2026, giờ server mẫu.':'Nhập key đã mua hoặc đăng ký mua 1 key.')+'</p>';
+if(offline)b+='<button class="btn-action primary" onclick="setLicenseScenario(\'trial\')">Thử kết nối lại (demo)</button>';
+else{
+b+='<div class="license-tabs"><button class="btn-action '+(licensePane==='key'?'primary':'')+'" onclick="setLicensePane(\'key\')">Nhập key</button><button class="btn-action '+(licensePane==='buy'?'primary':'')+'" onclick="setLicensePane(\'buy\')">'+(paid?'Gia hạn':'Mua 1 key')+'</button></div>';
+if(licensePane==='key')b+='<form onsubmit="activateLicenseDemo(event)">'+field('Key bản quyền','key')+'<button class="btn-action primary" type="submit">Kích hoạt</button></form>';
+else if(!o||(o.state==='paid'&&paid&&o.kind!=='renew'))b+='<form onsubmit="buyLicenseDemo(event)"><b>'+money(d.settings.price)+' / 12 tháng</b>'+field('Tên liên hệ','name',d.profiles.owner.name)+field('Số điện thoại','phone',d.profiles.owner.phone,'tel')+field('Tên phòng máy','room',r.name)+'<button class="btn-action primary" type="submit">'+(paid?'Đăng ký gia hạn':'Đăng ký mua key')+'</button></form>';
+if(o){b+='<div class="license-order"><b>'+le(o.id)+' · '+money(o.total)+'</b><p>'+({waiting:'Chờ thanh toán',review:'Chờ kế toán xác nhận',paid:'Đã xác nhận đủ tiền'}[o.state]||'Đang xử lý')+'</p>';
+if(o.state!=='paid')b+='<p>'+le(o.bank)+' · '+le(o.account)+'</p><p>Nội dung: '+le(o.id)+'</p>'+(o.state==='waiting'?'<button class="btn-action" onclick="reportLicensePayment()">Tôi đã chuyển khoản</button>':'')+'<p class="license-caption">Thanh toán đủ một lần. Kế toán duyệt xong mới cấp key.</p>';
+else b+=d.keys.filter(k=>k.order===o.id).map(k=>'<p class="license-key">'+le(k.text)+'</p>').join('')+(o.kind==='renew'?'<p>Đã gia hạn cho phòng.</p>':'<p class="license-caption">Sao chép key trên để nhập kích hoạt.</p>');
+b+='</div>';}
+if(paid||trial)b+='<button class="btn-action" onclick="continueLicenseDemo()">Tiếp tục vào Ting Update</button>';
+}
+b+='<p class="license-error" role="alert"></p><details class="license-caption"><summary>Dữ liệu demo · chưa nối server</summary><label>Kịch bản<select class="settings-select" onchange="setLicenseScenario(this.value)">'+[['trial','Trial còn hạn'],['new','Mới cài / mua lần đầu'],['expired','Hết trial'],['offline','Mất mạng'],['paid','License còn hạn'],['paid-expired','License hết hạn']].map(([v,t])=>'<option value="'+v+'" '+(u.scenario===v?'selected':'')+'>'+t+'</option>').join('')+'</select></label><a href="../ting-console-demo/index.html?proposal=1" target="_blank" rel="noopener">Console mẫu để kế toán duyệt</a></details>';
+document.getElementById('wizard-step-1').innerHTML=b;
+document.getElementById('view-license').innerHTML='<div class="subview-container"><div class="subview-header"><h2 class="subview-title">Bản quyền Ting Update</h2></div><div class="license-native">'+b+'</div></div>';
+document.getElementById('business-license-status').textContent=paid?'12 tháng · '+new Date(r.until).toLocaleDateString('vi-VN'):trial?'Trial đến 15/11/2026':offline?'Chờ kết nối':'Chưa kích hoạt / hết hạn';
+}
+function setLicensePane(p){licensePane=p;renderLicenseDemo();}
+function setLicenseScenario(s){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);d.update.scenario=s;if(s==='new'){d.update.order=null;r.type='expired';}if(s==='trial'){r.type='trial';r.until='2026-11-16T00:00:00+07:00';}if(s==='expired'||s==='paid-expired')r.type='expired';if(s==='paid'){r.type='paid';r.until='2027-10-07T10:00:00+07:00';}saveLicenseDemo(d);renderLicenseDemo();}
+function buyLicenseDemo(e){e.preventDefault();const v=Object.fromEntries(new FormData(e.target)),d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(!v.name.trim()||!v.room.trim()||!/^\+?[\d\s().-]{9,16}$/.test(v.phone))return licenseError('Điền tên, phòng máy và số điện thoại hợp lệ.');if(d.orders.some(o=>o.id===d.update.order&&['waiting','review'].includes(o.state))){renderLicenseDemo();return;}const s=d.settings,id='DH'+String(++d.seq).padStart(3,'0');d.orders.push({id,owner:'owner',kind:r.type==='paid'||d.update.scenario==='paid-expired'?'renew':'buy',room:r.id,quantity:1,total:s.price,price:s.price,pack:s.pack,company:s.company,tax:s.tax,bank:s.bank,account:s.account,beneficiary:s.beneficiary,state:'waiting',invoice:'none',terms:'demo-v1',created:licenseNow.toISOString()});d.profiles.owner={...d.profiles.owner,name:v.name.trim(),phone:v.phone.trim(),verified:false};r.name=v.room.trim();d.update.order=id;saveLicenseDemo(d);renderLicenseDemo();}
+function reportLicensePayment(){const d=readLicenseDemo(),o=d.orders.find(o=>o.id===d.update.order&&o.owner==='owner');if(o?.state==='waiting')o.state='review';saveLicenseDemo(d);renderLicenseDemo();}
+function activateLicenseDemo(e){e.preventDefault();const val=String(new FormData(e.target).get('key')).trim().toUpperCase(),d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room),k=d.keys.find(k=>k.text.toUpperCase()===val&&k.owner==='owner'),o=d.orders.find(o=>o.id===k?.order);if(!k||o?.state!=='paid'||!['unused','active'].includes(k.state)||(k.room&&k.room!==r.id))return licenseError('Key không hợp lệ hoặc đã dùng cho phòng khác.');if(k.state==='unused'){k.state='active';k.room=r.id;const end=new Date(licenseNow);end.setUTCFullYear(end.getUTCFullYear()+1);r.until=end.toISOString();r.type='paid';}if(r.type!=='paid'||new Date(r.until)<=licenseNow)return licenseError('Bản quyền đã hết hạn. Vui lòng gia hạn.');d.update.scenario='paid';saveLicenseDemo(d);renderLicenseDemo();continueLicenseDemo();}
+function continueLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(d.update.scenario==='offline'||!((r.type==='paid'&&new Date(r.until)>licenseNow&&d.update.scenario!=='paid-expired')||d.update.scenario==='trial'))return licenseError('Cần bản quyền hoặc trial còn hạn.');screenState=3;renderWizard();renderGrid();}
+window.addEventListener('storage',e=>{if(e.key===licenseStore)renderLicenseDemo();});
+renderLicenseDemo();
+
+  </script>
+</body></html>
