@@ -79,6 +79,23 @@ test('Console embedded Update creates only an order, not a profile or room edit'
  assert.match(f.dialog(),/0900000003/);
  f.openConsole();f.role('owner');f.click('page','orders');assert.doesNotMatch(f.html(),new RegExp(o.id));
 });
+test('retail buyer can submit old license with order; accountant grants days only after payment',()=>{
+ const f=fixture('update');f.clearUpdateOrder();
+ f.submit('quick-buy',{name:'Lan',phone:'0900000002',oldSoftware:'Phần mềm cũ',oldLicenseUntil:'2026-10-22',oldLicenseProof:'https://example.invalid/proof'});
+ const order=f.state().orders.find(o=>o.id===f.state().update.order);assert.equal(order.oldOffer.software,'Phần mềm cũ');assert.equal(f.state().bonuses.length,1);
+ f.role('accountant');f.submit('pay',{amount:'500000',reference:'sample'},order.id);
+ const bonus=f.state().bonuses.find(b=>b.order===order.id);assert.equal(bonus.state,'pending');assert.ok(bonus.days>0&&bonus.days<=30);
+ f.submit('bonus-review',{decision:'approved',days:'10',reason:'Đã kiểm tra'},bonus.id);assert.equal(f.state().bonuses.find(b=>b.id===bonus.id).applied,false);
+ f.role('owner');const key=f.state().keys.find(k=>k.order===order.id);f.submit('activate',{key:key.text});
+ const active=f.state();assert.equal(active.bonuses.find(b=>b.id===bonus.id).applied,true);assert.equal(Date.parse(active.rooms.find(r=>r.id==='R02').until)-Date.parse('2027-10-07T10:00:00+07:00'),10*86400000);
+ f.submit('activate',{key:key.text});assert.equal(f.state().rooms.find(r=>r.id==='R02').until,active.rooms.find(r=>r.id==='R02').until);
+});
+test('owner Console purchase keeps optional old license on the correct room',()=>{
+ const f=fixture();f.role('owner');f.submit('purchase',{kind:'buy',room:'R01',unit:'single',quantity:'1',name:'Lan',phone:'0900000002'});assert.equal(f.state().orders.length,2);
+ f.submit('purchase',{kind:'buy',room:'R02',unit:'single',quantity:'1',name:'Lan',phone:'0900000002',oldSoftware:'Phần mềm cũ',oldLicenseUntil:'2026-10-22',oldLicenseProof:'https://example.invalid/proof'});
+ const o=f.state().orders[0];assert.equal(o.owner,'owner');assert.equal(o.room,'R02');assert.equal(o.oldOffer.software,'Phần mềm cũ');
+ f.role('accountant');f.submit('pay',{amount:'500000',reference:'sample'},o.id);assert.equal(f.state().bonuses.find(b=>b.order===o.id).state,'pending');
+});
 
 function nativeUpdateFixture(){
  const events={},store=new Map(),nodes=new Map();
@@ -95,6 +112,13 @@ test('native Update keeps compact form and creates only one pending order',()=>{
  f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002'});assert.equal(f.state().orders.length,d.orders.length);
  f.context.reportLicensePayment();assert.equal(f.state().orders.find(o=>o.id===id).state,'review');
  f.submit('activateLicenseDemo',{key:'invalid'});assert.match(f.error(),/không hợp lệ/);assert.equal(f.context.screenState,1);
+});
+test('native Update stores optional old license and applies approved days on first activation',()=>{
+ const f=nativeUpdateFixture();f.context.setLicenseScenario('new');f.context.setLicensePane('buy');assert.match(f.html(),/Đang chuyển từ phần mềm khác/);
+ f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002',oldSoftware:'Phần mềm cũ',oldLicenseUntil:'2026-10-22'});assert.match(f.error(),/Điền đủ/);
+ f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002',oldSoftware:'Phần mềm cũ',oldLicenseUntil:'2026-10-22',oldLicenseProof:'https://example.invalid/proof'});
+ const d=f.state(),o=d.orders.find(o=>o.id===d.update.order);assert.equal(o.oldOffer.software,'Phần mềm cũ');o.state='paid';d.keys.push({id:'K-new',text:'GUEST-AAAAA-BBBBB-CCCCC-DDDDD',owner:'guest',state:'unused',room:null,order:o.id});d.bonuses.push({id:'UD-new',order:o.id,room:'R02',state:'approved',days:10,applied:false});f.context.saveLicenseDemo(d);
+ f.submit('activateLicenseDemo',{key:'GUEST-AAAAA-BBBBB-CCCCC-DDDDD'});const active=f.state();assert.equal(active.bonuses.find(b=>b.id==='UD-new').applied,true);assert.equal(Date.parse(active.rooms.find(r=>r.id==='R02').until)-Date.parse('2027-10-07T10:00:00+07:00'),10*86400000);
 });
 test('native Update cannot self-purchase for a KTV-managed room',()=>{
  const f=nativeUpdateFixture(),d=f.state();d.update.room='R01';d.update.order=null;f.context.saveLicenseDemo(d);f.context.setLicensePane('buy');assert.match(f.html(),/do KTV quản lý/);
