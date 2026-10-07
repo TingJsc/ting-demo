@@ -4290,14 +4290,14 @@
     function submitActivationToken() {
       const token = document.getElementById("activation-token-input").value.trim();
       if (!token) {
-        showFieldError("activation-dialog-error", "Nhập mã token trước khi xác nhận");
+        showFieldError("activation-dialog-error", "Nhập key trước khi xác nhận");
         return;
       }
       hideFieldError("activation-dialog-error");
       closeModal("modal-activation");
       if (!rootReady) openModal("modal-root-gate");
-      appendLog("info", "Đã nhận yêu cầu kích hoạt bằng token");
-      showToast("Đã nhận yêu cầu kích hoạt bằng token");
+      appendLog("info", "Đã nhận yêu cầu kích hoạt bằng key");
+      showToast("Đã nhận yêu cầu kích hoạt bằng key");
     }
     function submitRootGate() {
       const value = document.getElementById("root-gate-select").value;
