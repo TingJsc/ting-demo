@@ -5,13 +5,14 @@ import vm from 'node:vm';
 
 // Test business transitions through the same browser event handlers; no backend claims.
 function fixture(mode='console') {
-  const store=new Map(),listeners={},nodes=new Map();
+  const store=new Map(),session=new Map([['ting-demo-actor','ktv']]),listeners={},nodes=new Map(),classes=new Set();
   const node=s=>{if(!nodes.has(s))nodes.set(s,{innerHTML:'',textContent:'',style:{},open:false,value:'',showModal(){this.open=true;},close(){this.open=false;}});return nodes.get(s);};
   const storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)};
+  const sessionStorage={getItem:k=>session.get(k)||null,setItem:(k,v)=>session.set(k,v),removeItem:k=>session.delete(k)};
   const context={Intl,Date,URLSearchParams,JSON,Number,String,Object,Map,Set,Math,console,
     location:{search:mode==='update'?'?mode=update':'',origin:'http://demo.invalid'},
-    localStorage:storage,sessionStorage:{getItem:()=>'ktv',setItem:()=>{}},
-    document:{querySelector:node,addEventListener:(k,f)=>listeners[k]=f},
+    localStorage:storage,sessionStorage,
+    document:{querySelector:node,addEventListener:(k,f)=>listeners[k]=f,body:{classList:{toggle:(name,force)=>{if(force===undefined)force=!classes.has(name);if(force)classes.add(name);else classes.delete(name);return force;},contains:name=>classes.has(name)}}},
     window:{addEventListener:()=>{},open:()=>{}},parent:{postMessage:()=>{}},
     navigator:{clipboard:{writeText:async()=>{}}},setTimeout:()=>1,clearTimeout:()=>{},
     FormData:class {constructor(f){return new Map(Object.entries(f.values));}}
@@ -26,6 +27,11 @@ function fixture(mode='console') {
     dialog:()=>node('#dialog').innerHTML,
     change:(game,prop,checked)=>listeners.change({target:{dataset:{game,prop},checked}}),
     error:()=>node('#form-error').textContent,
+    theme:()=>store.get('theme'),isLight:()=>classes.has('light'),session:()=>new Map(session),
+    setStore:(fn)=>{const d=JSON.parse(store.get('ting-business-demo-v1'));fn(d);store.set('ting-business-demo-v1',JSON.stringify(d));vm.runInNewContext(readFileSync(new URL('index.html',import.meta.url),'utf8').split('/* business demo start */')[1].split('/* business demo end */')[0],context);},
+    clearUpdateOrder:()=>{const d=JSON.parse(store.get('ting-business-demo-v1'));d.update.order=null;store.set('ting-business-demo-v1',JSON.stringify(d));vm.runInNewContext(readFileSync(new URL('index.html',import.meta.url),'utf8').split('/* business demo start */')[1].split('/* business demo end */')[0],context);},
+    openConsole:()=>{context.location.search='';vm.runInNewContext(readFileSync(new URL('index.html',import.meta.url),'utf8').split('/* business demo start */')[1].split('/* business demo end */')[0],context);},
+    reload:()=>vm.runInNewContext(readFileSync(new URL('index.html',import.meta.url),'utf8').split('/* business demo start */')[1].split('/* business demo end */')[0],context),
   };
 }
 test('30 packs price uses server-design settings and creates 300 keys only after full payment',()=>{
@@ -39,7 +45,7 @@ test('buyer cannot confirm payment',()=>{const f=fixture();f.submit('pay',{amoun
 test('settings change only future orders; accountant cannot change price',()=>{
  const f=fixture();const s=f.state().settings;f.role('accountant');f.submit('settings',{...s,price:123});assert.equal(f.state().settings.price,500000);
  f.role('admin');f.submit('settings',{...s,price:600000,company:'Công ty mới'});assert.equal(f.state().orders.find(o=>o.id==='DH002').total,500000);
- f.role('ktv');f.submit('purchase',{kind:'buy',quantity:'1',unit:'single',name:'Demo',phone:'0900000000'});assert.equal(f.state().orders[0].total,600000);assert.equal(f.state().orders[0].company,'Công ty mới');
+ f.role('accountant');f.submit('settings',{...s,company:'Công ty mới'});f.role('ktv');f.submit('purchase',{kind:'buy',quantity:'1',unit:'single',name:'Demo',phone:'0900000000'});assert.equal(f.state().orders[0].total,600000);assert.equal(f.state().orders[0].company,'Công ty mới');
 });
 test('bonus capped at evidence and 30 days and approval cannot apply twice',()=>{
  const f=fixture();f.role('accountant');const old=f.state().rooms[0].until;
@@ -65,7 +71,13 @@ test('paid key activation persists room expiry and repeated activation never res
  f.submit('activate',{key:k.text});assert.equal(f.state().rooms.find(r=>r.id==='R02').until,until);
 });
 test('quick buy resumes an existing order without duplicating account/order',()=>{
- const f=fixture('update');const before=f.state().orders.length;f.submit('quick-buy',{name:'Demo',phone:'0900000000',room:'Demo'});assert.equal(f.state().orders.length,before);
+ const f=fixture('update');const before=f.state();f.submit('quick-buy',{name:'Demo',phone:'0900000000'});const after=f.state();assert.equal(after.orders.length,before.orders.length);assert.deepEqual(after.profiles,before.profiles);
+});
+test('Console embedded Update creates only an order, not a profile or room edit',()=>{
+ const f=fixture('update');f.clearUpdateOrder();const before=f.state();f.submit('quick-buy',{name:'Khách lẻ',phone:'0900000003'});const after=f.state(),o=after.orders.find(o=>o.id===after.update.order);
+ assert.equal(after.orders.length,before.orders.length+1);assert.equal(o.owner,'guest');assert.equal(o.source,'update');assert.equal(o.contactName,'Khách lẻ');assert.equal(o.contactPhone,'0900000003');assert.deepEqual(after.profiles,before.profiles);assert.deepEqual(after.rooms,before.rooms);
+ assert.match(f.dialog(),/0900000003/);
+ f.openConsole();f.role('owner');f.click('page','orders');assert.doesNotMatch(f.html(),new RegExp(o.id));
 });
 
 function nativeUpdateFixture(){
@@ -78,15 +90,249 @@ function nativeUpdateFixture(){
 }
 test('native Update keeps compact form and creates only one pending order',()=>{
  const f=nativeUpdateFixture();assert.match(f.html(),/Nhập key/);f.context.setLicenseScenario('new');f.context.setLicensePane('buy');
- f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002',room:'Cyber Lan'});
- const d=f.state(),id=d.update.order;assert.equal(d.orders.find(o=>o.id===id).total,500000);
- f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002',room:'Cyber Lan'});assert.equal(f.state().orders.length,d.orders.length);
+ const before=f.state();assert.doesNotMatch(f.html(),/name="room"/);f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002'});
+ const d=f.state(),id=d.update.order,o=d.orders.find(o=>o.id===id);assert.equal(o.total,500000);assert.equal(o.owner,'guest');assert.equal(o.source,'update');assert.equal(o.contactName,'Lan');assert.equal(o.contactPhone,'0900000002');assert.deepEqual(d.profiles,before.profiles);assert.equal(d.rooms.find(r=>r.id==='R02').name,before.rooms.find(r=>r.id==='R02').name);
+ f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002'});assert.equal(f.state().orders.length,d.orders.length);
  f.context.reportLicensePayment();assert.equal(f.state().orders.find(o=>o.id===id).state,'review');
  f.submit('activateLicenseDemo',{key:'invalid'});assert.match(f.error(),/không hợp lệ/);assert.equal(f.context.screenState,1);
+});
+test('native Update cannot self-purchase for a KTV-managed room',()=>{
+ const f=nativeUpdateFixture(),d=f.state();d.update.room='R01';d.update.order=null;f.context.saveLicenseDemo(d);f.context.setLicensePane('buy');assert.match(f.html(),/do KTV quản lý/);
+ f.submit('buyLicenseDemo',{name:'Khách',phone:'0900000002'});assert.equal(f.state().orders.length,d.orders.length);assert.match(f.error(),/liên hệ KTV/);
+});
+test('native Update accepts only the paid guest key for its current order',()=>{
+ const f=nativeUpdateFixture();f.context.setLicenseScenario('new');f.submit('buyLicenseDemo',{name:'Khách',phone:'0900000003'});const d=f.state(),id=d.update.order;d.orders.find(o=>o.id===id).state='paid';d.keys.push({id:'guest-key',text:'GUEST-AAAAA-BBBBB-CCCCC-DDDDD',owner:'guest',state:'unused',room:null,order:id});d.keys.push({id:'other-key',text:'OTHER-AAAAA-BBBBB-CCCCC-DDDDD',owner:'guest',state:'unused',room:null,order:'another-order'});f.context.saveLicenseDemo(d);
+ f.submit('activateLicenseDemo',{key:'OTHER-AAAAA-BBBBB-CCCCC-DDDDD'});assert.equal(f.context.screenState,1);
+ f.submit('activateLicenseDemo',{key:'GUEST-AAAAA-BBBBB-CCCCC-DDDDD'});assert.equal(f.context.screenState,3);assert.equal(f.state().keys.find(k=>k.id==='guest-key').room,'R02');
 });
 test('native Update activates paid key once, preserves expiry and blocks offline entry',()=>{
  const f=nativeUpdateFixture(),d=f.state();d.orders.find(o=>o.id==='DH002').state='paid';d.keys.push({id:'native-key',text:'DEMO0-PAID0-TEST0-KEY00-00001',owner:'owner',state:'unused',room:null,order:'DH002'});f.context.saveLicenseDemo(d);
  f.submit('activateLicenseDemo',{key:'DEMO0-PAID0-TEST0-KEY00-00001'});const until=f.state().rooms.find(r=>r.id==='R02').until;assert.equal(f.context.screenState,3);
  f.submit('activateLicenseDemo',{key:'DEMO0-PAID0-TEST0-KEY00-00001'});assert.equal(f.state().rooms.find(r=>r.id==='R02').until,until);
  f.context.setLicenseScenario('offline');f.context.screenState=1;f.context.continueLicenseDemo();assert.equal(f.context.screenState,1);
+});
+
+test('unified demo removes legacy trial controls and uses existing Ting logo',()=>{
+ const html=readFileSync(new URL('index.html',import.meta.url),'utf8');
+ assert.doesNotMatch(html,/BASELINE_START|session-demo|Phiên \/ lỗi|trial24|Thêm 7 ngày/);
+ assert.match(html,/logo-admin\.svg/);
+ const f=fixture();f.click('page','licenses');assert.match(f.html(),/Dùng thử 1 tháng/);
+ const count=f.state().orders.length;f.submit('purchase',{kind:'renew',room:'R02',name:'Lan',phone:'0900000002'});assert.equal(f.state().orders.length,count);
+});
+test('existing game auto-download and marketing flags remain editable only by admin',()=>{
+ const f=fixture();f.role('admin');f.click('page','games');assert.match(f.html(),/data-prop="forceDownload"/);
+ f.change('G1','forceDownload',true);assert.equal(f.state().games.find(g=>g.id==='G1').forceDownload,true);
+ f.role('ktv');f.change('G1','forceDownload',false);assert.equal(f.state().games.find(g=>g.id==='G1').forceDownload,true);
+});
+test('room assignment rejects duplicate and out-of-region technician; transfer preserves buyer',()=>{
+ const f=fixture();f.role('admin');const r=f.state().rooms[0];
+ f.submit('room-add',{ting:r.ting,name:'Duplicate',region:'HCM',tech:'ktv'});assert.equal(f.state().rooms.length,3);
+ f.submit('room-add',{ting:'TING-MMMM-NNNN-OOOO-PPPP',name:'New',region:'OTHER',tech:'ktv'});assert.equal(f.state().rooms.length,3);
+ f.submit('assign',{tech:'ktv2',reason:'test'},r.id);assert.equal(f.state().rooms[0].tech,'ktv2');assert.equal(f.state().rooms[0].owner,r.owner);
+});
+
+test('accountant has finance workspace without technical room, key or game controls',()=>{
+ const f=fixture();f.role('accountant');assert.match(f.html(),/Công việc kế toán/);assert.doesNotMatch(f.html(),/data-id="rooms"|data-id="keys"|data-id="games"|data-id="accounts"/);
+ f.click('page','rooms');assert.match(f.html(),/Công việc kế toán/);
+ f.submit('room-revoke',{reason:'test'},'R01');assert.notEqual(f.state().rooms[0].revoked,true);
+});
+test('self-registration cannot create admin or accountant and owner cannot buy packs',()=>{
+ const f=fixture();const before=f.state();f.submit('register',{role:'admin',name:'bad'});assert.deepEqual(f.state(),before);
+ f.submit('register',{role:'accountant',name:'bad'});assert.deepEqual(f.state(),before);
+ f.role('owner');f.submit('purchase',{kind:'buy',quantity:'1',unit:'pack',name:'Lan',phone:'0900000002'});assert.equal(f.state().orders.length,before.orders.length);
+});
+test('room assignment does not transfer buyer orders or keys',()=>{
+ const f=fixture();f.role('admin');f.submit('assign',{tech:'ktv2',reason:'test'},'R01');f.role('ktv');
+ f.click('page','rooms');assert.doesNotMatch(f.html(),/Cyber Bình Minh/);
+ f.click('page','keys');assert.match(f.html(),/DEMO1-AAAAA-BBBBB-CCCCC-DDDDD/);
+});
+
+test('add and edit dialogs follow Update header/body/footer with cancel and specific action',()=>{
+ const f=fixture();f.role('admin');f.click('account-add');assert.match(f.dialog(),/modal-header/);assert.match(f.dialog(),/modal-body/);assert.match(f.dialog(),/modal-footer/);assert.match(f.dialog(),/type="button" data-action="close">Hủy/);assert.match(f.dialog(),/type="submit" class="primary">Thêm KTV/);
+ const before=f.state().accounts.length;f.click('close');assert.equal(f.state().accounts.length,before);
+ f.click('game','G1');assert.match(f.dialog(),/>Lưu thay đổi<\/button>/);assert.doesNotMatch(f.dialog(),/Lưu \/ xác nhận/);
+});
+
+test('Update activation uses existing desktop input/select classes, including purchase fields',()=>{
+ const f=nativeUpdateFixture();assert.match(f.html(),/class="form-input" name="key"/);assert.match(f.html(),/class="adv-search-select"/);assert.doesNotMatch(f.html(),/settings-input|settings-select/);
+ f.context.setLicenseScenario('new');f.context.setLicensePane('buy');
+ for(const name of ['name','phone'])assert.match(f.html(),new RegExp('class="form-input" name="'+name+'"'));
+ assert.doesNotMatch(f.html(),/name="room"/);
+});
+
+test('admin navigation and dashboard contain management, not finance work',()=>{
+ const f=fixture();f.role('admin');
+ for(const p of ['orders','bonuses','invoices','refunds','keys'])assert.doesNotMatch(f.html(),new RegExp('data-id="'+p+'"'));
+ for(const p of ['rooms','licenses','accounts','games','tracker','settings'])assert.match(f.html(),new RegExp('data-id="'+p+'"'));
+ assert.doesNotMatch(f.html(),/data-id="menu"/);
+ f.click('page','orders');assert.match(f.html(),/Tổng quan hệ thống/);
+});
+test('admin cannot approve money, bonuses, invoices or refund via direct handlers',()=>{
+ const f=fixture();f.submit('refund-request',{reason:'test'},'K02');const refund=f.state().refunds[0];f.role('admin');const before=f.state();
+ f.submit('pay',{amount:'500000',reference:'test'},'DH002');f.submit('bonus-review',{decision:'approved',days:'15'},'UD01');f.click('invoice-issue','DH001');f.click('refund-approve',refund.id);f.submit('refund-done',{reference:'test',invoiceRef:'test'},refund.id);
+ assert.deepEqual(f.state(),before);
+ const s=f.state().settings;f.submit('settings',{...s,price:600000,company:'Wrong'});assert.equal(f.state().settings.company,s.company);assert.equal(f.state().settings.price,600000);
+});
+
+test('staff cannot impersonate customer actions on waiting orders or quick purchases',()=>{
+ for(const role of ['admin','accountant']){
+  const f=fixture();f.role(role);const before=f.state();
+  f.click('report-paid','DH002');f.click('cancel-order','DH002');
+  f.submit('quick-buy',{name:'Wrong',phone:'0900000000',room:'Wrong'});
+  f.submit('refund-request',{reason:'Wrong'},'K02');
+  assert.deepEqual(f.state(),before);
+ }
+});
+test('customers cannot read or mutate another buyer order',()=>{
+ for(const [role,other] of [['ktv','DH002'],['owner','DH001']]){
+  const f=fixture();f.role(role);const before=f.state();
+  f.click('order',other);assert.doesNotMatch(f.dialog(),new RegExp('Đơn '+other));
+  f.click('report-paid',other);f.click('cancel-order',other);
+  f.submit('pay',{amount:'500000',reference:'Wrong'},other);
+  assert.deepEqual(f.state(),before);
+ }
+});
+test('unknown roles and console activation cannot bypass account boundaries',()=>{
+ const f=fixture();const before=f.state();f.role('unknown');f.submit('login',{actor:'unknown'});
+ f.submit('activate',{key:'invalid'});assert.deepEqual(f.state(),before);
+ f.role('accountant');f.click('order','DH001');assert.doesNotMatch(f.dialog(),/data-action="copy"/);
+});
+test('revoked room rejects native activation and entry even with paid key',()=>{
+ const f=nativeUpdateFixture(),d=f.state();d.rooms.find(r=>r.id==='R02').revoked=true;
+ d.orders.find(o=>o.id==='DH002').state='paid';
+ d.keys.push({id:'revoked-test',text:'REVOKED-TEST',owner:'owner',state:'unused',room:null,order:'DH002'});
+ f.context.saveLicenseDemo(d);f.submit('activateLicenseDemo',{key:'REVOKED-TEST'});
+ assert.equal(f.state().keys.find(k=>k.id==='revoked-test').state,'unused');
+ f.context.continueLicenseDemo();assert.equal(f.context.screenState,1);
+});
+
+test('room management retains staging operational columns independently of license state',()=>{
+ const f=fixture();f.role('admin');f.click('page','rooms');
+ for(const title of ['Trạng thái','Dung lượng','Đồng bộ gần nhất','Peer'])assert.ok(f.html().includes(title));
+ f.submit('room-revoke',{reason:'test'},'R01');f.click('page','rooms');assert.match(f.html(),/Đã thu hồi/);
+});
+
+test('marketing preview follows source QC then HOT, supports add/remove and safe image fallback',()=>{
+ const f=fixture();f.role('admin');f.click('page','settings');
+ assert.ok(f.html().indexOf('data-poster="G2"')<f.html().indexOf('data-poster="G1"'));
+ assert.match(f.html(),/poster-fallback/);
+ f.submit('menu-select',{game:'G3'},'hot');assert.equal(f.state().games.find(g=>g.id==='G3').hot,true);
+ assert.match(f.html(),/data-poster="G3"/);
+ f.click('menu-remove-hot','G3');assert.equal(f.state().games.find(g=>g.id==='G3').hot,false);
+ f.click('menu-remove-promoted','G2');assert.equal(f.state().games.find(g=>g.id==='G2').promoted,false);
+ f.click('menu-remove-hot','G1');assert.match(f.html(),/Chưa có game trong dải poster/);
+});
+test('all non-admin roles cannot change marketing through direct actions or submits',()=>{
+ for(const role of ['ktv','owner','accountant']){
+  const f=fixture();f.role(role);const before=f.state();
+  f.submit('menu-select',{game:'G3'},'promoted');f.click('menu-remove-promoted','G2');
+  f.click('menu-remove-hot','G1');f.submit('game',{hot:'on',adThumbnail:'https://example.invalid/a.png'},'G3');
+  assert.deepEqual(f.state(),before);
+ }
+});
+test('invalid image URL or missing game cannot partially change game configuration',()=>{
+ const f=fixture();f.role('admin');const before=f.state();
+ f.submit('game',{hot:'on',adThumbnail:'javascript:alert(1)'},'G3');
+ assert.deepEqual(f.state(),before);f.submit('game',{hot:'on'},'missing');assert.deepEqual(f.state(),before);
+});
+
+test('theme button matches Console sidebar and survives role switch and reload',()=>{
+ const f=fixture();assert.match(f.html(),/data-action="theme"/);assert.match(f.html(),/data-action="logout"/);
+ assert.match(f.html(),/TING CONTROL PLANE/);assert.match(f.html(),/Làm mới/);
+ f.click('theme');assert.equal(f.theme(),'light');assert.equal(f.isLight(),true);
+ f.role('admin');assert.equal(f.isLight(),true);f.reload();assert.equal(f.isLight(),true);
+ f.click('theme');assert.equal(f.theme(),'dark');assert.equal(f.isLight(),false);
+});
+test('logout hides all management screens, keeps demo data, then sample login restores correct role',()=>{
+ const f=fixture();f.role('admin');const before=f.state();f.click('logout');
+ assert.match(f.html(),/Đăng nhập tài khoản mẫu/);assert.doesNotMatch(f.html(),/data-id="accounts"/);
+ assert.equal(f.session().get('ting-demo-signed-out'),'1');assert.equal(f.session().has('ting-demo-actor'),false);
+ f.click('page','accounts');f.submit('settings',{price:900000,pack:10});
+ assert.deepEqual(f.state(),before);assert.doesNotMatch(f.html(),/data-id="accounts"/);
+ f.reload();assert.match(f.html(),/Đăng nhập tài khoản mẫu/);
+ f.submit('login',{actor:'owner'});assert.match(f.html(),/Phòng máy của tôi/);
+ assert.doesNotMatch(f.html(),/data-id="accounts"/);assert.equal(f.session().get('ting-demo-signed-out'),'0');
+});
+test('logged-out registration remains available only for KTV or owner',()=>{
+ const f=fixture();f.click('logout');f.click('auth-register');
+ assert.match(f.html(),/Kỹ thuật viên/);assert.match(f.html(),/Chủ phòng máy/);
+ const before=f.state();f.submit('register',{role:'accountant',name:'Wrong'});
+ assert.deepEqual(f.state(),before);assert.match(f.html(),/Chào mừng đến Ting/);
+ f.click('close');assert.match(f.html(),/Đăng nhập tài khoản mẫu/);
+ f.click('auth-register');
+ f.click('auth-login');assert.match(f.html(),/Đăng nhập tài khoản mẫu/);
+});
+test('staging Settings placement and KTV account scope match the proposed roles',()=>{
+ const f=fixture();f.role('admin');f.click('page','settings');
+ assert.match(f.html(),/Xem trước dải poster Ting Menu/);
+ assert.match(f.html(),/Giá & cấu hình license/);
+ f.click('page','accounts');assert.match(f.html(),/<td>ktv2<\/td>/);
+ assert.doesNotMatch(f.html(),/<td>owner<\/td>|<td>accountant<\/td>/);
+ f.role('ktv');assert.match(f.html(),/data-id="settings"/);
+ f.click('page','settings');assert.match(f.html(),/Xem trước dải poster Ting Menu/);
+ assert.doesNotMatch(f.html(),/data-form="settings"|data-action="menu-select"/);
+ f.role('accountant');f.click('page','settings');
+ assert.match(f.html(),/Tên công ty bán hàng/);
+ assert.doesNotMatch(f.html(),/Xem trước dải poster Ting Menu/);
+});
+
+test('KTV key pool allows activating yearly license and decrements available pool',()=>{
+ const f=fixture();
+ const initialPool=f.state().keyPools['ktv'];
+ const initialActivated=initialPool.activated;
+ f.submit('license-activate',{room:'R02',kind:'yearly'},'R02');
+ const afterPool=f.state().keyPools['ktv'];
+ assert.equal(afterPool.activated,initialActivated+1);
+ const room=f.state().rooms.find(r=>r.id==='R02');
+ assert.equal(room.type,'paid');
+ assert.equal(room.settlementMonth,'2026-10');
+});
+
+test('KTV key pool rejects activation when pool has zero available keys',()=>{
+ const f=fixture();
+ f.setStore(d=>{d.keyPools['ktv'].activated=d.keyPools['ktv'].allocated;});
+ f.submit('license-activate',{room:'R02',kind:'yearly'},'R02');
+ assert.match(f.error(),/Kho key của KTV đã hết/);
+});
+
+test('Admin can allocate keys to KTV pool',()=>{
+ const f=fixture();
+ f.role('admin');
+ const initialAllocated=f.state().keyPools['ktv'].allocated;
+ f.submit('pool-allocate',{tech:'ktv',quantity:'20'});
+ assert.equal(f.state().keyPools['ktv'].allocated,initialAllocated+20);
+});
+
+test('Monthly settlement calculates total activated keys and accountant can issue consolidated invoice and mark paid',()=>{
+ const f=fixture();
+ f.role('accountant');
+ f.click('page','settlements');
+ assert.match(f.html(),/Chốt Kỳ Kế Toán/);
+ f.submit('settlement-invoice',{tech:'ktv',invoiceRef:'HD-202610-099'});
+ const s=f.state().settlements.find(x=>x.tech==='ktv'&&x.month==='2026-10');
+ assert.equal(s.state,'invoiced');
+ assert.equal(s.invoiceRef,'HD-202610-099');
+ f.submit('settlement-pay',{tech:'ktv',paidRef:'UNC-TEST-9988'});
+ const sPaid=f.state().settlements.find(x=>x.tech==='ktv'&&x.month==='2026-10');
+ assert.equal(sPaid.state,'paid');
+ assert.equal(sPaid.paidRef,'UNC-TEST-9988');
+});
+
+test('Retail room activation by admin records external transfer reference and yearly license',()=>{
+ const f=fixture();
+ f.role('admin');
+ f.submit('license-activate',{room:'R02',kind:'retail',reference:'CK-VIETCOMBANK-12345'});
+ const r=f.state().rooms.find(x=>x.id==='R02');
+ assert.equal(r.type,'paid');
+ assert.equal(r.source,'retail');
+ assert.equal(f.state().keys.some(k=>k.order==='RETAIL'&&k.room==='R02'),true);
+});
+
+test('Independent 30-day trial can be granted per room',()=>{
+ const f=fixture();
+ f.submit('license-activate',{room:'R01',kind:'trial'});
+ const r=f.state().rooms.find(x=>x.id==='R01');
+ assert.equal(r.type,'trial');
+ const diffDays=Math.round((Date.parse(r.until)-Date.parse('2026-10-07T10:00:00+07:00'))/86400000);
+ assert.equal(diffDays,30);
 });

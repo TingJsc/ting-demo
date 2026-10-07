@@ -2199,7 +2199,7 @@
             <div class="form-group">
               <label class="form-label">Số game xử lý file đồng thời</label>
               <div class="form-row">
-                <select class="form-select" id="file-processing-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option></select>
+                <select class="adv-search-select" id="file-processing-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option></select>
                 <input class="form-input" id="file-processing-limit" type="text" value="1" disabled style="width:90px" placeholder="1-32">
                 <button class="btn-action primary" onclick="saveFileProcessing()">Lưu</button>
                 <span id="file-processing-summary" class="form-hint"></span>
@@ -2210,7 +2210,7 @@
             <div class="form-group" id="download-concurrency-settings">
               <label class="form-label">Số game tải xuống đồng thời</label>
               <div class="form-row">
-                <select class="form-select" id="download-concurrency-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option><option value="unlimited">Không giới hạn</option></select>
+                <select class="adv-search-select" id="download-concurrency-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option><option value="unlimited">Không giới hạn</option></select>
                 <input class="form-input" id="download-concurrency-limit" type="text" value="1" disabled style="width:90px" placeholder="1-32">
                 <button class="btn-action primary" onclick="saveDownloadConcurrency()">Lưu</button>
                 <span id="download-concurrency-summary" class="form-hint"></span>
@@ -2222,7 +2222,7 @@
 <div class="form-group" id="seed-concurrency-settings">
               <label class="form-label">Số game seed đồng thời</label>
               <div class="form-row">
-                <select class="form-select" id="seed-concurrency-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option><option value="unlimited">Không giới hạn</option></select>
+                <select class="adv-search-select" id="seed-concurrency-mode" style="width:150px"><option value="auto">Tự động</option><option value="manual">Thủ công</option><option value="unlimited">Không giới hạn</option></select>
                 <input class="form-input" id="seed-concurrency-limit" type="text" value="1" disabled style="width:90px" placeholder="1-32">
                 <button class="btn-action primary" onclick="saveSeedConcurrency()">Lưu</button>
                 <span id="seed-concurrency-summary" class="form-hint"></span>
@@ -2236,7 +2236,7 @@
             <div class="form-group">
               <label class="form-label">Bảo vệ thư mục game đang seed</label>
               <div class="form-row">
-                <select class="form-select" id="server-folder-policy" style="width: 280px;" onchange="requestServerFolderPolicy(this.value)">
+                <select class="adv-search-select" id="server-folder-policy" style="width: 280px;" onchange="requestServerFolderPolicy(this.value)">
                   <option value="exclusive" selected>Khóa ghi/xóa file game đang seed</option>
                   <option value="observe">Cho phép thay đổi và tự ngừng seed</option>
                 </select>
@@ -2252,7 +2252,7 @@
               <div class="form-row">
                 <input type="text" class="form-input" id="cfg-cat-folder-1" value="Online games" style="flex: 1;" readonly>
                 <button class="btn-action" onclick="showToast('Đang mở hộp thoại chọn thư mục phân loại...')">Chọn thư mục...</button>
-                <select class="form-select" id="cfg-cat-map-1" style="width: 120px;" onchange="markCategoryFoldersDirty()">
+                <select class="adv-search-select" id="cfg-cat-map-1" style="width: 120px;" onchange="markCategoryFoldersDirty()">
                   <option value="online" selected>Online</option>
                   <option value="offline">Offline</option>
                   <option value="tool">Tools</option>
@@ -2261,7 +2261,7 @@
               <div class="form-row">
                 <input type="text" class="form-input" id="cfg-cat-folder-2" value="Offline Games" style="flex: 1;" readonly>
                 <button class="btn-action" onclick="showToast('Đang mở hộp thoại chọn thư mục phân loại...')">Chọn thư mục...</button>
-                <select class="form-select" id="cfg-cat-map-2" style="width: 120px;" onchange="markCategoryFoldersDirty()">
+                <select class="adv-search-select" id="cfg-cat-map-2" style="width: 120px;" onchange="markCategoryFoldersDirty()">
                   <option value="online">Online</option>
                   <option value="offline" selected>Offline</option>
                   <option value="tool">Tools</option>
@@ -2270,7 +2270,7 @@
               <div class="form-row">
                 <input type="text" class="form-input" id="cfg-cat-folder-3" value="Tools" style="flex: 1;" readonly>
                 <button class="btn-action" onclick="showToast('Đang mở hộp thoại chọn thư mục phân loại...')">Chọn thư mục...</button>
-                <select class="form-select" id="cfg-cat-map-3" style="width: 120px;" onchange="markCategoryFoldersDirty()">
+                <select class="adv-search-select" id="cfg-cat-map-3" style="width: 120px;" onchange="markCategoryFoldersDirty()">
                   <option value="online">Online</option>
                   <option value="offline">Offline</option>
                   <option value="tool" selected>Tools</option>
@@ -2288,7 +2288,7 @@
             <div class="form-group">
               <label class="form-label">Khi đóng cửa sổ</label>
               <div class="form-row">
-                <select class="form-select" style="width: 180px;">
+                <select class="adv-search-select" style="width: 180px;">
                   <option>Ẩn xuống tray</option>
                   <option>Đóng</option>
                 </select>
