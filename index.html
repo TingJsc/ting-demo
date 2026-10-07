@@ -130,6 +130,7 @@
     .brand-card.server:hover { border-color: #FF4A41; }
     .brand-card.launcher:hover { border-color: #FFB700; }
     .brand-card.admin:hover { border-color: #00B96B; }
+    .brand-card.console:hover { border-color: #39D9D0; }
     .brand-card.menu:hover { border-color: #E41865; }
 
     /* Logo Canvas Preview */
@@ -155,6 +156,9 @@
     }
     .brand-card.admin .logo-canvas {
       background: radial-gradient(circle at center, rgba(0, 185, 107, 0.12) 0%, rgba(13, 15, 20, 0.6) 80%);
+    }
+    .brand-card.console .logo-canvas {
+      background: radial-gradient(circle at center, rgba(57, 217, 208, 0.12) 0%, rgba(13, 15, 20, 0.6) 80%);
     }
     .brand-card.menu .logo-canvas {
       background: radial-gradient(circle at center, rgba(228, 24, 101, 0.15) 0%, rgba(13, 15, 20, 0.6) 80%);
@@ -203,6 +207,7 @@
     .brand-card.server .product-tag { background: rgba(255, 74, 65, 0.15); color: #FF7B42; }
     .brand-card.launcher .product-tag { background: rgba(255, 183, 0, 0.15); color: #FFB700; }
     .brand-card.admin .product-tag { background: rgba(0, 185, 107, 0.15); color: #00F5A0; }
+    .brand-card.console .product-tag { background: rgba(57, 217, 208, 0.15); color: #81ECE4; }
     .brand-card.menu .product-tag { background: rgba(228, 24, 101, 0.15); color: #FFA3CE; }
 
     .product-desc {
@@ -351,18 +356,19 @@
     <header class="showcase-header">
       <div class="badge-pill">Ting Ecosystem Design System</div>
       <h1 class="title">Bộ Nhận Diện Logo Sản Phẩm Ting</h1>
-      <p class="subtitle">Bộ nhận diện 5 sản phẩm Ting. Ting Menu dùng trực tiếp logo vàng 3D và palette UI từ source <code>Ting Menu.svg</code>.</p>
+      <p class="subtitle">Bộ nhận diện các sản phẩm Ting và liên kết tới từng demo. Ting Console dùng chung nhận diện quản trị với Ting Admin.</p>
       
       <div class="nav-links">
         <a href="ting-menu-demo/index.html" class="nav-btn">🎯 Demo Ting Menu</a>
         <a href="ting-admin-demo/index.html" class="nav-btn">🖥️ Demo Ting Admin</a>
+        <a href="ting-console-demo/index.html" class="nav-btn">🧭 Demo Ting Console</a>
         <a href="ting-launcher-demo/index.html" class="nav-btn">🎮 Demo Ting Launcher</a>
         <a href="ting-server-demo/index.html" class="nav-btn">⚡ Demo Ting Server</a>
         <a href="ting-update-demo/index.html" class="nav-btn">🔄 Demo Ting Update</a>
       </div>
     </header>
 
-    <!-- 4 PRODUCTS LOGO GRID -->
+    <!-- PRODUCT LOGO GRID -->
     <div class="grid-4">
 
       <!-- 1. TING UPDATE -->
@@ -546,6 +552,30 @@
       </div>
 
       <!-- 5. TING MENU -->
+      <!-- 5. TING CONSOLE -->
+      <div class="brand-card console">
+        <div class="logo-canvas">
+          <img src="logo-admin.svg" alt="Ting Console Logo">
+        </div>
+        <div class="card-body">
+          <div class="product-meta">
+            <span class="product-name">Ting Console</span>
+            <span class="product-tag">Cloud Management</span>
+          </div>
+          <p class="product-desc">Giao diện quản lý cloud cho tài khoản, phòng máy, game, trial và license Ting Update. Console dùng chung nhận diện quản trị với Ting Admin.</p>
+          <div class="palette-box">
+            <div class="palette-row"><span class="palette-label">Gradient</span><div class="swatch-group"><span class="swatch-dot" style="background:#39D9D0;"></span><span class="swatch-dot" style="background:#00B96B;"></span><span class="swatch-code">#39D9D0 → #00B96B</span></div></div>
+            <div class="palette-row"><span class="palette-label">Stroke</span><div class="swatch-group"><span class="swatch-dot" style="background:#81ECE4;"></span><span class="swatch-code">#81ECE4 (2px)</span></div></div>
+            <div class="palette-row"><span class="palette-label">Shadow</span><div class="swatch-group"><span class="swatch-dot" style="background:#064E3B;"></span><span class="swatch-code">#064E3B (75%)</span></div></div>
+          </div>
+          <div class="file-link-box">
+            <a href="logo-admin.svg" target="_blank" class="file-btn">📥 Xem SVG</a>
+            <a href="ting-console-demo/index.html" class="file-btn">🚀 Mở Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. TING MENU -->
       <div class="brand-card menu">
         <div class="logo-canvas">
           <img src="logo-menu.svg" alt="Ting Menu Logo">
