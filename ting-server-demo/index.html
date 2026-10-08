@@ -794,7 +794,7 @@
 
     table.data-grid {
       width: 100%;
-      min-width: 1260px;
+      min-width: 0;
       border-collapse: separate;
       border-spacing: 0;
     }
@@ -810,7 +810,7 @@
     table.data-grid th[data-col="peers"] { width: 95px; }
 
     @container (max-width: 1279px) {
-      table.data-grid { min-width: 1056px; }
+      table.data-grid { min-width: 0; }
       table.data-grid th[data-col="category"] { width: 40px; }
       table.data-grid th[data-col="version"] { width: 40px; }
       table.data-grid th[data-col="publishedAt"] { width: 60px; }
@@ -1568,6 +1568,58 @@
         transform: translateY(0);
       }
     }
+
+    @container (max-width: 899px) {
+      .toolbar-row-actions .btn-action, .toolbar-actions-right .btn-action {
+        font-size: 0;
+        min-width: 31px;
+        width: 31px;
+        padding: 0;
+        flex-shrink: 0;
+      }
+      .toolbar-row-search { gap: 12px; }
+      .toolbar-search-left .search-box-wrap { width: 155px; }
+      .toolbar-search-left .adv-search-select { width: 130px !important; min-width: 0; }
+      .toolbar-search-left .adv-search-select:last-child { width: 125px !important; }
+    }
+    @container (max-width: 1199px) {
+      table.data-grid { min-width: 0; table-layout: fixed; }
+      table.data-grid th[data-col="name"] { width: auto !important; }
+      table.data-grid th[data-col="status"] { width: 145px !important; }
+      table.data-grid th[data-col="speed"] { width: 50px !important; }
+      table.data-grid .col-cb { width: 38px; box-sizing: border-box; }
+      table.data-grid .col-actions { width: 198px !important; box-sizing: border-box; }
+      .row-actions-group { gap: 0; }
+      .row-btn-icon { width: 20px; }
+      .row-btn-icon[data-action="properties"] { display: none !important; }
+      .row-btn-icon[data-action="check_game"] { display: none !important; }
+    }
+    #column-menu { height: auto; min-height: 0; }
+    #column-menu .context-item { display: flex; align-items: center; justify-content: flex-start; gap: 0; }
+    .column-menu-check { flex: 0 0 18px; }
+    .column-menu-hint { padding: 4px 8px; font-size: 11px; color: var(--text-muted); text-align: center; }
+
+    /* Content containers fit their children; only data viewports scroll. */
+    .modal-card { max-height:calc(100dvh - 32px); min-height:0; }
+    .modal-header,.modal-footer { flex-shrink:0; height:auto; min-height:40px; box-sizing:border-box; }
+    .modal-header { padding-top:8px; padding-bottom:8px; gap:8px; }
+    .modal-body { min-height:0; max-height:none; overflow-y:auto; overflow-wrap:anywhere; }
+    .modal-title,.subview-desc,.stat-label,.stat-subtext,.form-hint { white-space:normal; overflow-wrap:anywhere; }
+    .form-row { height:auto; min-height:29px; flex-wrap:wrap; }
+    .form-row > input,.form-row > select,.form-group { min-width:0; max-width:100%; }
+    .settings-card,.stat-card { min-width:0; height:auto; }
+    .peer-table-viewport { overflow-x:auto; min-width:0; }
+    .peer-table-viewport table { min-width:955px; }
+    .service-state-grid { grid-template-columns:125px minmax(0,1fr) !important; }
+    .service-state-grid > * { min-width:0; overflow-wrap:anywhere; }
+    .service-error-message { white-space:normal; overflow:visible; overflow-wrap:anywhere; }
+    .toast-pill { height:auto; max-width:calc(100vw - 40px); white-space:normal; overflow-wrap:anywhere; }
+    .terminal-box > div { height:auto; min-height:18px; white-space:normal; overflow-wrap:anywhere; }
+    .shortcut-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    @media(max-width:1119px) {
+      .stats-grid,.shortcut-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .settings-card > div[style*="display: flex"] { flex-wrap:wrap; gap:8px; }
+    }
   </style>
 </head>
 
@@ -1721,14 +1773,14 @@
       <!-- VIEW 1: DANH SÁCH GAME (game-grid hiển thị luôn lập tức) -->
       <!-- ======================================================== -->
       <div class="view-panel active" id="view-games">
-        
+
         <!-- Toolbar 2 hàng: Hàng 1 (Thao tác game hàng loạt) - Hàng 2 (Tìm kiếm bên trái & Action bên phải) -->
         <div class="toolbar-wrapper">
           <!-- Hàng 1: Thao tác game hàng loạt (disable nghiêm ngặt theo trạng thái toàn bộ game đã chọn) -->
           <div class="toolbar-row-actions">
             <div class="toolbar-actions-list" id="toolbar-center-actions">
               <span class="selection-indicator" id="selection-count-badge" style="display: none;">Đã chọn: 0</span>
-              
+
               <!-- 1. Tải game qua P2P: chỉ enable khi tất cả game đều chưa tải -->
               <button class="btn-action" id="btn-p2p-fetch" disabled title="Tải game qua P2P (Chỉ kích hoạt khi TẤT CẢ game đã chọn đều chưa tải)">
                 <svg viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
@@ -1943,7 +1995,7 @@
               </button>
             </div>
 
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px;">
+            <div class="peer-table-viewport"><table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px;">
               <thead>
                 <tr style="background: var(--bg-table-header); height: 28px; color: var(--text-header); text-align: left;">
                   <th style="padding: 0 10px;">Địa chỉ IP Ting Update</th>
@@ -1988,7 +2040,7 @@
                   <td style="padding: 0 10px; color: var(--text-muted);">32m 10s</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
         </div>
       </div>
@@ -2088,7 +2140,7 @@
           <!-- Bảng tra cứu phím tắt -->
           <div class="settings-card">
             <h3 style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Phím tắt và Thao tác nhanh</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; font-size: 11.5px; color: var(--text-secondary);">
+            <div class="shortcut-grid" style="display:grid;gap:8px;font-size:11.5px;color:var(--text-secondary);">
               <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">F5</kbd> : Làm mới danh sách game và swarms</div>
               <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Ctrl + A</kbd> : Chọn tất cả game trong bảng</div>
               <div><kbd style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">Shift + Click</kbd> : Chọn dải hàng liên tiếp</div>
@@ -2993,7 +3045,7 @@
         key: header.dataset.col,
         label: header.querySelector(".th-inner span")?.textContent?.trim()
       }))
-      .filter(column => column.key);
+      .filter(column => column.key && column.key !== "name");
     const hiddenColumns = new Set();
     const toastPill = document.getElementById("toast-pill");
 
@@ -3138,7 +3190,7 @@
     }
 
     // Lấy danh sách game sau khi lọc và sắp xếp
-    
+
     // Format Status Badge với Progress Bar ở đáy (Kích thước đồng đều 138px x 25px)
     function formatStatusBadge(game) {
       const type = game.statusType || "paused";
@@ -3599,7 +3651,8 @@
 
     function applyColumnVisibility() {
       configurableColumns.forEach(column => {
-        const visible = !hiddenColumns.has(column.key);
+        const narrow = document.querySelector(".grid-viewport").clientWidth < 1200;
+        const visible = !hiddenColumns.has(column.key) && (!narrow || ["status", "speed"].includes(column.key));
         column.header.style.display = visible ? "" : "none";
         Array.from(gridBody.rows).forEach(row => {
           if (row.cells[column.index]) row.cells[column.index].style.display = visible ? "" : "none";
@@ -3612,22 +3665,36 @@
       event.stopPropagation();
       closeContextMenu();
       columnMenu.replaceChildren();
+      const hint = document.createElement("div");
+      hint.className = "column-menu-hint";
+      hint.textContent = document.querySelector(".grid-viewport").clientWidth < 1200
+        ? "Cửa sổ hẹp: ưu tiên cột chính" : "Cột hiển thị";
+      columnMenu.appendChild(hint);
       configurableColumns.forEach(column => {
         const item = document.createElement("div");
         item.className = "context-item";
         item.setAttribute("role", "menuitemcheckbox");
         item.tabIndex = 0;
         item.setAttribute("aria-checked", String(!hiddenColumns.has(column.key)));
-        item.textContent = `${hiddenColumns.has(column.key) ? "   " : "✓ "}${column.label}`;
+        const check = document.createElement("span");
+        check.className = "column-menu-check";
+        check.setAttribute("aria-hidden", "true");
+        check.textContent = hiddenColumns.has(column.key) ? "" : "✓";
+        const label = document.createElement("span");
+        label.textContent = column.label;
+        item.append(check, label);
         item.addEventListener("click", () => {
           if (hiddenColumns.has(column.key)) hiddenColumns.delete(column.key);
           else hiddenColumns.add(column.key);
           applyColumnVisibility();
-          columnMenu.style.display = "none";
+          item.setAttribute("aria-checked", String(!hiddenColumns.has(column.key)));
+          check.textContent = hiddenColumns.has(column.key) ? "" : "✓";
         });
         columnMenu.appendChild(item);
       });
       columnMenu.style.display = "block";
+      columnMenu.tabIndex = -1;
+      columnMenu.focus();
       const left = Math.min(event.clientX, window.innerWidth - columnMenu.offsetWidth - 8);
       const top = Math.min(event.clientY, window.innerHeight - columnMenu.offsetHeight - 8);
       columnMenu.style.left = Math.max(8, left) + "px";
@@ -3635,6 +3702,12 @@
     }
 
     columnHeaders.forEach(header => header.addEventListener("contextmenu", openColumnMenu));
+    new ResizeObserver(() => applyColumnVisibility()).observe(document.querySelector(".grid-viewport"));
+    document.querySelectorAll(".toolbar-row-actions .btn-action, .toolbar-actions-right .btn-action").forEach(button => {
+      const label = button.textContent.trim();
+      button.setAttribute("aria-label", label);
+      if (!button.title) button.title = label;
+    });
 
     function activateFocusedMenuItem(e) {
       if (e.key !== "Enter" && e.key !== " ") return;

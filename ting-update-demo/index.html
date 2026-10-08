@@ -849,7 +849,7 @@
 
     table.data-grid {
       width: 100%;
-      min-width: 1260px;
+      min-width: 0;
       border-collapse: separate;
       border-spacing: 0;
     }
@@ -865,7 +865,7 @@
     table.data-grid th[data-col="peers"] { width: 95px; }
 
     @container (max-width: 1279px) {
-      table.data-grid { min-width: 1027px; }
+      table.data-grid { min-width: 0; }
       table.data-grid th[data-col="category"] { width: 40px; }
       table.data-grid th[data-col="version"] { width: 40px; }
       table.data-grid th[data-col="updatedAt"] { width: 72px; }
@@ -1698,7 +1698,55 @@
 .license-order{padding:10px;margin:12px 0;border:1px solid var(--border-color);border-radius:4px;background:var(--bg-card-inner)}
 .license-order p{margin:6px 0;overflow-wrap:anywhere}.license-key{font-family:monospace;user-select:all}
 .license-error{color:var(--status-error-color,#ef4444);font-size:12px}
-</style>
+    @container (max-width: 899px) {
+      .toolbar-row-actions .btn-action, .toolbar-actions-right .btn-action {
+        font-size: 0;
+        min-width: 31px;
+        width: 31px;
+        padding: 0;
+        flex-shrink: 0;
+      }
+      .toolbar-row-search { gap: 12px; }
+      .toolbar-search-left .search-box-wrap { width: 155px; }
+      .toolbar-search-left .adv-search-select { width: 130px !important; min-width: 0; }
+      .toolbar-search-left .adv-search-select:last-child { width: 125px !important; }
+    }
+    @container (max-width: 1199px) {
+      table.data-grid { min-width: 0; table-layout: fixed; }
+      table.data-grid th[data-col="name"] { width: auto !important; }
+      table.data-grid th[data-col="status"] { width: 145px !important; }
+      table.data-grid th[data-col="speed"] { width: 55px !important; }
+      table.data-grid .col-cb { width: 39px; box-sizing: border-box; }
+      table.data-grid .col-actions { width: 158px !important; box-sizing: border-box; }
+      .row-actions-group { gap: 0; }
+      .row-btn-icon { width: 20px; }
+      .row-btn-icon[data-action="properties"] { display: none !important; }
+    }
+    #column-menu { height: auto; min-height: 0; }
+    #column-menu .context-item { display: flex; align-items: center; justify-content: flex-start; gap: 0; }
+    .column-menu-check { flex: 0 0 18px; }
+    .column-menu-hint { padding: 4px 8px; font-size: 11px; color: var(--text-muted); text-align: center; }
+
+    /* Content containers fit their children; only data viewports scroll. */
+    .modal-card { max-height:calc(100dvh - 32px); min-height:0; }
+    .modal-header,.modal-footer { flex-shrink:0; height:auto; min-height:40px; box-sizing:border-box; }
+    .modal-header { padding-top:8px; padding-bottom:8px; gap:8px; }
+    .modal-body { min-height:0; max-height:none; overflow-y:auto; overflow-wrap:anywhere; }
+    .modal-title,.subview-desc,.stat-label,.stat-subtext,.form-hint { white-space:normal; overflow-wrap:anywhere; }
+    .form-row { height:auto; min-height:29px; flex-wrap:wrap; }
+    .form-row > input,.form-row > select,.form-group { min-width:0; max-width:100%; }
+    .settings-card,.stat-card { min-width:0; height:auto; }
+    .service-state-grid { grid-template-columns:125px minmax(0,1fr) !important; }
+    .service-state-grid > * { min-width:0; overflow-wrap:anywhere; }
+    .service-error-message { white-space:normal; overflow:visible; overflow-wrap:anywhere; }
+    .toast-pill { height:auto; max-width:calc(100vw - 40px); white-space:normal; overflow-wrap:anywhere; }
+    .terminal-box > div { height:auto; min-height:18px; white-space:normal; overflow-wrap:anywhere; }
+    .shortcut-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    @media(max-width:1119px) {
+      .stats-grid,.shortcut-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .settings-card > div[style*="display: flex"] { flex-wrap:wrap; gap:8px; }
+    }
+  </style>
 </head>
 
 <body>
@@ -1997,7 +2045,7 @@
             <!-- Cụm action bên phải -->
             <div class="toolbar-actions-right">
               <button class="btn-action" id="btn-add-local-game" title="Thêm game từ ổ đĩa local" onclick="if (requireMainGate()) openLocalGameModal()">
-                <span>Thêm game local</span>
+                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Thêm game local</span>
               </button>
               <button class="btn-action" id="btn-refresh" title="Làm mới danh sách game từ cloud (F5)">
                 <svg viewBox="0 0 16 16">
@@ -2212,8 +2260,7 @@
 
           <div class="settings-card">
             <h3 style="font-size: 13px; font-weight: 700; color: var(--text-primary);">Phím tắt và Thao tác nhanh</h3>
-            <div
-              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; font-size: 11.5px; color: var(--text-secondary);">
+            <div class="shortcut-grid" style="display:grid;gap:8px;font-size:11.5px;color:var(--text-secondary);">
               <div><kbd
                   style="background: var(--bg-card-inner); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border-color);">F5</kbd>
                 : Làm mới danh sách game và tiến trình tải</div>
@@ -3712,7 +3759,8 @@
 
     function applyColumnVisibility() {
       configurableColumns.forEach(column => {
-        const visible = !hiddenColumns.has(column.key);
+        const narrow = document.querySelector(".grid-viewport").clientWidth < 1200;
+        const visible = !hiddenColumns.has(column.key) && (!narrow || ["status", "speed"].includes(column.key));
         column.header.style.display = visible ? "" : "none";
         Array.from(gridBody.rows).forEach(row => {
           if (row.cells[column.index]) row.cells[column.index].style.display = visible ? "" : "none";
@@ -3725,22 +3773,36 @@
       event.stopPropagation();
       closeContextMenu();
       columnMenu.replaceChildren();
+      const hint = document.createElement("div");
+      hint.className = "column-menu-hint";
+      hint.textContent = document.querySelector(".grid-viewport").clientWidth < 1200
+        ? "Cửa sổ hẹp: ưu tiên cột chính" : "Cột hiển thị";
+      columnMenu.appendChild(hint);
       configurableColumns.forEach(column => {
         const item = document.createElement("div");
         item.className = "context-item";
         item.setAttribute("role", "menuitemcheckbox");
         item.tabIndex = 0;
         item.setAttribute("aria-checked", String(!hiddenColumns.has(column.key)));
-        item.textContent = `${hiddenColumns.has(column.key) ? "   " : "✓ "}${column.label}`;
+        const check = document.createElement("span");
+        check.className = "column-menu-check";
+        check.setAttribute("aria-hidden", "true");
+        check.textContent = hiddenColumns.has(column.key) ? "" : "✓";
+        const label = document.createElement("span");
+        label.textContent = column.label;
+        item.append(check, label);
         item.addEventListener("click", () => {
           if (hiddenColumns.has(column.key)) hiddenColumns.delete(column.key);
           else hiddenColumns.add(column.key);
           applyColumnVisibility();
-          columnMenu.style.display = "none";
+          item.setAttribute("aria-checked", String(!hiddenColumns.has(column.key)));
+          check.textContent = hiddenColumns.has(column.key) ? "" : "✓";
         });
         columnMenu.appendChild(item);
       });
       columnMenu.style.display = "block";
+      columnMenu.tabIndex = -1;
+      columnMenu.focus();
       const left = Math.min(event.clientX, window.innerWidth - columnMenu.offsetWidth - 8);
       const top = Math.min(event.clientY, window.innerHeight - columnMenu.offsetHeight - 8);
       columnMenu.style.left = Math.max(8, left) + "px";
@@ -3748,6 +3810,12 @@
     }
 
     columnHeaders.forEach(header => header.addEventListener("contextmenu", openColumnMenu));
+    new ResizeObserver(() => applyColumnVisibility()).observe(document.querySelector(".grid-viewport"));
+    document.querySelectorAll(".toolbar-row-actions .btn-action, .toolbar-actions-right .btn-action").forEach(button => {
+      const label = button.textContent.trim();
+      button.setAttribute("aria-label", label);
+      if (!button.title) button.title = label;
+    });
 
     function activateFocusedMenuItem(e) {
       if (e.key !== "Enter" && e.key !== " ") return;
@@ -5055,7 +5123,7 @@ function selectedLicenseProof(file){if(!file||typeof file!=='object'||!file.name
 function renderLicenseDemo(){
 const d=readLicenseDemo(),u=d.update,r=d.rooms.find(r=>r.id===u.room),paid=r.type==='paid'&&new Date(r.until)>licenseNow&&u.scenario!=='paid-expired',trial=['trial','new'].includes(u.scenario)&&r.type==='trial'&&licenseNow<licenseTrialEnd&&licenseNow<new Date(r.until),offline=u.scenario==='offline',o=d.orders.find(o=>o.id===u.order&&['owner','guest'].includes(o.owner)&&o.state!=='cancelled');
 const money=n=>Number(n).toLocaleString('vi-VN')+'đ',field=(t,n,v='',type='text')=>'<label>'+t+'<input class="form-input" name="'+n+'" type="'+type+'" value="'+le(v)+'" required></label>';
-let b='<p class="license-caption">'+(offline?'Kết nối mạng để kiểm tra bản quyền.':paid?'Hạn dùng: '+new Date(r.until).toLocaleDateString('vi-VN'):trial?'Dùng thử đến hết 15/11/2026 theo giờ server mẫu. Không cần mã KTV.':'Nhập key đã mua hoặc đặt mua 1 key.')+'</p>';
+let b='<p class="license-caption">'+(offline?'Kết nối mạng để kiểm tra bản quyền.':paid?'Hạn dùng: '+new Date(r.until).toLocaleString('vi-VN', {timeZone:'Asia/Ho_Chi_Minh', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}):trial?'Dùng thử đến hết 15/11/2026 theo giờ server mẫu. Không cần mã KTV.':'Nhập key đã mua hoặc đặt mua 1 key.')+'</p>';
 if(offline)b+='<button class="btn-action primary" onclick="reconnectLicenseDemo()">Thử kết nối lại (demo)</button>';
 else{
 b+='<div class="license-tabs"><button class="btn-action '+(licensePane==='key'?'primary':'')+'" onclick="setLicensePane(\'key\')">Nhập key</button><button class="btn-action '+(licensePane==='buy'?'primary':'')+'" onclick="setLicensePane(\'buy\')">'+(paid?'Gia hạn':'Mua 1 key')+'</button></div>';
@@ -5071,7 +5139,7 @@ if(paid||trial)b+='<button class="btn-action" onclick="continueLicenseDemo()">Ti
 b+='<p class="license-error" role="alert"></p><details class="license-caption"><summary>Dữ liệu demo · chưa nối server</summary><label>Kịch bản<select class="adv-search-select" onchange="setLicenseScenario(this.value)">'+[['trial','Trial còn hạn'],['new','Mới cài / mua lần đầu'],['expired','Hết trial'],['offline','Mất mạng'],['paid','License còn hạn'],['paid-expired','License hết hạn']].map(([v,t])=>'<option value="'+v+'" '+(u.scenario===v?'selected':'')+'>'+t+'</option>').join('')+'</select></label><a href="../ting-console-demo/index.html?proposal=1" target="_blank" rel="noopener">Console mẫu để kế toán duyệt</a></details>';
 document.getElementById('wizard-step-1').innerHTML=b;
 document.getElementById('view-license').innerHTML='<div class="subview-container"><div class="subview-header"><h2 class="subview-title">Bản quyền Ting Update</h2></div><div class="license-native">'+b+'</div></div>';
-document.getElementById('business-license-status').textContent=paid?'12 tháng · '+new Date(r.until).toLocaleDateString('vi-VN'):trial?'Dùng thử đến 15/11/2026':offline?'Chờ kết nối':'Chưa kích hoạt / hết hạn';
+document.getElementById('business-license-status').textContent=paid?'12 tháng · '+new Date(r.until).toLocaleString('vi-VN', {timeZone:'Asia/Ho_Chi_Minh', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}):trial?'Dùng thử đến 15/11/2026':offline?'Chờ kết nối':'Chưa kích hoạt / hết hạn';
 }
 function setLicensePane(p){licensePane=p;renderLicenseDemo();}
 function setLicenseScenario(s){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(['new','trial','expired'].includes(s)&&(r.type==='paid'||d.keys.some(k=>k.room===r.id&&k.state==='active'))){renderLicenseDemo();return;}d.update.scenario=s;if(s==='new')d.update.order=null;if(s==='new'||s==='trial'){r.type=licenseNow<licenseTrialEnd?'trial':'expired';r.until=licenseTrialEnd.toISOString();}if(s==='expired')r.type='expired';if(s==='paid-expired'){r.type='paid';r.until='2026-10-01T00:00:00+07:00';}if(s==='paid'){r.type='paid';r.until='2027-10-07T10:00:00+07:00';}saveLicenseDemo(d);renderLicenseDemo();}
