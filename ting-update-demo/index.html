@@ -2161,8 +2161,7 @@
             Ting Update vẫn tự kết nối ra Internet và chia sẻ piece đã tải hợp lệ.<br>
             Phương thức: Tự động<br>
             Port: 16882<br>
-            Kiểm tra lúc: 2026-09-09T19:12:05.450+07:00<br><br>
-            GUI không hiển thị hash, magnet, tracker thô, peer debug hoặc rqbit WebUI.
+            Kiểm tra lúc: 2026-09-09T19:12:05.450+07:00
           </div>
 
           <div class="settings-card">
@@ -3234,7 +3233,7 @@
       const detail = incoming ? "Đã ghi nhận peer Internet kết nối vào trong 10 phút gần đây." : mapped
         ? "Router đã mở cổng tự động. Chưa ghi nhận kết nối vào từ peer Internet; tải và chia sẻ vẫn tiếp tục."
         : "Ting Update vẫn tự kết nối ra Internet và chia sẻ piece đã tải hợp lệ.";
-      document.getElementById("nat-summary").innerText = `NAT: ${status}\n${detail}\nPhương thức: ${mapped ? "UPnP" : "Tự động"}\nPort: 16882\nKiểm tra lúc: ${new Date().toISOString()}\n\nGUI không hiển thị hash, magnet, tracker thô, peer debug hoặc rqbit WebUI.`;
+      document.getElementById("nat-summary").innerText = `NAT: ${status}\n${detail}\nPhương thức: ${mapped ? "UPnP" : "Tự động"}\nPort: 16882\nKiểm tra lúc: ${new Date().toISOString()}`;
     }
 
     // License mở màn chính; root/P2P chỉ khóa các transfer action.
@@ -5123,6 +5122,14 @@ function selectedLicenseProof(file){if(!file||typeof file!=='object'||!file.name
 function renderLicenseDemo(){
 const d=readLicenseDemo(),u=d.update,r=d.rooms.find(r=>r.id===u.room),paid=r.type==='paid'&&new Date(r.until)>licenseNow&&u.scenario!=='paid-expired',trial=['trial','new'].includes(u.scenario)&&r.type==='trial'&&licenseNow<licenseTrialEnd&&licenseNow<new Date(r.until),offline=u.scenario==='offline',o=d.orders.find(o=>o.id===u.order&&['owner','guest'].includes(o.owner)&&o.state!=='cancelled');
 const money=n=>Number(n).toLocaleString('vi-VN')+'đ',field=(t,n,v='',type='text')=>'<label>'+t+'<input class="form-input" name="'+n+'" type="'+type+'" value="'+le(v)+'" required></label>';
+// Service báo phiên bản không hỗ trợ cả khi SSE vừa ngắt; GUI đọc lại health local.
+if(u.scenario==='unsupported'){
+const blocked='<h2>Cần cập nhật Ting Update</h2><p>Phiên bản Ting Update không còn được hỗ trợ. Hãy cài bản mới để tiếp tục.</p><button class="btn-action" onclick="document.getElementById(\'wizard-overlay\')?.classList.remove(\'visible\'); window.close()">Đóng</button>';
+document.getElementById('wizard-step-1').innerHTML=blocked;
+document.getElementById('view-license').innerHTML='<div class="subview-container">'+blocked+'</div>';
+document.getElementById('business-license-status').textContent='Cần cập nhật Ting Update';
+return;
+}
 let b='<p class="license-caption">'+(offline?'Kết nối mạng để kiểm tra bản quyền.':paid?'Hạn dùng: '+new Date(r.until).toLocaleString('vi-VN', {timeZone:'Asia/Ho_Chi_Minh', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}):trial?'Dùng thử đến hết 15/11/2026 theo giờ server mẫu. Không cần mã KTV.':'Nhập key đã mua hoặc đặt mua 1 key.')+'</p>';
 if(offline)b+='<button class="btn-action primary" onclick="reconnectLicenseDemo()">Thử kết nối lại (demo)</button>';
 else{
@@ -5136,7 +5143,7 @@ else b+=d.keys.filter(k=>k.order===o.id).map(k=>'<p class="license-key">'+le(k.t
 b+='</div>';}
 if(paid||trial)b+='<button class="btn-action" onclick="continueLicenseDemo()">Tiếp tục vào Ting Update</button>';
 }
-b+='<p class="license-error" role="alert"></p><details class="license-caption"><summary>Dữ liệu demo · chưa nối server</summary><label>Kịch bản<select class="adv-search-select" onchange="setLicenseScenario(this.value)">'+[['trial','Trial còn hạn'],['new','Mới cài / mua lần đầu'],['expired','Hết trial'],['offline','Mất mạng'],['paid','License còn hạn'],['paid-expired','License hết hạn']].map(([v,t])=>'<option value="'+v+'" '+(u.scenario===v?'selected':'')+'>'+t+'</option>').join('')+'</select></label><a href="../ting-console-demo/index.html?proposal=1" target="_blank" rel="noopener">Console mẫu để kế toán duyệt</a></details>';
+b+='<p class="license-error" role="alert"></p><details class="license-caption"><summary>Dữ liệu demo · chưa nối server</summary><label>Kịch bản<select class="adv-search-select" onchange="setLicenseScenario(this.value)">'+[['trial','Trial còn hạn'],['new','Mới cài / mua lần đầu'],['expired','Hết trial'],['offline','Mất mạng'],['paid','License còn hạn'],['paid-expired','License hết hạn'],['unsupported','Phiên bản không hỗ trợ']].map(([v,t])=>'<option value="'+v+'" '+(u.scenario===v?'selected':'')+'>'+t+'</option>').join('')+'</select></label><a href="../ting-console-demo/index.html?proposal=1" target="_blank" rel="noopener">Console mẫu để kế toán duyệt</a></details>';
 document.getElementById('wizard-step-1').innerHTML=b;
 document.getElementById('view-license').innerHTML='<div class="subview-container"><div class="subview-header"><h2 class="subview-title">Bản quyền Ting Update</h2></div><div class="license-native">'+b+'</div></div>';
 document.getElementById('business-license-status').textContent=paid?'12 tháng · '+new Date(r.until).toLocaleString('vi-VN', {timeZone:'Asia/Ho_Chi_Minh', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}):trial?'Dùng thử đến 15/11/2026':offline?'Chờ kết nối':'Chưa kích hoạt / hết hạn';
@@ -5147,7 +5154,7 @@ function reconnectLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id
 function buyLicenseDemo(e){e.preventDefault();const v=Object.fromEntries(new FormData(e.target)),d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(r.owner!=='owner')return licenseError('Phòng này do KTV quản lý. Hãy liên hệ KTV để mua key.');if(!v.name?.trim()||!/^\+?[\d\s().-]{9,16}$/.test(v.phone||''))return licenseError('Điền tên và số điện thoại liên hệ hợp lệ.');if(d.orders.some(o=>o.id===d.update.order&&['waiting','review'].includes(o.state))){renderLicenseDemo();return;}if(v.oldLicenseProof?.name&&selectedLicenseProof(v.oldLicenseProof)===null)return licenseError('Chọn ảnh JPG, PNG, WebP hoặc PDF không quá 10 MB.');const oldOffer=[v.oldSoftware,v.oldLicenseUntil,v.oldLicenseProof?.name].some(x=>String(x||'').trim())?{software:String(v.oldSoftware||'').trim(),until:String(v.oldLicenseUntil||'').trim(),evidence:selectedLicenseProof(v.oldLicenseProof)}:null;if(oldOffer&&(!oldOffer.software||!oldOffer.until||!oldOffer.evidence||Date.parse(oldOffer.until+'T23:59:59+07:00')<=licenseNow))return licenseError('Điền đủ phần mềm cũ, ngày còn hạn và bằng chứng; hoặc để trống cả ba mục.');const s=d.settings,id='DH'+String(++d.seq).padStart(3,'0');d.orders.push({id,owner:'guest',source:'update',contactName:v.name.trim(),contactPhone:v.phone.trim(),kind:r.type==='paid'||d.update.scenario==='paid-expired'?'renew':'buy',room:r.id,quantity:1,total:s.price,price:s.price,pack:s.pack,company:s.company,tax:s.tax,bank:s.bank,account:s.account,beneficiary:s.beneficiary,oldOffer,state:'waiting',invoice:'none',terms:'demo-v1',created:licenseNow.toISOString()});d.update.order=id;saveLicenseDemo(d);renderLicenseDemo();}
 function reportLicensePayment(){const d=readLicenseDemo(),o=d.orders.find(o=>o.id===d.update.order&&['owner','guest'].includes(o.owner));if(o?.state==='waiting')o.state='review';saveLicenseDemo(d);renderLicenseDemo();}
 function activateLicenseDemo(e){e.preventDefault();const val=String(new FormData(e.target).get('key')).trim().toUpperCase(),d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room),k=d.keys.find(k=>k.text.toUpperCase()===val&&(k.owner==='owner'||(k.owner==='guest'&&k.order===d.update.order))),o=d.orders.find(o=>o.id===k?.order);if(r.revoked)return licenseError('Phòng đã bị thu hồi. Vui lòng liên hệ hỗ trợ.');if(!k||o?.state!=='paid'||!['unused','active'].includes(k.state)||(k.room&&k.room!==r.id))return licenseError('Key không hợp lệ hoặc đã dùng cho phòng khác.');if(k.state==='unused'){k.state='active';k.room=r.id;const end=new Date(licenseNow);end.setUTCFullYear(end.getUTCFullYear()+1);r.until=end.toISOString();r.type='paid';const bonus=d.bonuses.find(b=>b.order===o.id&&b.room===r.id&&b.state==='approved'&&!b.applied);if(bonus){r.until=new Date(Date.parse(r.until)+bonus.days*86400000).toISOString();bonus.applied=true;}}if(r.type!=='paid'||new Date(r.until)<=licenseNow)return licenseError('Bản quyền đã hết hạn. Vui lòng gia hạn.');d.update.scenario='paid';saveLicenseDemo(d);renderLicenseDemo();continueLicenseDemo();}
-function continueLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(r.revoked||d.update.scenario==='offline'||!((r.type==='paid'&&new Date(r.until)>licenseNow&&d.update.scenario!=='paid-expired')||(r.type==='trial'&&['trial','new'].includes(d.update.scenario)&&licenseNow<licenseTrialEnd&&licenseNow<new Date(r.until))))return licenseError('Cần bản quyền hoặc trial còn hạn.');screenState=3;renderWizard();renderGrid();}
+function continueLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(d.update.scenario==='unsupported')return; if(r.revoked||d.update.scenario==='offline'||!((r.type==='paid'&&new Date(r.until)>licenseNow&&d.update.scenario!=='paid-expired')||(r.type==='trial'&&['trial','new'].includes(d.update.scenario)&&licenseNow<licenseTrialEnd&&licenseNow<new Date(r.until))))return licenseError('Cần bản quyền hoặc trial còn hạn.');screenState=3;renderWizard();renderGrid();}
 window.addEventListener('storage',e=>{if(e.key===licenseStore)renderLicenseDemo();});
 renderLicenseDemo();
 
