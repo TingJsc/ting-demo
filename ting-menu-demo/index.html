@@ -161,7 +161,7 @@ body{font-family:"Segoe UI",Arial,sans-serif}
           </div>
         </div>
       </div>
-      <div id="rba" class="hidden items-center gap-2.5 bg-amber-500/10 border border-amber-500/40 rounded-lg px-3.5 py-3 mb-4 text-amber-500 text-xs">⚠️<span>Bản cập nhật yêu cầu <strong>khởi động lại máy</strong> trước khi chơi.</span></div>
+      <div id="rba" class="hidden items-center gap-2.5 bg-amber-500/10 border border-amber-500/40 rounded-lg px-3.5 py-3 mb-4 text-amber-500 text-xs">⚠️<span>Khởi động lại máy để nhận bản cập nhật mới. Bạn vẫn có thể mở game.</span></div>
       <div class="flex gap-3 mt-11">
         <button id="bLaunch" class="flex-1 h-[46px] rounded-[10px] bg-gradient-to-br from-[#FFCC05] to-amber-600 text-[#231a02] text-sm font-extrabold tracking-widest uppercase flex items-center justify-center gap-2 hover:brightness-110 disabled:opacity-60"><span id="bLIco">▶</span><span id="bLTxt">CHƠI NGAY</span></button>
         <button id="btnOpenFolder" type="button" title="Mở thư mục cài đặt game trên máy" class="px-4 h-[46px] rounded-[10px] border border-white/15 bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-bold tracking-wide uppercase flex items-center justify-center gap-1.5 transition-all shadow"><span>📂</span><span>Mở thư mục</span></button>
@@ -193,6 +193,7 @@ const GAMES=[
   {id:"cs2",name:"Counter-Strike 2",cat:"online",genre:"FPS",status:"ready",is_promoted:true,updated_at:new Date(Date.now()-3600000).toISOString(),size:"35.2 GB",ver:"1.40.2",exe:"cs2.exe",path:"G:\\Online\\Counter-Strike 2\\cs2.exe",icon:"assets/source/game-counter-strike.png",poster:"assets/source/game-counter-strike.png"},
   {id:"hitman",name:"Hitman: World of Assassination",cat:"offline",genre:"Hành động",status:"ready",is_hot:true,size:"75 GB",ver:"3.180",exe:"HITMAN3.exe",path:"G:\\Offline\\Hitman 3\\HITMAN3.exe",icon:"assets/source/game-hitman.png",poster:"assets/source/game-hitman.png"},
   {id:"hl",name:"Half Life 1.1",cat:"offline",genre:"FPS cổ điển",status:"reboot",size:"1.2 GB",ver:"1.1",exe:"hl.exe",path:"G:\\Offline\\Half Life\\hl.exe",icon:"assets/source/game-counter-strike.png",poster:"assets/source/poster-pubg.png"},
+  {id:"cs-error",name:"Counter-Strike 1.6",cat:"offline",genre:"FPS cổ điển",status:"error",size:"1.2 GB",ver:"1.6",exe:"hl.exe",path:"G:\\Offline\\Counter-Strike 1.6\\hl.exe",icon:"assets/source/game-counter-strike.png",poster:"assets/source/game-counter-strike.png"},
   {id:"aoe",name:"Age of Empires",cat:"offline",genre:"Chiến thuật RTS",status:"not_installed",is_promoted:true,size:"2.5 GB",ver:"1.0c",exe:"EMPIRESX.EXE",path:"G:\\Offline\\AOE\\EMPIRESX.EXE",icon:"assets/source/game-aoe.png",poster:"assets/source/game-aoe.png"},
   {id:"fc",name:"EA SPORTS FC Online",cat:"online",genre:"Bóng đá",status:"updating",is_hot:true,size:"36.8 GB",ver:"2024.09",exe:"FC_Online.exe",path:"G:\\Online\\FC Online\\FC_Online.exe",icon:"assets/source/game-fo4.png",poster:"assets/source/game-fo4.png"},
   {id:"ntkt",name:"Nghịch Thiên Kiếm Thế",cat:"online",genre:"MMORPG",status:"ready",updated_at:new Date(Date.now()-7200000).toISOString(),size:"14.5 GB",ver:"2.1",exe:"game.exe",path:"G:\\Online\\Nghịch Thiên\\game.exe",icon:"assets/source/game-nghich-thien.png",poster:"assets/source/game-nghich-thien.png"},
@@ -214,9 +215,9 @@ function tele(ev,id,flush,details){
 setInterval(flushTele,30000);
 const $=id=>document.getElementById(id);
 const gg=$("gamesGrid"),ps=$("posterStrip"),modal=$("modal");
-const DOT={ready:"bg-emerald-500 shadow-[0_0_7px_#10B981]",updating:"bg-sky-400 shadow-[0_0_7px_#38BDF8] animate-spinSlow",reboot:"bg-amber-500 shadow-[0_0_7px_#F59E0B] animate-fl",waiting:"bg-slate-600"};
-const LBL={ready:"Sẵn sàng",updating:"Đang cập nhật",reboot:"Cần khởi động lại",waiting:"Chờ tải"};
-function launchable(g){return licenseActive&&(g.status==="ready"||g.status==="reboot");}
+const DOT={ready:"bg-emerald-500 shadow-[0_0_7px_#10B981]",updating:"bg-sky-400 shadow-[0_0_7px_#38BDF8] animate-spinSlow",reboot:"bg-amber-500 shadow-[0_0_7px_#F59E0B] animate-fl",error:"bg-rose-500 shadow-[0_0_7px_#F43F5E]",waiting:"bg-slate-600"};
+const LBL={ready:"Sẵn sàng",updating:"Đang cập nhật",reboot:"Cần khởi động lại",error:"Có lỗi",waiting:"Chờ tải"};
+function launchable(g){return licenseActive&&isPlayable(g);}
 function isPlayable(g){return g.status!=="not_installed"&&g.id!=="tingmenu";}
 function isRecent(g){
   if(!g.updated_at)return false;
@@ -312,7 +313,7 @@ function openModal(g){
   bl.className="flex-1 h-[46px] rounded-[10px] text-sm font-extrabold tracking-widest uppercase flex items-center justify-center gap-2 hover:brightness-110 disabled:opacity-60 transition-all";
   if(g.status==="updating"){
     bl.classList.add("bg-gradient-to-r","from-sky-500","to-cyan-600","text-white","shadow-[0_0_15px_rgba(6,182,212,0.5)]");
-    bi.innerHTML='<span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>';
+    bi.textContent="▶";
   }else if(g.status==="reboot"){
     bl.classList.add("bg-gradient-to-br","from-amber-400","to-amber-700","text-[#231a02]");
     bi.textContent="▶";
@@ -323,8 +324,8 @@ function openModal(g){
     bl.classList.add("bg-gradient-to-br","from-[#FFCC05]","to-amber-600","text-[#231a02]");
     bi.textContent="▶";
   }
-  bl.disabled=g.status!=="ready"&&g.status!=="not_installed";
-  bt.textContent=g.status==="reboot"?"KHỞI ĐỘNG LẠI MÁY ĐỂ CHƠI":g.status==="updating"?"ĐANG TẢI...":g.status==="not_installed"?"BÁO NHÂN VIÊN TẢI GAME":g.status==="error"?"LIÊN HỆ NHÂN VIÊN":"CHƠI NGAY";
+  bl.disabled=!licenseActive;
+  bt.textContent=g.status==="not_installed"?"BÁO NHÂN VIÊN TẢI GAME":"CHƠI NGAY";
   const bFld=$("btnOpenFolder");
   if(bFld)bFld.classList.toggle("hidden",g.status==="not_installed");
   modal.classList.remove("modal-hidden");
@@ -358,7 +359,6 @@ $("staffContactDialog").addEventListener("click",e=>{if(e.target===$("staffConta
 $("bLaunch").addEventListener("click",()=>{
   if(!licenseActive)return;
   if(!selGame||launching)return;
-  if(selGame.status==="reboot"){showToast("⚠️","Cần khởi động lại máy trước khi chơi "+selGame.name+".");return;}
   if(selGame.status==="not_installed"){
     tele("click",selGame.id,true);
     openStaffDialog();
