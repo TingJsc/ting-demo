@@ -1987,8 +1987,8 @@ body.secondary [data-action="open_executable"] { display:none !important; }
       <div class="view-panel" id="view-p2p">
         <div class="subview-container">
           <div class="subview-header">
-            <h2 class="subview-title">Mạng P2P và nhóm chia sẻ</h2>
-            <p class="subview-desc">Theo dõi băng thông truyền tải và các nhóm đang chia sẻ qua P2P</p>
+            <h2 class="subview-title">Mạng P2P</h2>
+            <p class="subview-desc">Theo dõi băng thông P2P, trạng thái NAT và các game đang seed</p>
           </div>
 
           <!-- Cards chỉ số Seeder -->
@@ -2004,15 +2004,19 @@ body.secondary [data-action="open_executable"] { display:none !important; }
               <span class="stat-subtext">Đỉnh upload qua Internet: 92.4 MB/s</span>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Ting Update kết nối</span>
-              <span class="stat-value">18 peers</span>
-              <span class="stat-subtext">Đang nhận các phần dữ liệu bản cập nhật</span>
-            </div>
-            <div class="stat-card">
               <span class="stat-label">Nhóm đang chia sẻ</span>
               <span class="stat-value" style="color: var(--status-seed-color);">6 game</span>
               <span class="stat-subtext">Mã nhận diện bản cập nhật hợp lệ</span>
             </div>
+          <div class="stat-card" style="margin-top:16px;">
+            <h3>Kết nối P2P từ Internet</h3>
+            <div id="nat-summary" style="white-space:pre-line;color:var(--text-muted);">NAT: Chờ xác nhận từ Internet
+Router đã mở cổng tự động. Chưa ghi nhận peer Internet kết nối vào.
+Phương thức: UPnP
+Port: 16881
+Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
+          </div>
+
           </div>
 
         </div>

@@ -81,8 +81,8 @@ test('paid key activation persists room expiry and repeated activation never res
  f.submit('activate',{key:k.text});const until=f.state().rooms.find(r=>r.id==='R02').until;assert.equal(f.state().update.scenario,'paid');
  f.submit('activate',{key:k.text});assert.equal(f.state().rooms.find(r=>r.id==='R02').until,until);
 });
-test('Console Update gives a new install the shared trial and keeps paid license on reconnect',()=>{
- const f=fixture('update');f.scenario('new');assert.equal(f.state().rooms.find(r=>r.id==='R02').until,'2026-11-16T00:00:00+07:00');assert.match(f.html(),/Đã tự động bật dùng thử/);assert.match(f.html(),/Vào màn hình cập nhật game/);
+test('Console Update gives a new install thirty trial days and keeps paid license on reconnect',()=>{
+ const f=fixture('update');f.scenario('new');assert.equal(Date.parse(f.state().rooms.find(r=>r.id==='R02').until)-Date.parse(f.state().rooms.find(r=>r.id==='R02').trialStartedAt),30*86400000);assert.match(f.html(),/Đã tự động bật dùng thử/);assert.match(f.html(),/Vào màn hình cập nhật game/);
  f.scenario('expired');assert.equal(f.state().rooms.find(r=>r.id==='R02').type,'expired');assert.doesNotMatch(f.html(),/Vào màn hình cập nhật game/);
  f.scenario('paid');const until=f.state().rooms.find(r=>r.id==='R02').until;f.scenario('offline');f.click('reconnect');assert.equal(f.state().update.scenario,'paid');assert.equal(f.state().rooms.find(r=>r.id==='R02').until,until);
  f.scenario('trial');assert.equal(f.state().rooms.find(r=>r.id==='R02').type,'paid');assert.equal(f.state().rooms.find(r=>r.id==='R02').until,until);
@@ -154,10 +154,10 @@ test('native Update activates paid key once, preserves expiry and blocks offline
  f.submit('activateLicenseDemo',{key:'DEMO0-PAID0-TEST0-KEY00-00001'});assert.equal(f.state().rooms.find(r=>r.id==='R02').until,until);
  f.context.setLicenseScenario('offline');f.context.screenState=1;f.context.continueLicenseDemo();assert.equal(f.context.screenState,1);
 });
-test('native Update gives new installs the common trial and normalizes saved trial data',()=>{
+test('native Update preserves saved trial expiry and gives thirty days on first activation',()=>{
  const f=nativeUpdateFixture(),d=f.state();d.rooms.find(r=>r.id==='R02').until='2026-10-08T00:00:00+07:00';f.context.saveLicenseDemo(d);
- assert.equal(f.state().rooms.find(r=>r.id==='R02').until,'2026-11-15T17:00:00.000Z');
- f.context.setLicenseScenario('new');assert.match(f.html(),/Dùng thử đến hết 15\/11\/2026/);assert.match(f.html(),/Tiếp tục vào Ting Update/);
+ assert.equal(f.state().rooms.find(r=>r.id==='R02').until,'2026-10-08T00:00:00+07:00');
+ f.context.setLicenseScenario('new');assert.match(f.html(),/Dùng thử 30 ngày từ lần kích hoạt đầu/);assert.match(f.html(),/Tiếp tục vào Ting Update/);
  f.context.continueLicenseDemo();assert.equal(f.context.screenState,3);
 });
 test('native Update reconnect keeps paid license and cannot change it back to trial',()=>{
@@ -171,7 +171,7 @@ test('unified demo removes legacy trial controls and uses existing Ting logo',()
  const html=readFileSync(new URL('index.html',import.meta.url),'utf8');
  assert.doesNotMatch(html,/BASELINE_START|session-demo|Phiên \/ lỗi|trial24|Thêm 7 ngày/);
  assert.match(html,/logo-admin\.svg/);
- const f=fixture();f.click('page','licenses');assert.match(f.html(),/Dùng thử đến 15\/11\/2026/);assert.doesNotMatch(f.html(),/Dùng thử 1 tháng|30 ngày độc lập/);
+ const f=fixture();f.role('admin');f.click('page','licenses');assert.match(f.html(),/Dùng thử 30 ngày/);assert.doesNotMatch(f.html(),/Dùng thử đến 15\/11\/2026/);
  const count=f.state().orders.length;f.submit('purchase',{kind:'renew',room:'R02',name:'Lan',phone:'0900000002'});assert.equal(f.state().orders.length,count);
 });
 test('existing game auto-download and marketing flags remain editable only by admin',()=>{
@@ -383,12 +383,12 @@ test('Retail room activation by admin records external transfer reference and ye
  assert.equal(f.state().keys.some(k=>k.order==='RETAIL'&&k.room==='R02'),true);
 });
 
-test('trial uses one cutoff and cannot be granted to a room manually',()=>{
+test('trial preserves first activation expiry and cannot be granted to a room manually',()=>{
  const f=fixture();
  f.setStore(d=>{d.rooms.find(x=>x.id==='R02').until='2026-11-06T00:00:00+07:00';});
- assert.equal(f.state().rooms.find(x=>x.id==='R02').until,'2026-11-16T00:00:00+07:00');
+ assert.equal(f.state().rooms.find(x=>x.id==='R02').until,'2026-11-06T00:00:00+07:00');
  f.submit('license-activate',{room:'R01',kind:'trial'});
  const r=f.state().rooms.find(x=>x.id==='R01');
  assert.equal(r.type,'paid');
- assert.match(f.error(),/Trial tự động theo ngày kết thúc chung/);
+ assert.match(f.error(),/Trial tự động 30 ngày trong thời gian ưu đãi/);
 });
