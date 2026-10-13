@@ -118,7 +118,7 @@ test('owner Console purchase keeps optional old license on the correct room',()=
 function nativeUpdateFixture(){
  const events={},store=new Map(),nodes=new Map();
  const node=id=>{if(!nodes.has(id))nodes.set(id,{innerHTML:'',textContent:''});return nodes.get(id);};
- const context={Date,JSON,Number,String,Object,Intl,localStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)},document:{getElementById:node,querySelectorAll:()=>[node('error')]},window:{addEventListener:(n,f)=>events[n]=f},FormData:class{constructor(f){return new Map(Object.entries(f.values));}},screenState:1,renderWizard(){},renderGrid(){}};
+ const context={Date,JSON,Number,String,Object,Intl,localStorage:{getItem:k=>store.get(k),setItem:(k,v)=>store.set(k,v)},document:{getElementById:node,querySelectorAll:()=>[node('error')]},window:{addEventListener:(n,f)=>events[n]=f},FormData:class{constructor(f){return new Map(Object.entries(f.values));}},screenState:1,rootReady:true,openModal(id){context.openedModal=id;},renderWizard(){},renderGrid(){}};
  const html=readFileSync(new URL('../ting-update-demo/index.html',import.meta.url),'utf8');
  vm.runInNewContext(html.match(/<script id="license-demo">([\s\S]*?)<\/script>/)[1],context);
  return {context,html:()=>node('wizard-step-1').innerHTML,error:()=>node('error').textContent,state:()=>context.readLicenseDemo(),submit:(fn,values)=>context[fn]({preventDefault(){},target:{values}})};
@@ -129,7 +129,7 @@ test('native Update keeps compact form and creates only one pending order',()=>{
  const d=f.state(),id=d.update.order,o=d.orders.find(o=>o.id===id);assert.equal(o.total,500000);assert.equal(o.owner,'guest');assert.equal(o.source,'update');assert.equal(o.contactName,'Lan');assert.equal(o.contactPhone,'0900000002');assert.deepEqual(d.profiles,before.profiles);assert.equal(d.rooms.find(r=>r.id==='R02').name,before.rooms.find(r=>r.id==='R02').name);
  f.submit('buyLicenseDemo',{name:'Lan',phone:'0900000002'});assert.equal(f.state().orders.length,d.orders.length);
  f.context.reportLicensePayment();assert.equal(f.state().orders.find(o=>o.id===id).state,'review');
- f.submit('activateLicenseDemo',{key:'invalid'});assert.match(f.error(),/không hợp lệ/);assert.equal(f.context.screenState,1);
+ f.submit('activateLicenseDemo',{key:'invalid'});assert.match(f.error(),/không hợp lệ/);assert.equal(f.context.screenState,3);
 });
 test('native Update stores optional old license and applies approved days on first activation',()=>{
   const f=nativeUpdateFixture();f.context.setLicenseScenario('new');f.context.setLicensePane('buy');assert.match(f.html(),/Đang chuyển từ phần mềm khác/);assert.match(f.html(),/type="file"/);assert.doesNotMatch(f.html(),/Link ảnh/);
@@ -145,7 +145,7 @@ test('native Update cannot self-purchase for a KTV-managed room',()=>{
 });
 test('native Update accepts only the paid guest key for its current order',()=>{
  const f=nativeUpdateFixture();f.context.setLicenseScenario('new');f.submit('buyLicenseDemo',{name:'Khách',phone:'0900000003'});const d=f.state(),id=d.update.order;d.orders.find(o=>o.id===id).state='paid';d.keys.push({id:'guest-key',text:'GUEST-AAAAA-BBBBB-CCCCC-DDDDD',owner:'guest',state:'unused',room:null,order:id});d.keys.push({id:'other-key',text:'OTHER-AAAAA-BBBBB-CCCCC-DDDDD',owner:'guest',state:'unused',room:null,order:'another-order'});f.context.saveLicenseDemo(d);
- f.submit('activateLicenseDemo',{key:'OTHER-AAAAA-BBBBB-CCCCC-DDDDD'});assert.equal(f.context.screenState,1);
+ f.submit('activateLicenseDemo',{key:'OTHER-AAAAA-BBBBB-CCCCC-DDDDD'});assert.equal(f.context.screenState,3);
  f.submit('activateLicenseDemo',{key:'GUEST-AAAAA-BBBBB-CCCCC-DDDDD'});assert.equal(f.context.screenState,3);assert.equal(f.state().keys.find(k=>k.id==='guest-key').room,'R02');
 });
 test('native Update activates paid key once, preserves expiry and blocks offline entry',()=>{
@@ -391,4 +391,18 @@ test('trial preserves first activation expiry and cannot be granted to a room ma
  const r=f.state().rooms.find(x=>x.id==='R01');
  assert.equal(r.type,'paid');
  assert.match(f.error(),/Trial tự động 30 ngày trong thời gian ưu đãi/);
+});
+
+
+test('automatic trial enters fresh-install drive selection and upgrade game list', () => {
+  const fresh = nativeUpdateFixture(); fresh.context.setLicenseScenario('new');
+  assert.equal(fresh.context.screenState, 3);
+  assert.equal(fresh.context.openedModal, 'modal-root-gate');
+  const upgrade = nativeUpdateFixture(); upgrade.context.reconnectLicenseDemo();
+  assert.equal(upgrade.context.screenState, 3);
+  assert.equal(upgrade.context.openedModal, undefined);
+  const expired = nativeUpdateFixture(); expired.context.setLicenseScenario('expired');
+  expired.context.continueLicenseDemo();
+  assert.equal(expired.context.screenState, 1);
+  assert.match(expired.error(), /Cần bản quyền/);
 });

@@ -2681,7 +2681,7 @@
       </div>
       <div class="modal-body">
         <div style="font-size: 11.5px; color: var(--text-muted);">
-          Ting API tự cấp trial 30 ngày nếu lần đầu còn trong thời gian ưu đãi. Nếu đã mua, hãy nhập key bản quyền.
+          Service tự lấy lại bản quyền còn hạn hoặc đăng ký dùng thử 30 ngày trong thời gian ưu đãi. Có bản quyền thì tự vào ứng dụng; nếu không, hãy nhập key.
         </div>
         <div class="form-group">
           <label class="form-label">Key bản quyền</label>
@@ -3167,7 +3167,7 @@
     function showToast(msg, level) {
       clearTimeout(toastTimer);
       const resolvedLevel = level || toastLevel(msg);
-      toastPill.textContent = resolvedLevel === "SUCCESS" ? "Thành công" : msg;
+      toastPill.textContent = resolvedLevel === "SUCCESS" && msg !== "Đã đồng bộ thành công danh sách game" ? "Thành công" : msg;
       toastPill.className = `toast-pill show ${resolvedLevel.toLowerCase()}`;
       toastTimer = setTimeout(() => toastPill.classList.remove("show"), resolvedLevel === "ERROR" || resolvedLevel === "WARN" ? 5000 : 2400);
     }
@@ -3463,7 +3463,8 @@
         badgeClass = "badge-downloading";
         barColor = "#0078d4";
         const pctStr = progress % 1 !== 0 ? (progress.toString().includes(".") && progress.toString().split(".")[1].length > 2 ? progress.toString() : progress.toFixed(2)) : progress;
-        text = `${pctStr}% · Đang tải`;
+        const peers = Number.parseInt(game.peers, 10) || 0;
+        text = `${pctStr}% · ${progress >= 100 ? "Đang hoàn tất tải" : peers === 0 ? "Đang tìm peer" : "Đang tải"}`;
       } else if (type === "checking") {
         badgeClass = "badge-checking";
         barColor = "#06b6d4";
@@ -3632,7 +3633,7 @@
               </button>
 
               <!-- 8. Xóa luôn giữ vị trí; Local xóa registry, API reset dữ liệu tải -->
-              <button class="row-btn-icon" data-action="delete_game" data-id="${game.id}" style="${blockedByLocal ? 'display:none;' : ''}" title="Xóa game">
+              <button class="row-btn-icon" data-action="delete_game" data-id="${game.id}" ${!game.local && game.statusType === "not_downloaded" ? "disabled" : ""} style="${blockedByLocal ? 'display:none;' : ''}" title="Xóa game">
                 <svg viewBox="0 0 16 16"><path d="M5.5 5.5v6h1v-6h-1zm4 0v6h1v-6h-1z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2H6l.5-1h3l.5 1h3.5a1 1 0 0 1 1 1zM4 4v9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4H4z"/></svg>
               </button>
 
@@ -3916,7 +3917,7 @@
 
       // 5. Xóa dữ liệu game: Local được gỡ; row trùng Local không được xóa nhầm game API.
       btnDeleteGame.disabled = selectedGames.length === 0
-        || selectedGames.some(g => g.blockedByLocal)
+        || selectedGames.some(g => g.blockedByLocal || (!g.local && g.statusType === "not_downloaded"))
         || (selectedGames.some(g => g.local) && selectedGames.length !== 1);
     }
 
@@ -3978,7 +3979,10 @@
       if (transferDivider) transferDivider.style.display = transferBlocked ? "none" : "";
       if (itemEditLocal) itemEditLocal.style.display = isLocal ? "" : "none";
       const itemDelete = document.getElementById("ctx-delete");
-      if (itemDelete) itemDelete.style.display = blockedByLocal ? "none" : "";
+      if (itemDelete) {
+        itemDelete.style.display = blockedByLocal ? "none" : "";
+        setContextItemState(itemDelete, gateOpen && isSrvOnline && !blockedByLocal && (game.local || game.statusType !== "not_downloaded"));
+      }
       const deleteDivider = document.getElementById("ctx-delete-divider");
       if (deleteDivider) deleteDivider.style.display = blockedByLocal ? "none" : "";
 
@@ -4625,6 +4629,7 @@
       if (!requireMainGate()) return;
       const count = selectedIds.size || 1;
       const selectedGames = games.filter(g => selectedIds.has(g.id));
+      if (selectedGames.some(g => !g.local && g.statusType === "not_downloaded")) return;
       const localTargets = selectedGames.filter(g => g.local);
       const localOnly = selectedGames.length > 0 && localTargets.length === selectedGames.length;
       document.getElementById("delete-modal-title").textContent = localOnly ? "Xóa dữ liệu game local" : "Xác nhận xóa dữ liệu Game";
@@ -5149,14 +5154,34 @@ document.getElementById('view-license').innerHTML='<div class="subview-container
 document.getElementById('business-license-status').textContent=paid?'12 tháng · '+new Date(r.until).toLocaleString('vi-VN', {timeZone:'Asia/Ho_Chi_Minh', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}):trial?'Dùng thử · còn '+Math.max(0,Math.ceil((Date.parse(r.until)-licenseNow)/86400000))+' ngày':offline?'Chờ kết nối':r.trialStartedAt?'Hết hạn dùng thử':'Yêu cầu nhập key';
 }
 function setLicensePane(p){licensePane=p;renderLicenseDemo();}
-function setLicenseScenario(s){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(['new','trial','expired'].includes(s)&&(r.type==='paid'||d.keys.some(k=>k.room===r.id&&k.state==='active'))){renderLicenseDemo();return;}d.update.scenario=s;if(s==='outside-promotion'){r.type='unlicensed';delete r.trialStartedAt;r.until=null;}if(s==='expired'){r.trialStartedAt=r.trialStartedAt||licenseNow.toISOString();r.until=new Date(licenseNow.getTime()-1000).toISOString();}if(s==='new')d.update.order=null;if(s==='new'||s==='trial'){if(!r.trialStartedAt&&licenseNow<licenseTrialEnd){r.type='trial';r.trialStartedAt=licenseNow.toISOString();r.until=new Date(licenseNow.getTime()+30*86400000).toISOString();}else if(!r.trialStartedAt){r.type='unlicensed';}}if(s==='expired')r.type='expired';if(s==='paid-expired'){r.type='paid';r.until='2026-10-01T00:00:00+07:00';}if(s==='paid'){r.type='paid';r.until='2027-10-07T10:00:00+07:00';}saveLicenseDemo(d);renderLicenseDemo();}
-function reconnectLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);d.update.scenario=r.type==='paid'&&new Date(r.until)>licenseNow?'paid':r.type==='trial'&&licenseNow<new Date(r.until)?'trial':'expired';saveLicenseDemo(d);renderLicenseDemo();}
+function setLicenseScenario(s){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(['new','trial','expired'].includes(s)&&(r.type==='paid'||d.keys.some(k=>k.room===r.id&&k.state==='active'))){renderLicenseDemo();return;}d.update.scenario=s;if(s==='outside-promotion'){r.type='unlicensed';delete r.trialStartedAt;r.until=null;}if(s==='expired'){r.trialStartedAt=r.trialStartedAt||licenseNow.toISOString();r.until=new Date(licenseNow.getTime()-1000).toISOString();}if(s==='new')d.update.order=null;if(s==='new'||s==='trial'){if(!r.trialStartedAt&&licenseNow<licenseTrialEnd){r.type='trial';r.trialStartedAt=licenseNow.toISOString();r.until=new Date(licenseNow.getTime()+30*86400000).toISOString();}else if(!r.trialStartedAt){r.type='unlicensed';}}if(s==='expired')r.type='expired';if(s==='paid-expired'){r.type='paid';r.until='2026-10-01T00:00:00+07:00';}if(s==='paid'){r.type='paid';r.until='2027-10-07T10:00:00+07:00';}saveLicenseDemo(d);renderLicenseDemo();if(['new','trial','paid'].includes(s)){if(s==='new')rootReady=false;continueLicenseDemo();}}
+function reconnectLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);d.update.scenario=r.type==='paid'&&new Date(r.until)>licenseNow?'paid':r.type==='trial'&&licenseNow<new Date(r.until)?'trial':'expired';saveLicenseDemo(d);renderLicenseDemo();if(['paid','trial'].includes(d.update.scenario))continueLicenseDemo();}
 function buyLicenseDemo(e){e.preventDefault();const v=Object.fromEntries(new FormData(e.target)),d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(r.owner!=='owner')return licenseError('Phòng này do KTV quản lý. Hãy liên hệ KTV để mua key.');if(!v.name?.trim()||!/^\+?[\d\s().-]{9,16}$/.test(v.phone||''))return licenseError('Điền tên và số điện thoại liên hệ hợp lệ.');if(d.orders.some(o=>o.id===d.update.order&&['waiting','review'].includes(o.state))){renderLicenseDemo();return;}if(v.oldLicenseProof?.name&&selectedLicenseProof(v.oldLicenseProof)===null)return licenseError('Chọn ảnh JPG, PNG, WebP hoặc PDF không quá 10 MB.');const oldOffer=[v.oldSoftware,v.oldLicenseUntil,v.oldLicenseProof?.name].some(x=>String(x||'').trim())?{software:String(v.oldSoftware||'').trim(),until:String(v.oldLicenseUntil||'').trim(),evidence:selectedLicenseProof(v.oldLicenseProof)}:null;if(oldOffer&&(!oldOffer.software||!oldOffer.until||!oldOffer.evidence||Date.parse(oldOffer.until+'T23:59:59+07:00')<=licenseNow))return licenseError('Điền đủ phần mềm cũ, ngày còn hạn và bằng chứng; hoặc để trống cả ba mục.');const s=d.settings,id='DH'+String(++d.seq).padStart(3,'0');d.orders.push({id,owner:'guest',source:'update',contactName:v.name.trim(),contactPhone:v.phone.trim(),kind:r.type==='paid'||d.update.scenario==='paid-expired'?'renew':'buy',room:r.id,quantity:1,total:s.price,price:s.price,pack:s.pack,company:s.company,tax:s.tax,bank:s.bank,account:s.account,beneficiary:s.beneficiary,oldOffer,state:'waiting',invoice:'none',terms:'demo-v1',created:licenseNow.toISOString()});d.update.order=id;saveLicenseDemo(d);renderLicenseDemo();}
 function reportLicensePayment(){const d=readLicenseDemo(),o=d.orders.find(o=>o.id===d.update.order&&['owner','guest'].includes(o.owner));if(o?.state==='waiting')o.state='review';saveLicenseDemo(d);renderLicenseDemo();}
 function activateLicenseDemo(e){e.preventDefault();const val=String(new FormData(e.target).get('key')).trim().toUpperCase(),d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room),k=d.keys.find(k=>k.text.toUpperCase()===val&&(k.owner==='owner'||(k.owner==='guest'&&k.order===d.update.order))),o=d.orders.find(o=>o.id===k?.order);if(r.revoked)return licenseError('Phòng đã bị thu hồi. Vui lòng liên hệ hỗ trợ.');if(!k||o?.state!=='paid'||!['unused','active'].includes(k.state)||(k.room&&k.room!==r.id))return licenseError('Key không hợp lệ hoặc đã dùng cho phòng khác.');if(k.state==='unused'){k.state='active';k.room=r.id;const end=new Date(licenseNow);end.setUTCFullYear(end.getUTCFullYear()+1);r.until=end.toISOString();r.type='paid';const bonus=d.bonuses.find(b=>b.order===o.id&&b.room===r.id&&b.state==='approved'&&!b.applied);if(bonus){r.until=new Date(Date.parse(r.until)+bonus.days*86400000).toISOString();bonus.applied=true;}}if(r.type!=='paid'||new Date(r.until)<=licenseNow)return licenseError('Bản quyền đã hết hạn. Vui lòng gia hạn.');d.update.scenario='paid';saveLicenseDemo(d);renderLicenseDemo();continueLicenseDemo();}
-function continueLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(d.update.scenario==='unsupported')return; if(r.revoked||d.update.scenario==='offline'||!((r.type==='paid'&&new Date(r.until)>licenseNow&&d.update.scenario!=='paid-expired')||(r.type==='trial'&&['trial','new'].includes(d.update.scenario)&&licenseNow<new Date(r.until))))return licenseError('Cần bản quyền hoặc trial còn hạn.');screenState=3;renderWizard();renderGrid();}
+function continueLicenseDemo(){const d=readLicenseDemo(),r=d.rooms.find(r=>r.id===d.update.room);if(d.update.scenario==='unsupported')return; if(r.revoked||d.update.scenario==='offline'||!((r.type==='paid'&&new Date(r.until)>licenseNow&&d.update.scenario!=='paid-expired')||(r.type==='trial'&&['trial','new'].includes(d.update.scenario)&&licenseNow<new Date(r.until))))return licenseError('Cần bản quyền hoặc trial còn hạn.');screenState=3;renderWizard();renderGrid();if(!rootReady)openModal('modal-root-gate');}
 window.addEventListener('storage',e=>{if(e.key===licenseStore)renderLicenseDemo();});
 renderLicenseDemo();
 
+  </script>
+<script>
+    // Demo cùng trạng thái với GUI thật: ?connection=starting hoặc reconnecting.
+    // Chỉ mất SSE không khóa các thao tác REST/local.
+    (() => {
+      const scenario = new URLSearchParams(location.search).get("connection");
+      if (!["starting", "reconnecting"].includes(scenario)) return;
+      const status = document.createElement("div");
+      status.setAttribute("role", "status");
+      status.style.cssText = "position:fixed;bottom:16px;left:24px;padding:10px 16px;border:1px solid #343840;border-radius:6px;background:#202228;color:#ddd;z-index:9999";
+      status.textContent = scenario === "starting"
+        ? "Đang kết nối service..."
+        : "Đang kết nối lại kênh cập nhật trạng thái";
+      document.body.append(status);
+      // Baseline tới là tự cập nhật, không yêu cầu bấm Làm mới.
+      setTimeout(() => {
+        renderGrid();
+        status.remove();
+      }, 1500);
+    })();
   </script>
 </body></html>
