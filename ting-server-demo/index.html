@@ -1650,10 +1650,11 @@ body.secondary [data-action="open_executable"] { display:none !important; }
 <div id="server-mode-gate"><section class="server-mode-dialog" role="dialog" aria-modal="true" aria-labelledby="server-mode-title">
   <header class="server-mode-header">Thiết lập Ting Server</header>
   <div class="server-mode-body"><h2 id="server-mode-title">Chọn vai trò cho máy này</h2><p>Server bắt đầu hoạt động sau khi bạn chọn vai trò.</p>
+    <p>TingID: <strong>TING-8A9B-4C2D-1E5F-8899</strong> <button class="btn-action" onclick="copyServerTingId()">Sao chép TingID</button></p><p>Chọn vai trò để đăng ký máy với API.</p>
     <div class="server-role-options">
       <div class="server-role-option"><h3>Server chính</h3><p>Quản lý game nguồn và tạo bản cập nhật để phân phối.</p><button class="btn-action" onclick="setServerMode('MAIN')">Chọn vai trò này</button></div>
       <div class="server-role-option"><h3>Server phụ</h3><p>Tự kiểm tra game có sẵn, tải phần thiếu hoặc sai rồi seed. Không tạo bản cập nhật.</p><button class="btn-action" onclick="setServerMode('SECONDARY')">Chọn vai trò này</button></div>
-    </div><p>Có thể đổi vai trò trong Cài đặt khi đã dừng tải và seed.</p><p>TingID máy mẫu: <strong>TING-8A9B-4C2D-1E5F-8899</strong>. Vai trò được chọn tại máy này; Console chỉ duyệt việc dùng máy làm nguồn seed ưu tiên.</p>
+    </div><p>Có thể đổi vai trò trong Cài đặt khi đã dừng tải và seed.</p><p>TingID máy mẫu: <strong>TING-8A9B-4C2D-1E5F-8899</strong>. Vai trò được chọn tại máy này; nguồn mới tự bật; Console quản lý bật/tắt nguồn seed ưu tiên.</p>
   </div>
 </section></div>
 
@@ -2140,13 +2141,21 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
           </div>
 
           <div class="settings-card server-role-settings">
-            <h3>Vai trò Server</h3><p>Dừng tải và seed trước khi đổi vai trò. Không cần khởi động lại dịch vụ.</p>
-            <p><strong>Demo flow đăng ký đề xuất — chưa triển khai API.</strong></p>
-            <p>TingID: <strong>TING-8A9B-4C2D-1E5F-8899</strong> · ID máy mẫu, không nhập hoặc tạo ID mới.</p>
-            <p>Server gửi vai trò đã chọn và tự cập nhật IP public khi thay đổi. Đổi IP không tạo Server mới. Việc duyệt nguồn seed không quyết định máy được tạo bản cập nhật hay không.</p>
+            <h3>Vai trò Server</h3><p>Dừng tải và seed trước khi đổi vai trò. Vai trò được tự gửi lên Console; nguồn mới tự bật, nguồn đã tắt chỉ bật lại tại Console.</p>
+            <p><strong>Demo dùng dữ liệu mô phỏng, không gửi API thật.</strong></p>
+            <p>TingID: <strong>TING-8A9B-4C2D-1E5F-8899</strong> <button class="btn-action" onclick="copyServerTingId()">Sao chép TingID</button> · ID máy mẫu, không nhập hoặc tạo ID mới.</p>
+            <p>Server gửi vai trò đã chọn và tự cập nhật IP public khi thay đổi. Đổi IP không tạo Server mới. Việc bật/tắt nguồn seed không quyết định máy được tạo bản cập nhật hay không.</p>
             <p id="seed-registration-preview" role="status">Chưa chọn vai trò.</p>
-            <p><a href="../ting-console-demo/index.html?view=tracker">Mở demo Console để duyệt nguồn seed</a> · Hai demo dùng tình huống mô phỏng riêng, không gửi đăng ký thật.</p>
-            <details><summary>Tình huống demo</summary><p><a href="?setup=1&amp;view=settings">Xem lại màn chọn Chính/Phụ lần đầu</a> · Chỉ đặt lại vai trò trong demo, không điều khiển Server thật.</p></details>
+            <p><a href="../ting-console-demo/index.html?view=tracker">Mở demo Console để quản lý nguồn seed</a> · Hai demo dùng tình huống mô phỏng riêng, không gửi đăng ký thật.</p>
+            <details><summary>Tình huống demo</summary><p><a href="?setup=1&amp;view=settings">Xem lại màn chọn Chính/Phụ lần đầu</a> · Chỉ đặt lại vai trò trong demo, không điều khiển Server thật.</p>
+              <label>Trạng thái đăng ký mô phỏng <select onchange="previewSeedRegistration(this.value)">
+                <option value="acknowledged">Đã nhận xác nhận API</option><option value="pending">Chờ gửi vai trò mới</option>
+                <option value="registering">Đang gửi</option><option value="retrying">Lỗi đăng ký, sẽ thử lại</option>
+                <option value="wan_unavailable">Chưa đọc được IP public</option><option value="configuration_error">Cấu hình xác thực lỗi</option>
+                <option value="offline">Mất kết nối Service</option>
+                <option value="late_snapshot">Đã xác nhận; snapshot cũ đến trễ</option>
+              </select></label>
+            </details>
             <div class="server-role-options">
               <div class="server-role-option" data-server-role="MAIN"><h3>Server chính</h3><p>Quản lý game nguồn và tạo bản cập nhật để phân phối.</p><button class="btn-action" onclick="setServerMode('MAIN')">Chọn vai trò này</button></div>
               <div class="server-role-option" data-server-role="SECONDARY"><h3>Server phụ</h3><p>Tự kiểm tra game có sẵn, tải phần thiếu hoặc sai rồi seed. Không tạo bản cập nhật.</p><button class="btn-action" onclick="setServerMode('SECONDARY')">Chọn vai trò này</button></div>
@@ -2711,6 +2720,25 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
     </div>
   </div>
 
+  <div class="modal-overlay" id="modal-server-mode">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <span class="modal-title">Xác nhận đổi vai trò Server</span>
+        <button class="modal-close-btn" onclick="closeModal('modal-server-mode')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="server-mode-confirm-target"></p>
+        <p id="server-mode-confirm-description"></p>
+        <p>Dữ liệu game được giữ nguyên. Hãy dừng tải và seed trước khi xác nhận; Service sẽ từ chối nếu máy còn bận.</p>
+        <p id="server-mode-confirm-error" style="color: var(--danger);"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" onclick="closeModal('modal-server-mode')">Hủy</button>
+        <button class="btn-action primary" onclick="setServerMode(requestedServerMode, false, true)">Xác nhận đổi vai trò</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal 9: Xác nhận đổi chế độ bảo vệ thư mục -->
   <div class="modal-overlay" id="modal-folder-policy">
     <div class="modal-card" style="max-width: 500px;">
@@ -2987,23 +3015,60 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       : ["MAIN", "SECONDARY"].includes(savedServerMode) ? savedServerMode : "UNCONFIGURED";
     const suppressedSeeds = new Set(JSON.parse(localStorage.getItem("ting-demo-stopped-seeds") || "[]"));
     function saveSuppressedSeeds() { localStorage.setItem("ting-demo-stopped-seeds", JSON.stringify([...suppressedSeeds])); }
-    function setServerMode(mode, restoring = false) {
+    let requestedServerMode = null;
+    function previewSeedRegistration(phase) {
+      if (phase === "late_snapshot") {
+        previewSeedRegistration("acknowledged");
+        showToast("Giữ trạng thái đã xác nhận; không ghi đè bằng snapshot bắt đầu trước cập nhật mới.");
+        return;
+      }
+      const messages = {
+        unconfigured: "Chọn vai trò để đăng ký máy với API.",
+        pending: "Đã lưu vai trò; đang chờ gửi đăng ký tới API.",
+        registering: "Đang gửi đăng ký tới API…",
+        acknowledged: "Đã lưu xác nhận đăng ký từ API. Xem trạng thái bật/tắt nguồn và CDN trên Console.",
+        retrying: "Chưa hoàn tất đăng ký hoặc lưu xác nhận. Service sẽ tự thử lại.",
+        wan_unavailable: "Chưa kiểm tra được IP public. Service sẽ tự thử lại; giữ xác nhận trước đó.",
+        configuration_error: "Chưa thể đăng ký: cấu hình xác thực Server chưa hợp lệ. Xem Log để kiểm tra.",
+        offline: "Mất kết nối Service; chưa xác nhận được trạng thái đăng ký hiện tại."
+      };
+      document.getElementById("seed-registration-preview").textContent = "Mô phỏng: " + messages[phase];
+    }
+    async function copyServerTingId() {
+      try {
+        await navigator.clipboard.writeText("TING-8A9B-4C2D-1E5F-8899");
+        showToast("Đã sao chép TingID");
+      } catch {
+        showToast("Không thể sao chép TingID");
+      }
+    }
+
+    function setServerMode(mode, restoring = false, confirmed = false) {
       if (!["MAIN", "SECONDARY", "UNCONFIGURED"].includes(mode)) return;
       if (!restoring && mode === "UNCONFIGURED") return;
       if (!restoring && mode === serverMode) return;
+      if (!restoring && serverMode !== "UNCONFIGURED" && !confirmed) {
+        requestedServerMode = mode;
+        document.getElementById("server-mode-confirm-target").textContent = "Đổi máy này sang " + (mode === "MAIN" ? "Server chính" : "Server phụ") + "?";
+        document.getElementById("server-mode-confirm-description").textContent = mode === "MAIN" ? "Server chính quản lý game nguồn và tạo bản cập nhật." : "Server phụ tải và seed game, không tạo bản cập nhật.";
+        document.getElementById("server-mode-confirm-error").textContent = "";
+        openModal("modal-server-mode");
+        return;
+      }
       if (!restoring && !isSrvOnline) {
+        document.getElementById("server-mode-confirm-error").textContent = "Chưa kết nối dịch vụ. Vui lòng thử lại khi dịch vụ sẵn sàng.";
         showToast("Chưa kết nối dịch vụ. Vui lòng thử lại khi dịch vụ sẵn sàng.");
         return;
       }
       if (!restoring && mode !== serverMode && serverMode !== "UNCONFIGURED"
           && games.some(g => hasActiveOperation(g) || g.statusType === "seeding")) {
+        document.getElementById("server-mode-confirm-error").textContent = "Dừng các tác vụ và seed trước khi đổi vai trò Server.";
         showToast("Dừng các tác vụ và seed trước khi đổi vai trò Server.");
         return;
       }
+      closeModal("modal-server-mode");
       serverMode = mode;
-      document.getElementById("seed-registration-preview").textContent = mode === "UNCONFIGURED"
-        ? "Chưa chọn vai trò."
-        : "Mô phỏng đã gửi đăng ký — chờ Console duyệt nguồn seed ưu tiên. Vai trò: " + (mode === "MAIN" ? "Server chính." : "Server phụ.");
+      previewSeedRegistration(mode === "UNCONFIGURED" ? "unconfigured" : "acknowledged");
       const roleLabel = mode === "UNCONFIGURED" ? "Chưa chọn vai trò" : mode === "SECONDARY" ? "Server phụ" : "Server chính";
       document.title = "Ting Server — " + roleLabel;
       document.querySelector(".titlebar-title").textContent = document.title;
@@ -3025,9 +3090,9 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       for (const id of ["btn-delete-game", "ctx-delete"]) {
         const el = document.getElementById(id); if (el) { const label=el.querySelector("span"); if(label) label.textContent=mode === "SECONDARY" ? "Ngừng seed" : "Xóa game"; }
       }
-      if (mode === "SECONDARY") games.forEach(g => {
-        if (suppressedSeeds.has(g.id)) { stopProgressTick(g.id); g.statusType="stopped"; }
-        else if (!hasActiveOperation(g) && g.statusType !== "seeding") singleReseed(g.id);
+      games.forEach(g => {
+        if (suppressedSeeds.has(g.id) || g.statusType === "stopped") { stopProgressTick(g.id); g.statusType="stopped"; }
+        else if (mode === "SECONDARY" && !hasActiveOperation(g) && g.statusType !== "seeding") singleReseed(g.id);
       });
       renderGrid();
     }
@@ -4059,6 +4124,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
     function singleDownload(id) {
       const g = games.find(x => x.id === id);
       if (!g || !operational() || !canDownload(g)) return;
+      suppressedSeeds.delete(id); saveSuppressedSeeds();
       stopProgressTick(id);
       g.hasGameFiles = false;
       g.statusType = "downloading";
@@ -4076,8 +4142,8 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
     function singleReseed(id) {
       const g = games.find(x => x.id === id);
       if (!g || !operational() || !canReseed(g)) return;
+      suppressedSeeds.delete(id); saveSuppressedSeeds();
       if (serverMode === "SECONDARY") {
-        suppressedSeeds.delete(id); saveSuppressedSeeds();
         const game = games.find(g => g.id === id);
         if (game && (!game.hasGameFiles || game.availableVersion && game.availableVersion !== game.version)) {
           game.hasGameFiles = false; game.statusType = "not_downloaded";
@@ -4156,6 +4222,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
     function singlePause(id) {
       const g = games.find(x => x.id === id);
       if (!g || !operational() || !canPause(g)) return;
+      suppressedSeeds.add(id); saveSuppressedSeeds();
       stopProgressTick(id);
       if (typeof g.progress !== "number") g.progress = 100;
       g.statusType = "stopped";
@@ -4168,6 +4235,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
     function singleStop(id) {
       const g = games.find(x => x.id === id);
       if (!g || !operational() || !canStop(g)) return;
+      suppressedSeeds.add(id); saveSuppressedSeeds();
       stopProgressTick(id);
       g.metadataRetryPending = false;
       if (typeof g.progress !== "number") g.progress = 0;
