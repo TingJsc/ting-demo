@@ -3272,13 +3272,16 @@
         if (typeof g.progress !== "number") g.progress = 0;
         g.progress = Math.min(100, g.progress + 0.6 + Math.random() * 0.9);
         if (g.progress >= 100) {
-          g.progress = 100;
-          g.statusType = "ready";
-          g.statusText = "Sẵn sàng";
+          g.progress = 0;
+          g.statusType = "checking";
+          g.progressStage = "payload_verification";
+          g.statusText = "Chờ kiểm tra dữ liệu";
+          g._preCheck = { statusType: "ready", statusText: "Sẵn sàng", progress: 100 };
           g.speed = "-"; g.eta = "-"; g.peers = "-";
           g.updatedAt = fullLogTimestamp().slice(0, 16);
           stopProgressTick(id);
-          appendLog("ok", `Hoàn tất tải '${g.name}' — Sẵn sàng`);
+          startCheckingTick(id);
+          appendLog("info", `Đã tải đủ '${g.name}', chờ kiểm tra dữ liệu.`);
           renderGrid();
           return;
         }
@@ -3296,7 +3299,15 @@
           stopProgressTick(id);
           const prev = g._preCheck || { statusType: "ready", statusText: "Sẵn sàng", progress: 100 };
           delete g._preCheck;
-          if (prev.statusType === "downloading") {
+          delete g.progressStage;
+          if (g.demoPayloadDamaged) {
+            g.demoPayloadDamaged = false;
+            g.progress = 85; g.statusType = "downloading";
+            g.statusText = "85% · Đang tải bù";
+            g.speed = "↓ 18.2 MB/s"; g.peers = "10 / 1";
+            appendLog("warn", `Phát hiện dữ liệu thiếu/hỏng '${g.name}', tự tải bù rồi kiểm tra lại.`);
+            startProgressTick(g.id);
+          } else if (prev.statusType === "downloading") {
             g.progress = prev.progress; g.statusType = "downloading";
             g.statusText = `${Math.floor(g.progress)}% · Đang tải`;
             startProgressTick(g.id);
@@ -3304,7 +3315,8 @@
             g.progress = prev.progress; g.statusType = "paused";
             g.statusText = `${Math.floor(g.progress)}% · Tạm dừng`;
           } else if (prev.statusType === "not_downloaded") {
-            g.progress = 0; g.statusType = "not_downloaded"; g.statusText = "Chưa tải";
+            g.progress = 0; g.statusType = "downloading"; g.statusText = "0% · Đang tải";
+            startProgressTick(g.id);
           } else if (prev.statusType === "stopped") {
             g.progress = prev.progress; g.statusType = "stopped"; g.statusText = "Đã dừng";
           } else {
@@ -3322,6 +3334,7 @@
     function startDownloadOne(g) {
       if (isLocalLike(g) || !["not_downloaded", "error"].includes(g.statusType)) return false;
       g.progress = 0;
+      delete g.progressStage;
       g.statusType = "downloading";
       g.statusText = `${Math.floor(g.progress)}% · Đang tải`;
       g.speed = "↓ 18.2 MB/s"; g.eta = "12m 40s"; g.peers = "10 / 1";
@@ -3397,7 +3410,9 @@
       if (isLocalLike(g) || g.statusType === "checking") return false;
       stopProgressTick(g.id);
       g._preCheck = { statusType: g.statusType, statusText: g.statusText, progress: typeof g.progress === "number" ? g.progress : 0 };
+      g.demoPayloadDamaged = g.demoPayloadDamaged || g.statusType === "missing";
       g.statusType = "checking";
+      g.progressStage = "payload_verification";
       g.progress = 0;
       g.statusText = "0% · Đang kiểm tra";
       g.speed = "-";
@@ -3446,16 +3461,22 @@
       // Resume dữ liệu đã xác minh giữ Ready; service chỉ gửi Checking khi cần xử lý lại.
       } else if (game.progressStage === "download_queued" && ["downloading", "checking"].includes(type)) {
         badgeClass = "badge-downloading";
-        text = `${Math.floor(progress)}% · Chờ lượt xử lý`;
+        progress = 0;
+        text = "Chờ lượt xử lý";
       } else if (game.progressStage === "piece_check" && ["downloading", "checking"].includes(type)) {
         badgeClass = "badge-checking";
         text = `${Math.floor(progress)}% · Đang kiểm tra phần đã có`;
       } else if (game.progressStage === "payload_verification" && ["downloading", "checking"].includes(type)) {
         badgeClass = "badge-checking";
-        text = `${Math.floor(progress)}% · Đang kiểm tra dữ liệu`;
+        text = progress === 0 ? "Chờ kiểm tra dữ liệu" : `${Math.floor(progress)}% · Đang kiểm tra dữ liệu`;
       } else if (game.progressStage === "tree_materialization" && ["downloading", "checking"].includes(type)) {
         badgeClass = "badge-checking";
-        text = `${Math.floor(progress)}% · ${progress < 25 ? "Đang chuẩn bị cấu trúc" : "Hoàn tất cấu trúc"}`;
+        progress = 0;
+        text = "Hoàn tất cấu trúc";
+      } else if (["delete_local", "remove_game"].includes(game.progressStage)) {
+        progress = 0;
+        badgeClass = "badge-checking";
+        text = "Đang xóa game";
       } else if (game.progressStage === "seed_initialization" && type === "checking") {
         badgeClass = "badge-downloading";
         text = "Đang chuẩn bị seed";

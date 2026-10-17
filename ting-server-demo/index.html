@@ -3101,7 +3101,12 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
     function statusTextFor(g) {
       const pct = typeof g.progress === "number" ? Math.round(g.progress) : 0;
       let text;
-      if (isQueued(g)) text = "Chờ xử lý";
+      if (g.statusType === "checking" && g.releaseStep) {
+        const steps = { waiting: [1, "Chờ xử lý"], inventory: [2, "Đang quét folder game"], hashing: [3, "Đang băm và tạo torrent"], seed: [4, "Đang chuẩn bị seed"], waiting_upload: [5, "Chờ lượt upload"], ticket: [5, "Đang lấy quyền upload"], upload: [6, "Đang upload torrent"], publish: [7, "Đang công bố và lưu bản cập nhật"] };
+        const [step, label] = steps[g.releaseStep];
+        text = `[${step}/7] ${g.releaseStep === "hashing" ? `[${pct}%] ` : ""}${label}`;
+      }
+      else if (isQueued(g)) text = "Chờ xử lý";
       else if (g.statusType === "seeding") text = "Đang seed";
       else if (g.statusType === "downloading") {
         const peers = Number.parseInt(g.peers, 10) || 0;
@@ -3109,11 +3114,11 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       }
       else if (g.statusType === "checking" && g.progressStage === "release_build") text = `${pct}% · Đang tạo bản cập nhật`;
       else if (g.statusType === "checking" && g.progressStage === "seed_initialization") text = "Đang chuẩn bị seed";
-      else if (g.statusType === "checking" && g.progressStage === "release_upload") text = `${pct}% · Đang gửi bản cập nhật`;
+      else if (g.statusType === "checking" && g.progressStage === "release_upload") text = "Đang upload torrent";
       else if (g.statusType === "checking" && g.progressStage === "game_check") text = `${pct}% · Đang kiểm tra file`;
       else if (g.statusType === "checking" && g.progressStage === "piece_check") text = `${pct}% · Đang kiểm tra phần đã có`;
       else if (g.statusType === "checking" && g.progressStage === "payload_verification") text = `${pct}% · Đang kiểm tra dữ liệu`;
-      else if (g.statusType === "checking" && g.progressStage === "tree_materialization") text = `${pct}% · Hoàn tất cấu trúc`;
+      else if (g.statusType === "checking" && g.progressStage === "tree_materialization") text = "Hoàn tất cấu trúc";
       else if (g.statusType === "checking") text = `${pct}% · Đang chuẩn bị file`;
       else if (g.statusType === "stopped" || g.statusType === "paused") text = "Đã dừng";
       else if (g.statusType === "source_only") text = g.operationErrorText || "Chưa seed";
@@ -3234,6 +3239,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       if (progressTimers.has(id)) { clearInterval(progressTimers.get(id)); progressTimers.delete(id); }
     }
     function startProgressTick(id, kind) {
+      if (kind === "release") { startReleaseTick(id); return; }
       stopProgressTick(id);
       const g = games.find(x => x.id === id);
       if (!g) return;
@@ -3242,15 +3248,6 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
         const cur = typeof g.progress === "number" ? g.progress : 0;
         const next = Math.min(100, cur + 4 + Math.random() * 6);
         g.progress = Math.round(next);
-        if (kind === "release") {
-          if (g.progressStage === "release_build" && g.progress >= 70) {
-            g.progress = 70;
-            g.progressStage = "seed_initialization";
-          } else if (g.progressStage === "seed_initialization") {
-            g.progress = 90;
-            g.progressStage = "release_upload";
-          }
-        }
         if (kind === "download") { g.statusType = "downloading"; g.statusText = statusTextFor(g); }
         else if (kind === "check" || kind === "release") { g.statusType = "checking"; g.statusText = statusTextFor(g); }
         else { g.statusType = "downloading"; g.statusText = statusTextFor(g); }
@@ -3269,6 +3266,38 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
         renderGrid();
       }, 350);
       progressTimers.set(id, timer);
+    }
+    function startReleaseTick(id) {
+      stopProgressTick(id);
+      const g = games.find(game => game.id === id);
+      if (!g) return;
+      const phases = ["waiting", "inventory", "hashing", "seed", "waiting_upload", "ticket", "upload", "publish"];
+      g.statusType = "checking"; g.releaseStep = "waiting"; g.progress = null;
+      g.progressStage = "download_queued";
+      const timer = setInterval(() => {
+        if (!isSrvOnline) return;
+        if (g.releaseStep === "hashing" && g.progress < 100) {
+          g.progress = Math.min(100, g.progress + 20);
+        } else {
+          const next = phases[phases.indexOf(g.releaseStep) + 1];
+          if (!next) {
+            stopProgressTick(id);
+            delete g.releaseStep;
+            g.version = nextVersionTag(g.version); g.publishedAt = utc7Minute();
+            g.statusType = "seeding"; g.progressStage = "seeding"; g.progress = 100;
+            g.speed = "↑ 12.4 MB/s"; g.peers = "4 / 1";
+            appendLog("success", `Đã công bố bản cập nhật '${g.name}' và bắt đầu seed.`);
+          } else {
+            g.releaseStep = next;
+            g.progress = next === "hashing" ? 0 : null;
+            g.progressStage = ["inventory", "hashing"].includes(next) ? "release_build" : next === "seed" ? "seed_initialization" : "release_upload";
+          }
+        }
+        g.statusText = statusTextFor(g);
+        syncReleaseModal([g]); renderGrid();
+      }, 450);
+      progressTimers.set(id, timer);
+      g.statusText = statusTextFor(g);
     }
     // Health summary tính thật từ store
     function updateHealthSummary() {
@@ -3294,7 +3323,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
         progress = 0;
         badgeClass = "badge-checking";
         barColor = "#eab308";
-        text = "Chờ xử lý";
+        text = statusTextFor(game);
       } else if (type === "downloading") {
         badgeClass = "badge-downloading";
         barColor = "#0078d4";
@@ -4201,23 +4230,8 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       game.hasGameFiles = true;
       game.canImport = false;
       game.statusType = "checking";
-      game.progressStage = "download_queued";
-      game.progress = 0;
-      game.statusText = statusTextFor(game);
-      game.speed = "-";
-      game.eta = "-";
-      game.peers = "-";
+      startReleaseTick(id);
       renderGrid();
-      setTimeout(() => {
-        const current = games.find(item => item.id === id);
-        if (!current || current.statusType !== "checking" || current.progressStage !== "download_queued") return;
-        current.progressStage = "release_build";
-        current.progress = 5;
-        current.statusText = statusTextFor(current);
-        appendLog("info", `Đang tạo bản cập nhật cho game '${current.name}'.`);
-        renderGrid();
-        startProgressTick(id, "release");
-      }, 400);
     }
     function singlePause(id) {
       const g = games.find(x => x.id === id);
@@ -4506,13 +4520,9 @@ Nhập tên thư mục hoặc đường dẫn đầy đủ:`, input.value);
     }
 
     function syncReleaseModal(targets) {
-      const progress = Math.round(targets.reduce((sum, game) => sum + (game.progress || 0), 0) / targets.length);
-      const uploading = targets.some(game => game.progressStage === "release_upload");
-      const preparingSeed = targets.some(game => game.progressStage === "seed_initialization");
-      document.getElementById("quick-release-progress-bar").style.width = `${progress}%`;
-      document.getElementById("quick-release-status").textContent = uploading
-        ? `${progress}% · Đang gửi bản cập nhật`
-        : preparingSeed ? "Đang chuẩn bị seed" : `${progress}% · Đang tạo bản cập nhật`;
+      const active = targets.find(game => game.statusType === "checking") || targets[0];
+      document.getElementById("quick-release-progress-bar").style.width = `${active.releaseStep === "hashing" ? active.progress : 0}%`;
+      document.getElementById("quick-release-status").textContent = statusTextFor(active);
     }
 
     function submitCreateVersion() {
@@ -4531,46 +4541,10 @@ Nhập tên thư mục hoặc đường dẫn đầy đủ:`, input.value);
       document.getElementById("btn-submit-version").disabled = true;
       document.getElementById("btn-submit-version").textContent = "Đang phát hành...";
       document.getElementById("btn-close-version").textContent = "Đóng";
-      targets.forEach(g => {
-        stopProgressTick(g.id);
-        g.statusType = "checking";
-        g.progressStage = "release_build";
-        g.progress = 5;
-        g.statusText = statusTextFor(g);
-      });
+      targets.forEach(g => startReleaseTick(g.id));
       syncReleaseModal(targets);
       renderGrid();
       closeModal("modal-version");
-      let completed = 0;
-      targets.forEach(g => {
-        const timer = setInterval(() => {
-          if (g.progressStage === "release_build" && g.progress < 70) {
-            g.progress = Math.min(70, g.progress + 15);
-          } else if (g.progressStage === "release_build") {
-            g.progressStage = "seed_initialization";
-          } else if (g.progressStage === "seed_initialization") {
-            g.progressStage = "release_upload";
-            g.progress = 90;
-          } else {
-            stopProgressTick(g.id);
-            g.version = nextVersionTag(g.version);
-            g.publishedAt = utc7Minute();
-            g.statusType = "seeding";
-            g.progressStage = "seeding";
-            g.progress = 100;
-            g.statusText = "Đang seed";
-            completed += 1;
-          }
-          if (completed === targets.length) {
-            appendLog("success", `Đã tạo torrent toàn bộ thư mục game và xuất bản phiên bản mới cho ${targets.length} game.`);
-            showToast("Đã tạo bản cập nhật và bắt đầu seed.");
-          } else {
-            syncReleaseModal(targets);
-          }
-          renderGrid();
-        }, 450);
-        progressTimers.set(g.id, timer);
-      });
     }
 
     function toggleVersionPaths() {
