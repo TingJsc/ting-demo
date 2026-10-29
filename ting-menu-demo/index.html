@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Ting Menu - Game Hub</title>
+<!-- Media: fallback hiện trong khi tải; lỗi tạm retry tối đa4lần, backoff1/2/4giây+jitter, chung4slot. Demo dùng asset nội bộ nên không gọi LAN/cloud. -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config={theme:{extend:{
@@ -186,7 +187,8 @@ body{font-family:"Segoe UI",Arial,sans-serif}
 "use strict";
 /* Interactive UI Design Preview (Môi trường demo tương tác; ứng dụng production apps/ting-menu lấy 100% dữ liệu thật từ ting-update). */
 const previewParams=new URLSearchParams(location.search);
-const licenseActive=previewParams.get("license")!=="invalid";
+// Menu remains usable even when the Update license is absent or expired.
+const licenseActive=true;
 const GAMES=[
   {id:"lol",name:"League of Legends",cat:"online",genre:"MOBA",status:"ready",is_hot:true,size:"22.4 GB",ver:"14.18",exe:"LeagueClient.exe",path:"G:\\Online\\League of Legends\\LeagueClient.exe",icon:"assets/source/game-lol.png",poster:"assets/source/poster-lol.png"},
   {id:"gta5",name:"Grand Theft Auto V",cat:"offline",genre:"Thế giới mở",status:"ready",is_promoted:true,size:"110 GB",ver:"1.0.3095",exe:"GTA5.exe",path:"G:\\Offline\\GTA V\\GTA5.exe",icon:"assets/source/game-gta.png",poster:"assets/source/game-gta-poster.png"},

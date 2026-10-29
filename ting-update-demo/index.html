@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Product version and Admin verification configuration come from the executable, independently of cached Slint/runtime code. -->
 <html lang="vi" data-theme="dark">
 
 <head>
@@ -1746,7 +1747,41 @@
       .stats-grid,.shortcut-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .settings-card > div[style*="display: flex"] { flex-wrap:wrap; gap:8px; }
     }
-  </style>
+
+
+    .download-drive {box-sizing:border-box;width:100%;min-width:0;padding:12px;border:1px solid var(--border-color);border-radius:7px;cursor:pointer;background:var(--bg-card);color:var(--text-primary)}
+    .download-drive.selected {border-color:#168ce8;background:#172d40}
+    [data-theme="light"] .download-drive.selected {background:#e8f3ff}
+    .download-drive:focus-visible {outline:2px solid #168ce8;outline-offset:2px}
+    .drive-heading {display:flex;align-items:center;gap:7px;min-height:24px;font-size:14px;margin-bottom:9px}
+    .drive-badge {padding:3px 7px;border-radius:4px;background:#234363;color:#c8e5ff;font-size:10px;font-weight:500}
+    [data-theme="light"] .drive-badge {background:#cce4fa;color:#164c78}
+    .drive-heading .btn-action {margin-left:auto;font-size:11px;padding:3px 7px}
+    .drive-choice {margin-left:auto;display:grid;place-items:center;flex:0 0 14px;height:14px;box-sizing:border-box;border:1px solid var(--border-color);border-radius:3px;color:transparent;background:#16171b;font-size:10px;font-weight:800}
+    [data-theme="light"] .drive-choice {background:#fff}
+    .drive-heading .btn-action + .drive-choice {margin-left:0}
+    .selected .drive-choice {background:var(--accent-blue);border-color:var(--accent-blue);color:#fff}
+    .drive-choice.single {border-radius:50%;color:transparent;background:#16171b}
+    [data-theme="light"] .drive-choice.single {background:#fff}
+    .selected .drive-choice.single {color:transparent;position:relative}
+    .selected .drive-choice.single::after {content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent-blue)}
+    .drive-capacity-row {display:flex;align-items:center;gap:8px;font-size:11px;white-space:nowrap}
+    .drive-meter {flex:1;min-width:36px;height:5px;background:#3d4856;border-radius:3px;overflow:hidden}
+    [data-theme="light"] .drive-meter {background:#cbd5e1}
+    .drive-meter span {display:block;margin-left:0;margin-right:auto;height:100%;background:#168ce8}.drive-used {font-size:10px;color:var(--text-secondary)}
+    #download-storage-settings {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px}
+    #download-storage-onboarding,#download-location-cards {display:grid;grid-template-columns:minmax(0,1fr);gap:10px;width:100%}
+    #download-storage-settings>.drive-help {grid-column:1/-1}
+    .drive-editor {width:100%;min-width:0}.drive-editor-footer {display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}.drive-editor-footer span {flex:1;font-size:12px;color:var(--text-secondary)}
+    .drive-help {font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0}
+    .drive-editor>.drive-help {margin-bottom:12px}
+    #modal-drive-location .form-row {display:block} #modal-drive-location .modal-body {gap:12px}
+    #download-location-cards {gap:8px;align-content:start;padding-bottom:8px}
+    #modal-activation .license-phase {padding:16px;border-radius:8px;background:#172d40;color:var(--text-primary);font-size:14px;line-height:1.5}
+    [data-theme="light"] #modal-activation .license-phase {background:#e8f3ff}
+    #modal-activation .license-phase small {display:block;color:var(--text-secondary);font-size:11px;margin-bottom:8px}
+
+</style>
 </head>
 
 <body>
@@ -1757,7 +1792,7 @@
       <div class="titlebar-logo">
         <img src="../logo-update.svg" alt="Ting Update" style="height: 22px; width: 22px; object-fit: contain;">
       </div>
-      <span class="titlebar-title">Ting Update</span>
+      <span class="titlebar-title">Ting Update [TEST]</span>
     </div>
   </header>
 
@@ -1773,7 +1808,7 @@
         <div class="sidebar-brand">
           <div class="brand-logo-wrap">
             <img src="../logo-update.svg" alt="Ting Update" class="brand-logo-img">
-            <span class="brand-tag">Update</span>
+            <span class="brand-tag">TEST · Update</span>
           </div>
           <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Thu nhỏ sidebar">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -2194,7 +2229,7 @@
                   Ổ G:\ (Đã dùng: 590 GB · Trống: 410 GB · Tổng: 1.00 TB)
                 </div>
               </div>
-              <button class="btn-action" onclick="openModal('modal-root-gate')">Đổi ổ game chính...</button>
+              <button class="btn-action" onclick="openModal('modal-root-gate')">Danh sách ổ tải...</button>
             </div>
 
             <!-- Capacity Bar -->
@@ -2249,7 +2284,7 @@
                   <option value="err">Err</option>
                 </select>
                 <button class="btn-action" onclick="clearLogs()">Xóa log</button>
-                <button class="btn-action" onclick="showToast('Đang mở thư mục Log...')">Mở thư mục Log</button>
+                <button class="btn-action" title="Mở thư mục log Ting Update; không cần license hoặc service online" onclick="showToast('Đã mở thư mục log Ting Update')">Mở thư mục Log</button>
               </div>
             </div>
             <div class="terminal-box" id="terminal-log-content">
@@ -2338,25 +2373,10 @@
 
           <div class="settings-card">
             <div class="form-group">
-              <label class="form-label">Ổ game chính</label>
-              <div class="form-row">
-                <input type="text" class="form-input" value="G:\" readonly style="width: 260px;">
-                <button class="btn-action" onclick="hideFieldError('settings-root-drive-error'); openModal('modal-root-gate')">Chọn ổ...</button>
-              </div>
-              <span class="form-hint">Chỉ lưu tên ổ gốc, không chọn thư mục tùy ý.</span>
-              <div id="settings-root-restart-warn" style="display: none; font-size: 11px; color: #d49a2e;">Cần restart Ting Update Service trước khi áp dụng ổ mới.</div>
-              <div id="settings-root-drive-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
+              <label class="form-label">Cài đặt danh sách ổ đĩa để tải</label>
+              <div class="drive-editor"><p class="drive-help">Chọn ổ tải game mới. Game đã cài giữ nguyên vị trí.</p><div id="download-storage-settings"></div>
+              <div class="drive-editor-footer"><span id="drive-draft-state">Đã lưu</span><button class="btn-action" id="drive-reset" onclick="resetDownloadStorage()">Hủy thay đổi</button><button class="btn-action primary" id="drive-save" onclick="submitRootGate()">Lưu thay đổi</button></div></div>
             </div>
-
-            <div class="form-group">
-              <div class="form-row" style="justify-content: space-between;">
-                <label class="form-label">Ổ game phụ</label>
-                <button class="btn-action" onclick="addSecondaryDriveSetting()">+ Thêm ổ game phụ</button>
-              </div>
-              <div id="secondary-drive-settings" style="display: flex; flex-direction: column; gap: 6px;"></div>
-              <span class="form-hint">Mặc định chưa cấu hình. Mỗi lần nhấn Thêm tạo một dòng textbox rỗng, Chọn và Lưu; không giới hạn số dòng.</span>
-            </div>
-
             <div class="form-group">
               <label class="form-label">Số game xử lý file đồng thời</label>
               <div class="form-row">
@@ -2535,19 +2555,11 @@
     <div class="context-item" id="ctx-open-folder" role="menuitem" tabindex="0">
       <span>Mở thư mục chứa Game</span>
     </div>
-    <!-- 8. Tải game chưa cài về ổ phụ -->
-    <div class="context-item" id="ctx-download-secondary" role="menuitem" tabindex="0">
-      <span>Tải về ổ đĩa phụ...</span>
-    </div>
     <!-- 9. Di chuyển giữa ổ chính và ổ phụ -->
     <div class="context-item" id="ctx-move-drive" role="menuitem" tabindex="0">
       <span>Di chuyển game...</span>
     </div>
-    <!-- 9. Thông tin game chi tiết -->
-    <div class="context-item" id="ctx-properties" role="menuitem" tabindex="0">
-      <span>Thông tin game chi tiết...</span>
-    </div>
-    <!-- LocalGame chỉ được Sửa/Xóa/Xem chi tiết; không có thao tác folder/torrent -->
+<!-- LocalGame chỉ được Sửa/Xóa/Xem chi tiết; không có thao tác folder/torrent -->
     <div class="context-item" id="ctx-edit-local" role="menuitem" tabindex="0">
       <span>Sửa Game local...</span>
     </div>
@@ -2649,18 +2661,18 @@
   <div class="modal-overlay" id="modal-drive-location">
     <div class="modal-card" style="max-width: 540px;">
       <div class="modal-header">
-        <span class="modal-title" id="drive-location-title">Tải về ổ đĩa phụ</span>
+        <span class="modal-title" id="drive-location-title">Chọn ổ tải game</span>
         <button class="modal-close-btn" onclick="closeModal('modal-drive-location')">✕</button>
       </div>
       <div class="modal-body">
         <div>
           <div style="font-size: 14px; font-weight: 700;" id="location-game-name">Counter-Strike 2</div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="location-game-desc">Ghi nhớ ổ game phụ cho lần tải này và các lần cập nhật sau</div>
+          <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;" id="location-game-desc">Ghi nhớ ổ game phụ cho lần tải này và các lần cập nhật sau</div>
         </div>
         <div class="form-group">
           <label class="form-label">Ổ game đích</label>
           <div class="form-row">
-            <select class="adv-search-select" id="target-drive-select" style="width: 100%;"></select>
+            <div id="download-location-cards"></div>
           </div>
         </div>
         <div id="location-dialog-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
@@ -2681,10 +2693,17 @@
       </div>
       <div class="modal-body">
         <div style="font-size: 11.5px; color: var(--text-muted);">
-          Service tự lấy lại bản quyền còn hạn hoặc đăng ký dùng thử 30 ngày trong thời gian ưu đãi. Có bản quyền thì tự vào ứng dụng; nếu không, hãy nhập key.
+          <button class="btn-action" onclick="renderLicenseCheckDemo('checking')">Thử lại</button>
+          <div class="license-phase"><small>Trạng thái hiện tại</small><strong id="license-check-state">Đang kiểm tra bản quyền…</strong></div>
+          <details style="margin-top:12px"><summary>Điều khiển demo</summary><label>Trạng thái mô phỏng:
+          <select onchange="renderLicenseCheckDemo(this.value)">
+          <option value="checking">Đang kiểm tra</option><option value="trial">Đang xin trial</option>
+          <option value="retry">Lỗi mạng / chờ thử lại</option><option value="success">Trial thành công</option>
+          <option value="expired">Đã xác nhận hết hạn</option></select></label></details>
+          <button class="btn-action primary" id="license-check-continue" style="display:none" onclick="closeModal('modal-activation');continueLicenseDemo()">Tiếp tục chọn ổ tải</button>
         </div>
         <div class="form-group">
-          <label class="form-label">Key bản quyền</label>
+          <label class="form-label">Bạn đã có key bản quyền?</label>
           <input class="form-input" id="activation-token-input" placeholder="TUP-XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX">
         </div>
         <div id="activation-dialog-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
@@ -2698,26 +2717,18 @@
 
   <!-- Modal 6: Chọn ổ đĩa gốc -->
   <div class="modal-overlay" id="modal-root-gate">
-    <div class="modal-card" style="max-width: 480px;">
+    <div class="modal-card" style="max-width: 580px;">
       <div class="modal-header">
-        <span class="modal-title">Chọn Ổ Lưu Trữ Game Mặc Định</span>
-        <button class="modal-close-btn" onclick="closeModal('modal-root-gate')">✕</button>
+        <span class="modal-title">Cài đặt danh sách ổ đĩa để tải</span>
+        <button class="modal-close-btn" onclick="resetDownloadStorage();closeModal('modal-root-gate')">✕</button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Danh sách ổ đĩa phát hiện:</label>
-          <select class="adv-search-select" id="root-gate-select" style="width: 100%;">
-            <option value="G:\" selected>Ổ G:\ (410 GB trống / 1.0 TB)</option>
-            <option value="D:\">Ổ D:\ (Dữ liệu - 250 GB trống / 512 GB)</option>
-            <option value="E:\">Ổ E:\ (SSD Tốc độ cao - 180 GB trống / 500 GB)</option>
-          </select>
-        </div>
-        <div style="font-size: 11px; color: var(--text-muted);">Xác nhận ổ đang dùng để bật tải/kiểm tra game server. Game local vẫn hoạt động nếu chưa xác nhận.</div>
+        <p class="drive-help">Chọn ổ tải game mới. Game đã cài giữ nguyên vị trí.</p><div id="download-storage-onboarding"></div>
         <div id="root-drive-error" style="display: none; font-size: 11px; color: var(--status-error-color);"></div>
       </div>
       <div class="modal-footer">
-        <button class="btn-action" onclick="closeModal('modal-root-gate')">Hủy</button>
-        <button class="btn-action primary" id="root-gate-submit" onclick="submitRootGate()">Áp dụng</button>
+        <button class="btn-action" onclick="resetDownloadStorage();closeModal('modal-root-gate')">Hủy</button>
+        <button class="btn-action primary" id="root-gate-submit" onclick="submitRootGate()">Lưu và tiếp tục</button>
       </div>
     </div>
   </div>
@@ -2859,6 +2870,9 @@
         <div id="wizard-step-1" style="display: flex; flex-direction: column; gap: 12px;">
           <!-- Trial/mua key mới được nạp từ demo dùng chung cuối file. -->
         </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action" title="Mở thư mục log Ting Update; không cần license hoặc service online" onclick="showToast('Đã mở thư mục log Ting Update')">Mở Log</button>
       </div>
     </div>
   </div>
@@ -3332,6 +3346,13 @@
       }, 300);
     }
     function startDownloadOne(g) {
+      if (g.statusType === "not_downloaded") {
+        if (downloadStorage.selected.length > 1 && !g.forceDownload) { openDriveLocationModal(g.id, "download"); return false; }
+        const target = g.forceDownload ? downloadStorage.default : downloadStorage.selected[0];
+        if (!target) return false;
+        g.path = target + g.path.replace(/^[A-Z]:\\/i, "");g.rootDrive = target;
+        if (!g.forceDownload) downloadStorage.last = target;
+      }
       if (isLocalLike(g) || !["not_downloaded", "error"].includes(g.statusType)) return false;
       g.progress = 0;
       delete g.progressStage;
@@ -3754,7 +3775,8 @@
           syncSelection();
         });
 
-        tr.addEventListener("dblclick", () => {
+        tr.addEventListener("dblclick", (e) => {
+          if (e.target.closest("button, input, a") || e.ctrlKey || e.metaKey || e.shiftKey) return;
           openGameProperties(game.id);
         });
 
@@ -3960,7 +3982,6 @@
       const itemStop = document.getElementById("ctx-stop");
       const itemRecheck = document.getElementById("ctx-recheck");
       const itemRepair = document.getElementById("ctx-repair-structure");
-      const itemDownloadSecondary = document.getElementById("ctx-download-secondary");
       const itemMoveDrive = document.getElementById("ctx-move-drive");
       const itemOpenFolder = document.getElementById("ctx-open-folder");
       const itemEditLocal = document.getElementById("ctx-edit-local");
@@ -3985,13 +4006,12 @@
       // 4. Kiểm tra game: enable
       setContextItemState(itemRecheck, gateOpen && isSrvOnline && !transferBlocked);
       setContextItemState(itemRepair, gateOpen && isSrvOnline && !transferBlocked && game.payloadOrigin === "downloaded" && !["not_downloaded", "downloading", "checking"].includes(game.statusType));
-      setContextItemState(itemDownloadSecondary, gateOpen && isSrvOnline && !transferBlocked && secondaryDrives.length > 0 && game.statusType === "not_downloaded");
-      setContextItemState(itemMoveDrive, gateOpen && isSrvOnline && !transferBlocked && secondaryDrives.length > 0 && !["not_downloaded", "downloading", "checking"].includes(game.statusType));
+      setContextItemState(itemMoveDrive, gateOpen && isSrvOnline && !transferBlocked && downloadStorage.selected.some(drive => drive !== game.rootDrive) && !["not_downloaded", "downloading", "checking"].includes(game.statusType));
       setContextItemState(document.getElementById("ctx-priority"), gateOpen && isSrvOnline && !transferBlocked);
       setContextItemState(document.getElementById("ctx-delete"), gateOpen && isSrvOnline && !blockedByLocal);
       setContextItemState(itemEditLocal, gateOpen && isSrvOnline && isLocal);
-      // Local giữ Sửa/Xóa/Chi tiết; API conflict chỉ giữ Chi tiết.
-      [itemDl, itemPause, itemResume, itemStop, itemRecheck, itemRepair, itemDownloadSecondary, itemMoveDrive,
+      // Local giữ Sửa/Xóa; chi tiết mở bằng nhấp đúp cho cả Local và API conflict.
+      [itemDl, itemPause, itemResume, itemStop, itemRecheck, itemRepair, itemMoveDrive,
         document.getElementById("ctx-priority")].forEach(item => {
         if (item) item.style.display = transferBlocked ? "none" : "";
       });
@@ -4128,11 +4148,6 @@
       showToast(`Đang mở thư mục: ${g ? g.path : "G:\\"}...`);
     });
 
-    document.getElementById("ctx-download-secondary").addEventListener("click", () => {
-      if (document.getElementById("ctx-download-secondary").classList.contains("disabled")) return;
-      closeContextMenu();
-      openDriveLocationModal(currentContextGameId, "download");
-    });
 
     document.getElementById("ctx-move-drive").addEventListener("click", () => {
       if (document.getElementById("ctx-move-drive").classList.contains("disabled")) return;
@@ -4140,10 +4155,7 @@
       openDriveLocationModal(currentContextGameId, "move");
     });
 
-    document.getElementById("ctx-properties").addEventListener("click", () => {
-      closeContextMenu();
-      openGameProperties(currentContextGameId);
-    });
+
 
     document.getElementById("ctx-edit-local").addEventListener("click", () => {
       if (document.getElementById("ctx-edit-local").classList.contains("disabled")) return;
@@ -4391,41 +4403,50 @@
       appendLog("info", "Đã nhận yêu cầu kích hoạt bằng key");
       showToast("Đã nhận yêu cầu kích hoạt bằng key");
     }
+
+    const downloadStorage = {"selected": ["G:\\", "E:\\"], "default": "G:\\", "last": null};
+    const downloadDisks = [{"root": "G:\\", "free": 410, "total": 1000}, {"root": "E:\\", "free": 180, "total": 500}, {"root": "I:\\", "free": 700, "total": 1000}];
+    let downloadDraft = structuredClone(downloadStorage);
+    let locationTarget = "";
+    function driveCards(settings) {
+      const config=settings?downloadDraft:downloadStorage;
+      return downloadDisks.filter(d => settings || (config.selected.includes(d.root) && (driveLocationMode !== "move" || d.root !== games.find(g=>g.id===currentContextGameId)?.rootDrive))).map(d => {
+        const index=downloadDisks.indexOf(d), selected=settings?config.selected.includes(d.root):locationTarget===d.root, used=Math.round((d.total-d.free)*100/d.total);
+        return `<div class="download-drive ${selected?'selected':''}" role="${settings?'checkbox':'radio'}" aria-checked="${selected}" aria-label="Chọn ổ ${d.root}" tabindex="0" onclick="chooseDownloadDrive(${index},${settings?!selected:true},${settings})" onkeydown="if(event.target===this && (event.key===' '||event.key==='Enter')){event.preventDefault();this.click()}">
+          <div class="drive-heading"><strong>${d.root}</strong>${d.root===config.default?'<span class="drive-badge">Mặc định</span>':''}${d.root===downloadStorage.last?'<span class="drive-badge">Gần nhất</span>':''}
+          ${settings&&d.root!==config.default?`<button class="btn-action" ${!selected?'disabled':''} onclick="event.stopPropagation();downloadDraft.default=downloadDisks[${index}].root;renderDownloadStorage()">Đặt mặc định</button>`:''}<span class="drive-choice ${settings?'':'single'}" aria-hidden="true">✓</span></div>
+          <div class="drive-capacity-row"><span>Trống ${d.free} GB / ${d.total} GB</span><div class="drive-meter"><span style="width:${used}%"></span></div><span class="drive-used">Đã dùng ${used}%</span></div></div>`;
+
+      }).join('')+(settings?`<p class="drive-help">${JSON.stringify(downloadDraft)!==JSON.stringify(downloadStorage)?'Mặc định sau khi lưu':'Ổ tải mặc định'}: ${config.default}</p>`:'');
+    }
+    function resetDownloadStorage() {downloadDraft=structuredClone(downloadStorage);renderDownloadStorage();}
+    function chooseDownloadDrive(index,checked,settings) {
+      const drive=downloadDisks[index].root;
+      if(settings) downloadDraft.selected=checked?[...new Set([...downloadDraft.selected,drive])]:downloadDraft.selected.filter(d=>d!==drive);
+      else locationTarget=drive;
+      renderDownloadStorage();
+    }
+    function renderDownloadStorage() {
+      for(const id of ['download-storage-settings','download-storage-onboarding']) document.getElementById(id).innerHTML=driveCards(true);
+      const target=document.getElementById('download-location-cards');if(target)target.innerHTML=driveCards(false);
+      const dirty=JSON.stringify(downloadDraft)!==JSON.stringify(downloadStorage);
+      document.getElementById('drive-draft-state').textContent=dirty?'Có thay đổi chưa lưu':'Đã lưu';
+      document.getElementById('drive-save').disabled=!dirty;document.getElementById('drive-reset').disabled=!dirty;
+      document.getElementById('drive-location-submit').textContent=driveLocationMode==='move'?'Di chuyển':'Tải vào '+locationTarget;
+    }
+    function renderLicenseCheckDemo(phase) {
+      const labels={checking:'Đang kiểm tra bản quyền…',trial:'Đang đăng ký dùng thử 30 ngày…',retry:'Chưa kiểm tra được bản quyền. Đang chờ thử lại; vui lòng kiểm tra Internet.',success:'Đã kích hoạt dùng thử 30 ngày. Ngày hết hạn hiển thị trong phần Bản quyền.',expired:'Bản quyền đã hết hạn. Nhập key để tiếp tục.'};
+      document.getElementById('license-check-state').textContent=labels[phase];
+      document.getElementById('license-check-continue').style.display=phase==='success'?'':'none';
+    }
     function submitRootGate() {
-      const value = document.getElementById("root-gate-select").value;
-      if (!value) {
-        showFieldError("root-drive-error", "Chọn ổ game trước khi áp dụng");
-        return;
-      }
-      hideFieldError("root-drive-error");
-      if (!rootReady && value === demoSettings.rootDrive) {
-        rootReady = true;
-        closeModal("modal-root-gate");
-        document.getElementById("root-degraded-banner").classList.remove("visible");
-        appendLog("ok", `Đã xác nhận ổ game ${value}; bật lại tải/kiểm tra game server`);
-        showToast("Đã xác nhận ổ game");
-        renderGrid();
-        return;
-      }
-      const changed = value !== demoSettings.rootDrive;
-      closeModal("modal-root-gate");
-      demoSettings.rootDrive = value;
-      if (changed) rootReady = false;
-      const restartWarn = document.getElementById("settings-root-restart-warn");
-      if (restartWarn) restartWarn.style.display = changed ? "block" : "none";
-      document.getElementById("root-degraded-banner").classList.toggle("visible", !rootReady);
-      appendLog("info", `Đã lưu ổ game chính: ${value}${changed ? " (cần restart service rồi xác nhận)" : ""}`);
-      showToast("Đã nhận yêu cầu lưu ổ game chính");
+      if(!downloadDraft.selected.includes(downloadDraft.default)) return showToast('Chọn ít nhất một ổ và đặt ổ mặc định trong danh sách đã chọn.');
+      Object.assign(downloadStorage,structuredClone(downloadDraft));
+      rootReady=true;rootRestartRequired=false;closeModal('modal-root-gate');
+      document.getElementById('root-degraded-banner').classList.remove('visible');
+      renderDownloadStorage();renderGrid();showToast('Đã lưu danh sách ổ tải');
     }
-    function renderRootGateAction() {
-      const select = document.getElementById("root-gate-select");
-      const submit = document.getElementById("root-gate-submit");
-      if (!select || !submit) return;
-      submit.textContent = !rootReady && select.value === demoSettings.rootDrive
-        ? "Xác nhận ổ này và tiếp tục"
-        : "Áp dụng";
-    }
-    document.getElementById("root-gate-select").addEventListener("change", renderRootGateAction);
+    function renderRootGateAction() { renderDownloadStorage(); }
     function reconfigureMenuSettings() {
       const launcherPath = document.getElementById("settings-launcher-path")?.value || "C:\\Ting\\TingLauncher.exe";
       appendLog("info", `Đã cập nhật IP Server (${demoSettings.menuIp}) và Launcher (${launcherPath}) cho Ting Menu tại settings.ini`);
@@ -4454,7 +4475,12 @@
     }
 
     function gamePathsOverlap(a, b) {
-      const normalize = value => String(value || "").trim().replace(/[\\/]+$/, "").toLowerCase();
+      const normalize = value => {
+        let path = String(value || "").trim().replaceAll("\\", "/");
+        if (/^\/\/\?\/[a-z]:\//i.test(path)) path = path.slice(4);
+        else if (path.slice(0, 8).toLowerCase() === "//?/unc/") path = "//" + path.slice(8);
+        return path.replaceAll("/", "\\").replace(/\\+$/, "").toLowerCase();
+      };
       const left = normalize(a);
       const right = normalize(b);
       return !!left && !!right && (left === right || left.startsWith(right + "\\") || right.startsWith(left + "\\"));
@@ -4521,6 +4547,7 @@
     let screenState = wizardScreenParam === "0" ? 0 : wizardScreenParam === "1" || !wizardScreenParam ? 1 : 3;
     // License hợp lệ mở được màn hình và LocalGame; root chỉ là gate của transfer.
     let rootReady = wizardScreenParam !== "2";
+    let rootRestartRequired = false;
     function renderWizard() {
       const gate = document.getElementById("wizard-gate");
       const step0 = document.getElementById("wizard-step-0");
@@ -4544,7 +4571,8 @@
     function retryWizardConnection() {
       screenState = 1;
       appendLog("info", "Thử lại kết nối Ting Update Service");
-      renderWizard();
+      renderDownloadStorage();
+    renderWizard();
     }
     function copyWizardTingId() {
       showToast("Đã sao chép Ting ID");
@@ -4567,72 +4595,6 @@
       appendLog("info", `Đã đặt ưu tiên tải "${selectedPrio}" cho ${selectedIds.size} game`);
       showToast(`Đã đặt ưu tiên tải thành "${selectedPrio}" cho các game đã chọn.`);
       renderGrid();
-    }
-
-    // Danh sách ổ game phụ là động; mỗi lần thêm tạo một item độc lập.
-    const mainGameDrive = "G:\\";
-    const secondaryDrives = [];
-    let secondaryDriveSettingCount = 0;
-
-    function normalizeGameDrive(value) {
-      const match = value.trim().match(/^([A-Za-z]):(?:\\)?$/);
-      return match ? `${match[1].toUpperCase()}:\\` : "";
-    }
-
-    function refreshTargetDriveOptions(game, mode) {
-      const select = document.getElementById("target-drive-select");
-      const candidates = mode === "download"
-        ? secondaryDrives
-        : [mainGameDrive, ...secondaryDrives].filter(drive => drive !== game.rootDrive);
-      select.replaceChildren(...candidates.map(drive => {
-        const option = document.createElement("option");
-        option.value = drive;
-        option.textContent = `${drive === mainGameDrive ? "Ổ game chính" : "Ổ game phụ"} ${drive}`;
-        return option;
-      }));
-    }
-
-    function addSecondaryDriveSetting() {
-      const index = secondaryDriveSettingCount++;
-      const row = document.createElement("div");
-      row.className = "form-row";
-      row.dataset.secondaryDriveIndex = String(index);
-      row.innerHTML = `
-        <input type="text" class="form-input secondary-drive-input" placeholder="Nhập tên ổ, ví dụ X:\\" style="width: 260px;">
-        <button class="btn-action secondary-drive-browse">Chọn...</button>
-        <button class="btn-action primary secondary-drive-save">Lưu</button>`;
-      const input = row.querySelector(".secondary-drive-input");
-      row.querySelector(".secondary-drive-browse").addEventListener("click", () => {
-        showToast("Mở browser Windows để chọn ổ game phụ...");
-        input.focus();
-      });
-      row.querySelector(".secondary-drive-save").addEventListener("click", () => {
-        const value = normalizeGameDrive(input.value);
-        if (!value) {
-          showToast("Ổ game phụ phải có dạng X:\\");
-          return;
-        }
-        if (value === mainGameDrive) {
-          showToast("Ổ game phụ không được trùng ổ game chính");
-          return;
-        }
-        const previous = row.dataset.savedDrive || "";
-        const duplicate = secondaryDrives.some(drive => drive === value && drive !== previous);
-        if (duplicate) {
-          showToast(`${value} đã có trong danh sách ổ game phụ`);
-          return;
-        }
-        if (previous) {
-          secondaryDrives.splice(secondaryDrives.indexOf(previous), 1, value);
-        } else {
-          secondaryDrives.push(value);
-        }
-        row.dataset.savedDrive = value;
-        input.value = value;
-        showToast(`Đã lưu ổ game phụ ${value}`);
-      });
-      document.getElementById("secondary-drive-settings").appendChild(row);
-      input.focus();
     }
 
     // Xóa dữ liệu game Modal
@@ -4706,29 +4668,21 @@
       renderGrid();
     }
 
-    // Chọn ổ game phụ khi tải hoặc di chuyển game.
+    // Chọn ổ đã lưu khi tải hoặc di chuyển game.
     let driveLocationMode = "download";
     function openDriveLocationModal(gameId, mode) {
-      const g = games.find(x => x.id === gameId) || games[0];
-      driveLocationMode = mode;
-      document.getElementById("location-game-name").textContent = g.name;
-      document.getElementById("location-game-desc").textContent = mode === "move"
-        ? "Chuyển toàn bộ thư mục game sang ổ game đã cấu hình"
-        : "Ghi nhớ ổ game phụ cho lần tải này và các lần cập nhật sau";
-      document.getElementById("drive-location-title").textContent = mode === "move" ? "Di chuyển game" : "Tải về ổ đĩa phụ";
-      document.getElementById("drive-location-submit").textContent = mode === "move" ? "Di chuyển" : "Tải về ổ này";
-      refreshTargetDriveOptions(g, mode);
-      if (!document.getElementById("target-drive-select").value) {
-        showFieldError("location-dialog-error", "Chưa có ổ game phụ phù hợp");
-        openModal("modal-drive-location");
-        return;
-      }
-      hideFieldError("location-dialog-error");
-      openModal("modal-drive-location");
+      const g=games.find(g=>g.id===gameId); if(!g)return;
+      currentContextGameId=gameId;driveLocationMode=mode;
+      locationTarget=mode==='move' ? (downloadStorage.selected.find(d=>d!==g.rootDrive)||'') : (downloadStorage.selected.includes(downloadStorage.last)?downloadStorage.last:downloadStorage.default);
+      document.getElementById('location-game-name').textContent=g.name;
+      document.getElementById('drive-location-title').textContent=mode==='move'?'Di chuyển game':'Chọn ổ tải game';
+      document.getElementById('location-game-desc').textContent='Các lần cập nhật sau giữ nguyên vị trí game đã lưu.';
+
+      renderDownloadStorage();openModal('modal-drive-location');
     }
 
     function submitDriveLocation() {
-      const targetDrive = document.getElementById("target-drive-select").value;
+      const targetDrive = locationTarget;
       if (!targetDrive) {
         showFieldError("location-dialog-error", "Chọn ổ game đích trước khi tiếp tục");
         return;
@@ -4740,12 +4694,13 @@
         g.rootDrive = targetDrive;
         g.path = targetDrive + relativePath;
         if (driveLocationMode === "download") {
+          downloadStorage.last = targetDrive;
           g.statusType = "downloading";
           g.progress = 0;
           g.statusText = "0% · Đang tải";
           g.speed = "↓ 18.2 MB/s";
           startProgressTick(g.id);
-          appendLog("info", `Đã tải '${g.name}' về ổ phụ ${targetDrive} (từ ${fromDrive})`);
+          appendLog("info", `Đã tải '${g.name}' về ổ ${targetDrive} (từ ${fromDrive})`);
         } else {
           appendLog("info", `Đã di chuyển '${g.name}' từ ${fromDrive} sang ${targetDrive}`);
         }
@@ -4753,7 +4708,7 @@
       closeModal("modal-drive-location");
       showToast(driveLocationMode === "move"
         ? "Đã nhận yêu cầu di chuyển game"
-        : "Đã nhận yêu cầu tải về ổ đĩa phụ");
+        : "Đã nhận yêu cầu tải game");
       renderGrid();
     }
 
@@ -4961,6 +4916,8 @@
       showToast("Đang yêu cầu restart Ting Update Service...");
       setTimeout(() => {
         applyServiceState(true);
+        rootRestartRequired = false;
+        renderRootGateAction();
         if (button) { button.disabled = false; button.textContent = "Khởi động lại dịch vụ"; }
         showToast("Đã khởi động lại Ting Update Service");
       }, 900);
@@ -5013,6 +4970,7 @@
     appendLog("info", "Ting Update demo sẵn sàng — state JS + render lại, toast chỉ notify");
     document.getElementById("root-degraded-banner").classList.toggle("visible", !rootReady);
     renderGrid();
+    renderDownloadStorage();
     renderWizard();
     const previewModal = previewParams.get("modal");
     if (previewModal === "local-game") openLocalGameModal();

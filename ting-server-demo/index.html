@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Product version comes from the executable; cached Slint/runtime code does not own release metadata. -->
 <html lang="vi" data-theme="dark">
 
 <head>
@@ -1664,7 +1665,7 @@ body.secondary [data-action="open_executable"] { display:none !important; }
       <div class="titlebar-logo">
         <img src="../logo-server.svg" alt="Ting Server Logo" style="height: 22px; width: 22px; object-fit: contain;">
       </div>
-      <span class="titlebar-title">Ting Server — Chưa chọn vai trò</span>
+      <span class="titlebar-title">Ting Server [TEST] — Chưa chọn vai trò</span>
     </div>
   </header>
 
@@ -1679,7 +1680,7 @@ body.secondary [data-action="open_executable"] { display:none !important; }
         <div class="sidebar-brand">
           <div class="brand-logo-wrap">
             <img src="../logo-server.svg" alt="Ting Server Logo" class="brand-logo-img">
-            <span class="brand-tag">SERVER</span>
+            <span class="brand-tag">TEST · SERVER</span>
           </div>
           <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Thu nhỏ sidebar">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -2456,7 +2457,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
             <div class="form-group">
               <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
                 <span>File chạy</span>
-                <span id="exe-validation-msg" style="font-size: 11px; font-weight: normal; color: #f59e0b;">⚠ Chọn file EXE để bắt đầu</span>
+                <span id="exe-validation-msg" style="font-size: 11px; font-weight: normal; color: #f59e0b;">⚠ Chọn file EXE, BAT, CMD, COM hoặc VBS để bắt đầu</span>
               </label>
               <div class="form-row">
                 <input type="text" class="form-input" id="add-game-exe" placeholder="Đường dẫn tương đối tới file chạy (ví dụ: b1\Binaries\Win64\b1-Win64-Shipping.exe)" style="flex: 1;" oninput="onExeInputChanged()">
@@ -3070,9 +3071,9 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       serverMode = mode;
       previewSeedRegistration(mode === "UNCONFIGURED" ? "unconfigured" : "acknowledged");
       const roleLabel = mode === "UNCONFIGURED" ? "Chưa chọn vai trò" : mode === "SECONDARY" ? "Server phụ" : "Server chính";
-      document.title = "Ting Server — " + roleLabel;
+      document.title = "Ting Server [TEST] — " + roleLabel;
       document.querySelector(".titlebar-title").textContent = document.title;
-      document.querySelector(".brand-tag").textContent = mode === "UNCONFIGURED" ? "SERVER" : roleLabel.toLocaleUpperCase("vi");
+      document.querySelector(".brand-tag").textContent = "TEST · " + (mode === "UNCONFIGURED" ? "SERVER" : roleLabel.toLocaleUpperCase("vi"));
       localStorage.setItem("ting-demo-server-mode", mode);
       document.body.classList.toggle("secondary", mode === "SECONDARY");
       document.getElementById("server-mode-gate").style.display = mode === "UNCONFIGURED" ? "flex" : "none";
@@ -3104,7 +3105,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       if (g.statusType === "checking" && g.releaseStep) {
         const steps = { waiting: [1, "Chờ xử lý"], inventory: [2, "Đang quét folder game"], hashing: [3, "Đang băm và tạo torrent"], seed: [4, "Đang chuẩn bị seed"], waiting_upload: [5, "Chờ lượt upload"], ticket: [5, "Đang lấy quyền upload"], upload: [6, "Đang upload torrent"], publish: [7, "Đang công bố và lưu bản cập nhật"] };
         const [step, label] = steps[g.releaseStep];
-        text = `[${step}/7] ${g.releaseStep === "hashing" ? `[${pct}%] ` : ""}${label}`;
+        text = `[${step}/7] ${["hashing", "upload"].includes(g.releaseStep) ? `[${pct}%] ` : ""}${label}`;
       }
       else if (isQueued(g)) text = "Chờ xử lý";
       else if (g.statusType === "seeding") text = "Đang seed";
@@ -3114,7 +3115,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       }
       else if (g.statusType === "checking" && g.progressStage === "release_build") text = `${pct}% · Đang tạo bản cập nhật`;
       else if (g.statusType === "checking" && g.progressStage === "seed_initialization") text = "Đang chuẩn bị seed";
-      else if (g.statusType === "checking" && g.progressStage === "release_upload") text = "Đang upload torrent";
+      else if (g.statusType === "checking" && g.progressStage === "release_upload") text = `${pct}% · Đang gửi bản cập nhật`;
       else if (g.statusType === "checking" && g.progressStage === "game_check") text = `${pct}% · Đang kiểm tra file`;
       else if (g.statusType === "checking" && g.progressStage === "piece_check") text = `${pct}% · Đang kiểm tra phần đã có`;
       else if (g.statusType === "checking" && g.progressStage === "payload_verification") text = `${pct}% · Đang kiểm tra dữ liệu`;
@@ -3276,7 +3277,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
       g.progressStage = "download_queued";
       const timer = setInterval(() => {
         if (!isSrvOnline) return;
-        if (g.releaseStep === "hashing" && g.progress < 100) {
+        if (["hashing", "upload"].includes(g.releaseStep) && g.progress < 100) {
           g.progress = Math.min(100, g.progress + 20);
         } else {
           const next = phases[phases.indexOf(g.releaseStep) + 1];
@@ -3289,7 +3290,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
             appendLog("success", `Đã công bố bản cập nhật '${g.name}' và bắt đầu seed.`);
           } else {
             g.releaseStep = next;
-            g.progress = next === "hashing" ? 0 : null;
+            g.progress = ["hashing", "upload"].includes(next) ? 0 : null;
             g.progressStage = ["inventory", "hashing"].includes(next) ? "release_build" : next === "seed" ? "seed_initialization" : "release_upload";
           }
         }
@@ -3431,7 +3432,7 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
         msg.textContent = "✓ Đã nhập đường dẫn file chạy";
         msg.style.color = "#34c759";
       } else {
-        msg.textContent = "⚠ Chọn file EXE để bắt đầu";
+        msg.textContent = "⚠ Chọn file EXE, BAT, CMD, COM hoặc VBS để bắt đầu";
         msg.style.color = "#f59e0b";
       }
       inferCategoryFromFolder();
@@ -3742,7 +3743,8 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
         });
 
         // Double click xem thông tin chi tiết
-        tr.addEventListener("dblclick", () => {
+        tr.addEventListener("dblclick", (e) => {
+          if (e.target.closest("button, input, a") || e.ctrlKey || e.metaKey || e.shiftKey) return;
           openGameProperties(game.id);
         });
 
@@ -4408,9 +4410,15 @@ Kiểm tra lúc: Chưa có dữ liệu thực tế</div>
     }
 
     let categoryFoldersDirty = false;
+    function normalizeWindowsFolder(value) {
+      let path = String(value || "").trim().replaceAll("\\", "/");
+      if (/^\/\/\?\/[a-z]:\//i.test(path)) path = path.slice(4);
+      else if (path.slice(0, 8).toLowerCase() === "//?/unc/") path = "//" + path.slice(8);
+      return path.replaceAll("/", "\\");
+    }
     function categoryFolderRelative(value) {
       const root = demoSettings.rootDrive.replaceAll('\\', '/').replace(/\/+$/, '') + '/';
-      let folder = value.trim().replaceAll('\\', '/').replace(/\/+$/, '');
+      let folder = normalizeWindowsFolder(value).replaceAll('\\', '/').replace(/\/+$/, '');
       if (folder.toLowerCase().startsWith(root.toLowerCase())) folder = folder.slice(root.length);
       return folder && !/[/:]/.test(folder) && folder !== '.' && folder !== '..' ? folder : null;
     }
@@ -4521,12 +4529,12 @@ Nhập tên thư mục hoặc đường dẫn đầy đủ:`, input.value);
 
     function syncReleaseModal(targets) {
       const active = targets.find(game => game.statusType === "checking") || targets[0];
-      document.getElementById("quick-release-progress-bar").style.width = `${active.releaseStep === "hashing" ? active.progress : 0}%`;
+      document.getElementById("quick-release-progress-bar").style.width = `${["hashing", "upload"].includes(active.releaseStep) ? active.progress : 0}%`;
       document.getElementById("quick-release-status").textContent = statusTextFor(active);
     }
 
     function submitCreateVersion() {
-      const targets = games.filter(g => selectedIds.has(g.id));
+      const targets = games.filter(g => selectedIds.size > 0 ? selectedIds.has(g.id) : g.id === currentContextGameId);
       if (targets.length === 0) {
         showFieldError("quick-submit-error", "Chọn ít nhất một game để tạo bản cập nhật.");
         return;
@@ -4640,7 +4648,7 @@ Nhập tên thư mục hoặc đường dẫn đầy đủ:`, input.value);
 
     function submitAddGame() {
       const exe = document.getElementById("add-game-exe").value.trim();
-      const folder = document.getElementById("add-game-folder").value.trim() || "G:\\Offline Games\\custom-game";
+      const folder = normalizeWindowsFolder(document.getElementById("add-game-folder").value) || "G:\\Offline Games\\custom-game";
       const name = document.getElementById("add-game-name").value.trim() || "Game Mới";
       const id = document.getElementById("add-game-id").value.trim() || ("game-" + Date.now().toString().slice(-4));
       const version = document.getElementById("add-game-version").value.trim() || "v1";
